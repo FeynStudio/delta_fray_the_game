@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/verify.sh *)", "Bash(./scripts/guards.sh *)",
+      "Bash(git status *)", "Bash(git diff *)", "Bash(git log *)",
+      "Bash(git stash *)", "Bash(git switch *)", "Bash(git checkout *)",
+      "Bash(git add *)", "Bash(git commit *)", "Bash(git push origin task/*)",
+      "Read", "Edit", "Write", "Glob", "Grep", "Bash(npm test *)"
+    ],
+    "deny": [
+      "Bash(git push * main)", "Bash(git merge *)", "Bash(git reset --hard *)",
+      "Bash(rm -rf *)", "Bash(curl *)", "Bash(wget *)",
+      "Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)",
+      "Edit(./scripts/guards.sh)", "Edit(./scripts/verify.sh)", "Edit(./.github/**)",
+      "Edit(./agent-team/evals/cases/**)", "Edit(./agent-team/evals/*-rubric.md)",
+      "Edit(./.claude/settings.json)"
+    ]
+  }
+}
