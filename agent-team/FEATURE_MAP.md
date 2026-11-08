@@ -1,4 +1,5 @@
 Feature Map - product-a (Galaxy Shooter - Prototype 1)
+Feature plan doc: docs/PLAN.md source of truth for game features plan.
 Roles: Coordinator, Owner, Reviewer.
 
 1. Agent test hook (applies to all features)
@@ -7,7 +8,7 @@ The game draws on a canvas, so agents can't click elements. src/game.js exposes 
 - window.__game.press('Space' | 'Shift'): simulates input
 - window.__game.setState(state): loads a test scenario
 - window.__game.step(ms): advances the game clock
-Command-line checks: ./verify.sh --feature <name> runs that feature's unit tests (node --test tests/<name>.test.js) and a browser smoke check.
+Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guards, lint and all unit tests (node --test tests/*.test.js), then that feature's scenario and/or browser smoke check. --feature all (the default) runs every feature, so it only passes once the whole prototype is built. See section 9 for the harness contract.
 
 2. Map & Rendering
 - What it does: "I see the play area full screen with two triangle ships."
@@ -76,3 +77,18 @@ Command-line checks: ./verify.sh --feature <name> runs that feature's unit tests
 - Data access: no database or API in Prototype 1. All game state lives in one state object owned by src/game.js.
 - Errors and logging: use src/log.js (log.info, log.warn, log.error), silent unless ?debug=1. No bare console.log.
 - Tests: tests/<feature>.test.js with Node's built-in test runner (node --test). Copy the pattern from tests/rules.test.js.
+
+9. Test harness contract (set 2026-11-07; changing it needs a brief)
+- Files: scripts/run-scenario.mjs (rules scenarios), scripts/smoke.mjs (headless Chrome/Edge, no npm dependencies; set CHROME_PATH to choose a browser), scripts/serve.mjs (static server; npm run dev serves http://localhost:5173/index.html), scenarios/*.json (inputs), expected/*.json (correct output).
+- scenarios/ and expected/ are the spec. The owner never edits them to make a check pass; a wrong expectation goes back to the coordinator as a new brief.
+- Smoke checks save a screenshot next to their output in agent-team/evidence/T-###/ for the reviewer.
+- Every slice must keep guards green, so src/rules.js has to exist from slice 1 (it may start with just the functions below as they are built).
+- Config: src/config.js has a default export of one plain, mutable object with at least worldWidth, worldHeight, shipSize, maxMove and spawns: [{x, y, heading}, {x, y, heading}]. Rules read it at call time, so a scenario can override values.
+- State: { turn: 0 | 1, ships: [{x, y, heading, alive}, {x, y, heading, alive}], gauge }. Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
+- Move: { distance, angle, backward? }. angle is the world travel direction in degrees (same convention as heading).
+- Rules (pure, return a new state, never mutate input; run-scenario.mjs freezes inputs to enforce this):
+  - applyMove(state, move): moves ships[state.turn]; forward moves set heading to angle, backward moves keep it.
+  - resolveMove(state, move): applyMove plus swept-area hits and walls; destroyed ships get alive: false. No respawn, no turn change.
+  - endTurn(state): respawns destroyed ships at config.spawns[i] and passes the turn. game.js calls it after the move animation.
+- Gauge (in getState().gauge): { phase: 'power' | 'direction' | 'moving', power: 0..1, needle: degrees relative to the ship's heading (0 = straight ahead), backward: boolean, distance }. distance = power × maxMove once locked.
+- Debug API: getState() returns a copy; setState(state) accepts a modified copy; press() and real keydown events both work and keydown with repeat is ignored; step(ms) finishes the move animation and calls endTurn.

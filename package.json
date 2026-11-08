@@ -1,0 +1,15 @@
+{
+  "name": "galaxy-shooter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Galaxy Shooter Prototype 1: local hot-seat, plain JavaScript, no build step.",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test",
+    "verify": "bash scripts/verify.sh"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

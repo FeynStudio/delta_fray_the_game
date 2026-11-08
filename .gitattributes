@@ -1,2 +1,6 @@
 # Shell scripts must keep LF line endings so bash can run them on any OS
 *.sh text eol=lf
+# JSON fixtures and JS must keep LF so verify.sh diffs match on Windows (core.autocrlf)
+*.json text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf

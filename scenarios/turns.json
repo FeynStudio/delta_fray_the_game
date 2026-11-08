@@ -1,0 +1,179 @@
+{
+  "description": "rules.endTurn(state): respawns destroyed ships at config.spawns and passes the turn to the other player.",
+  "overrides": {
+    "maxMove": 150,
+    "worldWidth": 1280,
+    "worldHeight": 960,
+    "shipSize": 30,
+    "spawns": [
+      {
+        "x": 190,
+        "y": 480,
+        "heading": 0
+      },
+      {
+        "x": 1090,
+        "y": 480,
+        "heading": 180
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "destroyed enemy respawns and it becomes their turn (FEATURE_MAP 6)",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 300,
+            "y": 490,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        },
+        {
+          "call": "endTurn"
+        }
+      ],
+      "pick": [
+        "turn",
+        "ships.1.alive",
+        "ships.1.x",
+        "ships.1.y",
+        "ships.1.heading",
+        "ships.0.x"
+      ]
+    },
+    {
+      "name": "ship that hits the wall respawns",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 1200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 600,
+            "y": 200,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        },
+        {
+          "call": "endTurn"
+        }
+      ],
+      "pick": [
+        "turn",
+        "ships.0.alive",
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading",
+        "ships.1.x"
+      ]
+    },
+    {
+      "name": "double kill does not skip a turn",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 1150,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1220,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        },
+        {
+          "call": "endTurn"
+        }
+      ],
+      "pick": [
+        "turn",
+        "ships.0.alive",
+        "ships.0.x",
+        "ships.1.alive",
+        "ships.1.x"
+      ]
+    },
+    {
+      "name": "plain move passes the turn back",
+      "state": {
+        "turn": 1,
+        "ships": [
+          {
+            "x": 190,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 100,
+            "angle": 180
+          }
+        },
+        {
+          "call": "endTurn"
+        }
+      ],
+      "pick": [
+        "turn",
+        "ships.0.x",
+        "ships.1.x"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "description": "Config override: maxMove raised to 200 in config only; rules must accept and resolve a 200-unit move with no other edits.",
+  "overrides": {
+    "maxMove": 200,
+    "worldWidth": 1280,
+    "worldHeight": 960,
+    "shipSize": 30
+  },
+  "cases": [
+    {
+      "name": "a 200-unit move is allowed when maxMove is 200",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 200,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y"
+      ]
+    },
+    {
+      "name": "a 200-unit move resolves when maxMove is 200",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 200,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.0.x",
+        "ships.1.alive"
+      ]
+    }
+  ]
+}

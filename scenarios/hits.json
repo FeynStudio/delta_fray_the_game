@@ -1,0 +1,278 @@
+{
+  "description": "rules.resolveMove(state, move): applies the move, then destroys (alive: false) any enemy inside the swept path and the mover if it reaches a wall. No respawn and no turn change here.",
+  "overrides": {
+    "maxMove": 150,
+    "worldWidth": 1280,
+    "worldHeight": 960,
+    "shipSize": 30
+  },
+  "cases": [
+    {
+      "name": "swept path destroys the enemy (FEATURE_MAP 5)",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 300,
+            "y": 490,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.0.x",
+        "ships.0.y",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "stopping short of the enemy misses",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 300,
+            "y": 490,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 50,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "enemy well beside the path survives",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 300,
+            "y": 600,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "enemy behind the start survives",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 150,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "reaching the wall destroys the mover",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 1200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 600,
+            "y": 200,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "stopping well before the wall is safe",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 1000,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 600,
+            "y": 200,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.0.x"
+      ]
+    },
+    {
+      "name": "hit then wall destroys both",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 1150,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1220,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive"
+      ]
+    },
+    {
+      "name": "player 2 can destroy player 1",
+      "state": {
+        "turn": 1,
+        "ships": [
+          {
+            "x": 1000,
+            "y": 470,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "resolveMove",
+          "move": {
+            "distance": 150,
+            "angle": 180
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.alive",
+        "ships.1.alive",
+        "ships.1.x"
+      ]
+    }
+  ]
+}

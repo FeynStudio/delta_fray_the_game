@@ -1,0 +1,218 @@
+{
+  "description": "rules.applyMove(state, move): moves the ship whose turn it is. move.angle is the world travel direction in degrees, 0 = right (+x), 90 = down (+y). Forward moves turn the heading to the travel direction; backward moves keep it.",
+  "overrides": {
+    "maxMove": 150,
+    "worldWidth": 1280,
+    "worldHeight": 960,
+    "shipSize": 30
+  },
+  "cases": [
+    {
+      "name": "max move straight ahead (FEATURE_MAP 4)",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 150,
+            "angle": 0
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading",
+        "ships.1.x",
+        "ships.1.y"
+      ]
+    },
+    {
+      "name": "forward move turns the heading; 90 degrees is down",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 100,
+            "angle": 90
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading"
+      ]
+    },
+    {
+      "name": "backward move keeps the heading",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 100,
+            "angle": 180,
+            "backward": true
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading"
+      ]
+    },
+    {
+      "name": "diagonal move uses degrees, not radians",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 100,
+            "angle": 45
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading"
+      ]
+    },
+    {
+      "name": "heading stays within 0 to 360",
+      "state": {
+        "turn": 0,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 50,
+            "angle": 270
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.0.y",
+        "ships.0.heading"
+      ]
+    },
+    {
+      "name": "only the player whose turn it is moves",
+      "state": {
+        "turn": 1,
+        "ships": [
+          {
+            "x": 200,
+            "y": 480,
+            "heading": 0,
+            "alive": true
+          },
+          {
+            "x": 1090,
+            "y": 480,
+            "heading": 180,
+            "alive": true
+          }
+        ]
+      },
+      "steps": [
+        {
+          "call": "applyMove",
+          "move": {
+            "distance": 100,
+            "angle": 180
+          }
+        }
+      ],
+      "pick": [
+        "ships.0.x",
+        "ships.1.x",
+        "ships.1.heading"
+      ]
+    }
+  ]
+}
