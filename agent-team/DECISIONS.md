@@ -7,3 +7,5 @@ Decided by human in session, 2026-11-08: "field render looks good."
 Decided by human in session, 2026-11-08: "T-002 build the whole sequence"
 
 Decided by human in session, 2026-11-08: "dark blue wording is very hard to see, switch to a different color"
+
+Decided by human in session, 2026-11-08: "see the power guage and direction selection on localhost. however, it does not distinguish who's turn it is. scale power gauge to 50% and have it show right below the ship itself. scale directional guage to 70% and show it right before the ship along its long axis. in addition, clicking shift makes the move goes backwards and show it right behind the ship along its long axis. so that the guages for power and direction follows where the ship goes."

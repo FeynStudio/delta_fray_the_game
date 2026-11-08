@@ -73,23 +73,66 @@ export function drawShips(ctx, state) {
   });
 }
 
-// Gauge panel layout at the bottom center of the map, in game units, from config at call time.
-export function gaugeLayout() {
-  const cx = config.worldWidth / 2;
-  const barY = config.worldHeight - config.gaugeMargin - config.gaugeBarHeight;
-  return {
-    bar: { x: cx - config.gaugeBarWidth / 2, y: barY, w: config.gaugeBarWidth, h: config.gaugeBarHeight },
-    dial: { x: cx, y: barY - config.gaugeGap - config.gaugeDialRadius, r: config.gaugeDialRadius },
+const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), Math.max(lo, hi));
+const rad = (deg) => (deg * Math.PI) / 180;
+
+// Lowest and highest y of a half-disc (radius r, centre y cy) whose arc faces angle a (radians).
+function halfDiscYRange(cy, r, a) {
+  const s = Math.sin(a), c = Math.abs(Math.cos(a));
+  return { top: cy - r * (s <= 0 ? 1 : c), bottom: cy + r * (s >= 0 ? 1 : c) };
+}
+
+// Gauge layout on the ship whose turn it is, in game units, from config at call time.
+// Follows the ship's current position and heading, so the gauges move with it.
+// - dial: a half-disc of fixed size (never scaled by distance) whose flat side sits just past the nose
+//   (forward) or just past the tail (backward), on the ship's long axis, arc facing away from the ship.
+// - bar: centred under the ship, just below it, or below the dial when the dial hangs lower.
+// Near a map edge both are clamped inside the map; the bar moves above the ship if it does not fit below.
+export function gaugeLayout(state) {
+  const ship = state.ships[state.turn];
+  const { backward, phase } = state.gauge;
+  const W = config.worldWidth, H = config.worldHeight, m = config.gaugeEdgeMargin;
+  const half = config.gaugeLineWidth / 2;
+  const pts = shipPoints(ship, config.shipSize, config.shipWidth);
+  const h = rad(ship.heading);
+  const fx = Math.cos(h), fy = Math.sin(h);
+
+  const r = config.gaugeDialRadius * config.gaugeDialScale;
+  const facing = rad(ship.heading + (backward ? 180 : 0));
+  const anchor = backward
+    ? { x: (pts[1].x + pts[2].x) / 2, y: (pts[1].y + pts[2].y) / 2 } // middle of the tail edge
+    : pts[0]; // nose
+  const sign = backward ? -1 : 1;
+  const push = config.gaugeDialGap + config.shipLineWidth / 2 + half;
+  const dial = {
+    x: clamp(anchor.x + sign * fx * push, m + r, W - m - r),
+    y: clamp(anchor.y + sign * fy * push, m + r, H - m - r),
+    r,
+    facing,
   };
+
+  const w = config.gaugeBarWidth * config.gaugePowerScale;
+  const bh = config.gaugeBarHeight * config.gaugePowerScale;
+  const shipEdge = config.shipLineWidth / 2 + half;
+  let below = Math.max(...pts.map((p) => p.y)) + shipEdge;
+  let above = Math.min(...pts.map((p) => p.y)) - shipEdge;
+  if (phase === 'direction') {
+    const d = halfDiscYRange(dial.y, r, facing);
+    below = Math.max(below, d.bottom + half);
+    above = Math.min(above, d.top - half);
+  }
+  let y = below + config.gaugePowerGap;
+  if (y + bh > H - m) y = above - config.gaugePowerGap - bh;
+  const bar = { x: clamp(ship.x - w / 2, m, W - m - w), y: clamp(y, m, H - m - bh), w, h: bh };
+  return { bar, dial };
 }
 
 const GAUGE_DIM = COLORS.dim;
-const rad = (deg) => (deg * Math.PI) / 180;
 
 // Power bar: fills with the reading in the power phase; shows the locked reading (dim) in the direction phase.
 export function drawPowerBar(ctx, state) {
   const { phase, power } = state.gauge;
-  const { bar } = gaugeLayout();
+  const { bar } = gaugeLayout(state);
   const color = SHIP_COLORS[state.turn % SHIP_COLORS.length];
   ctx.lineWidth = config.gaugeLineWidth;
   ctx.strokeStyle = phase === 'power' ? color : GAUGE_DIM;
@@ -98,22 +141,20 @@ export function drawPowerBar(ctx, state) {
   ctx.fillRect(bar.x, bar.y, bar.w * Math.min(Math.max(power, 0), 1), bar.h);
 }
 
-// Direction dial in the panel, turned to the active ship's heading so the needle points the way the
-// ship will travel. Only the active 180-degree side is drawn: around the nose (forward) or tail (backward).
-// Fixed size, never scaled by distance, and never drawn at the ship: no path or end-point preview.
+// Direction dial at the active ship: only the active 180-degree side is drawn, in front of the nose
+// (forward) or behind the tail (backward). Fixed size, never scaled by the locked distance, so it marks
+// no path or end point (docs/DESIGN.md "Do NOT Add").
 export function drawDirectionDial(ctx, state) {
-  const { needle, backward } = state.gauge;
-  const ship = state.ships[state.turn];
-  const { dial } = gaugeLayout();
-  const center = ship.heading + (backward ? 180 : 0);
-  const max = config.gaugeNeedleMax;
+  const { needle } = state.gauge;
+  const { dial } = gaugeLayout(state);
+  const max = rad(config.gaugeNeedleMax);
   ctx.lineWidth = config.gaugeLineWidth;
   ctx.strokeStyle = GAUGE_DIM;
   ctx.beginPath();
-  ctx.arc(dial.x, dial.y, dial.r, rad(center - max), rad(center + max));
+  ctx.arc(dial.x, dial.y, dial.r, dial.facing - max, dial.facing + max);
   ctx.closePath();
   ctx.stroke();
-  const a = rad(center + needle);
+  const a = dial.facing + rad(needle);
   ctx.strokeStyle = SHIP_COLORS[state.turn % SHIP_COLORS.length];
   ctx.beginPath();
   ctx.moveTo(dial.x, dial.y);
