@@ -1,17 +1,17 @@
-commit: cb4a8ba  branch: task/T-001-map-and-ships  2026-11-08T04:56:49Z
+commit: none  branch: none  2026-11-08T05:19:00Z
 PASS guards
 PASS lint
-✔ config holds the Prototype 1 starting values (0.6761ms)
-✔ config is a plain, mutable object (0.1084ms)
-✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.1508ms)
-✔ each spawned ship triangle lies fully inside the map without touching an edge (0.2294ms)
-✔ each spawn heading points at the other spawn (within 1 degree) (0.1463ms)
-✔ fitScale fills one window dimension and keeps the aspect ratio (0.7157ms)
-✔ shipPoints is an equilateral triangle with its tip along the heading (0.2186ms)
-✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.3273ms)
-✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.6227ms)
-✔ createInitialState reads config at call time (1.0068ms)
-✔ createInitialState does not share objects with config (0.1988ms)
+✔ config holds the Prototype 1 starting values (0.7157ms)
+✔ config is a plain, mutable object (0.1037ms)
+✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.1464ms)
+✔ each spawned ship triangle lies fully inside the map without touching an edge (0.263ms)
+✔ each spawn heading points at the other spawn (within 1 degree) (0.1682ms)
+✔ fitScale fills one window dimension and keeps the aspect ratio (0.795ms)
+✔ shipPoints is an equilateral triangle with its tip along the heading (0.2311ms)
+✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.2186ms)
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.4735ms)
+✔ createInitialState reads config at call time (0.7199ms)
+✔ createInitialState does not share objects with config (0.1892ms)
 ℹ tests 11
 ℹ suites 0
 ℹ pass 11
@@ -19,24 +19,8 @@ PASS lint
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 84.5305
+ℹ duration_ms 84.7965
 PASS unit tests
-FAIL render browser runs
---- expected/render-smoke.json	2026-11-07 23:55:24.341793700 -0500
-+++ agent-team/evidence/T-001/render-smoke.json	2026-11-07 23:56:50.781665400 -0500
-@@ -1,12 +1,3 @@
- {
--  "one canvas": true,
--  "fits the 1920x1080 window": true,
--  "aspect ratio kept at 1920x1080": true,
--  "no scrollbars at 1920x1080": true,
--  "aspect ratio kept at 1000x1000": true,
--  "no scrollbars at 1000x1000": true,
--  "sharp on a 2x screen": true,
--  "two ships": true,
--  "ships at their spawn points": true,
--  "ships face each other": true
-+  "error": "browser exited early (code 0)"
- }
-FAIL render browser output
-RESULT: FAIL
+PASS render browser runs
+PASS render browser output
+RESULT: PASS
