@@ -13,3 +13,6 @@ Decided by human in session, 2026-11-08: "see the power guage and direction sele
 Decided by human in session, 2026-11-08: "checked localhost and i do see the updates, however, scale power guage to 60% of its current size and move it away from the ship body for a bit so that it does not jump down when the directional guage displays. scale directional guage to 80% of its current size."
 
 Decided by human in session, 2026-11-08: "confirm all changes and looks good."
+
+Decided by human in session, 2026-11-08: "accept 1 and 2."
+Context: answers the main session's two questions after review round 1: (1) accept the human's own browser check plus unit tests in place of a screenshot showing the gauges for Done-when 5; (2) keep T-002 as one task at about 529 changed lines.

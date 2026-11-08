@@ -89,7 +89,7 @@ const reach = () => config.shipSize + config.gaugeDialGap + config.gaugeLineWidt
 const CASES = [
   { phase: 'power', power: 0.6 },
   { phase: 'direction', power: 0.6, distance: 0.6 * config.maxMove, needle: 30, backward: false },
-  { phase: 'direction', power: 1, distance: config.maxMove, needle: -90, backward: true },
+  { phase: 'direction', power: 1, distance: config.maxMove, needle: -config.gaugeNeedleMax, backward: true },
 ];
 const testShips = (x, y, heading) => [{ x, y, heading, alive: true }, { x: 1000, y: 800, heading: 180, alive: true }];
 
@@ -121,6 +121,9 @@ test('gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of 
   assert.ok(Math.abs(bar.w - config.gaugeBarWidth * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(bar.h - config.gaugeBarHeight * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(dial.r - config.gaugeDialRadius * config.gaugeDialScale) < 1e-9);
+  // Deliberately pinned, not derived: these two values are the human's decisions of 2026-11-08
+  // (agent-team/DECISIONS.md): power gauge 50%, then 60% of that (0.5 x 0.6); direction gauge 70%,
+  // then 80% of that (0.7 x 0.8). Change them only with a new human decision.
   assert.ok(Math.abs(config.gaugePowerScale - 0.5 * 0.6) < 1e-9);
   assert.ok(Math.abs(config.gaugeDialScale - 0.7 * 0.8) < 1e-9);
 });
