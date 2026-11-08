@@ -1,0 +1,24 @@
+commit: 35e99f9  branch: task/T-001-map-and-ships  2026-11-08T04:55:34Z
+GUARD FAIL [rules-exists]: src/rules.js must exist and hold all game rules
+FAIL guards
+PASS lint
+FAIL unit tests
+FAIL render browser runs
+--- expected/render-smoke.json	2026-11-07 23:55:24.341793700 -0500
++++ agent-team/evidence/T-001/render-smoke.json	2026-11-07 23:55:35.522793100 -0500
+@@ -1,12 +1,3 @@
+ {
+-  "one canvas": true,
+-  "fits the 1920x1080 window": true,
+-  "aspect ratio kept at 1920x1080": true,
+-  "no scrollbars at 1920x1080": true,
+-  "aspect ratio kept at 1000x1000": true,
+-  "no scrollbars at 1000x1000": true,
+-  "sharp on a 2x screen": true,
+-  "two ships": true,
+-  "ships at their spawn points": true,
+-  "ships face each other": true
++  "error": "browser exited early (code 0)"
+ }
+FAIL render browser output
+RESULT: FAIL
