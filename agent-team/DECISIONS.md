@@ -1,0 +1,1 @@
+Decided by human in session, 2026-11-07: "stack difference should not be a problem. the agents.md stack calls for typescript, react, and etc as it is the stack plan for the actual/live product-a game. however, for our starting point of building prototype 1, only javascript web browser app is needed as a first small step."
