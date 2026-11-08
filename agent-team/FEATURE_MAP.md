@@ -87,6 +87,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 - State: { turn: 0 | 1, ships: [{x, y, heading, alive}, {x, y, heading, alive}], gauge }. Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
 - Move: { distance, angle, backward? }. angle is the world travel direction in degrees (same convention as heading).
 - Rules (pure, return a new state, never mutate input; run-scenario.mjs freezes inputs to enforce this):
+  - createInitialState(): builds { turn: 0, ships at config.spawns[i] with alive: true, gauge } from config at call time (T-001). game.js uses it to start the game.
   - applyMove(state, move): moves ships[state.turn]; forward moves set heading to angle, backward moves keep it.
   - resolveMove(state, move): applyMove plus swept-area hits and walls; destroyed ships get alive: false. No respawn, no turn change.
   - endTurn(state): respawns destroyed ships at config.spawns[i] and passes the turn. game.js calls it after the move animation.
