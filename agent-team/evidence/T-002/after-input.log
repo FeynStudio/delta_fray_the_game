@@ -1,39 +1,47 @@
-commit: 212a97b  branch: task/T-002-controls-and-gauges  2026-11-08T15:08:42Z
+commit: e04554f  branch: task/T-002-controls-and-gauges  2026-11-08T15:45:40Z
 PASS guards
 PASS lint
-✔ config holds the Prototype 1 starting values (0.7365ms)
-✔ config is a plain, mutable object (0.1353ms)
-✔ spawns are on opposite sides of the map, 850 to 950 units apart (1.3331ms)
-✔ the ship triangle is narrower than equilateral (0.1563ms)
-✔ each spawned narrow ship, outline included, lies fully inside the map without touching an edge (0.3711ms)
-✔ each spawn heading points at the other spawn (within 1 degree) (0.2309ms)
-✔ the starting gauge is in the power phase (1.6057ms)
-✔ power sweeps with elapsed time, stays within 0..1 and turns back at both ends (1.206ms)
-✔ first Space locks distance = power x maxMove (0.2597ms)
-✔ first Space reads maxMove at call time (override to 200) (0.1888ms)
-✔ sweep speeds are read from config at call time (0.3364ms)
-✔ direction phase: needle sweeps with time within -max..max, backward starts false (1.4517ms)
-✔ Shift flips backward in the direction phase only (0.4186ms)
-✔ second Space launches and keeps the needle, backward and distance it had (0.1551ms)
-✔ Space, Shift and time change nothing in the moving phase (0.2259ms)
-✔ no function mutates the state passed in (0.752ms)
-✔ keyFromEvent maps Space and both Shift keys and ignores key repeat (0.2464ms)
-✔ fitScale fills one window dimension and keeps the aspect ratio (0.7474ms)
-✔ shipPoints is a narrow isosceles triangle with its tip along the heading (0.384ms)
-✔ drawShips draws outlines only: stroke, no fill or gradient (0.4179ms)
-✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.2616ms)
-✔ drawGauge only reads state and draws inside the gauge panel (no path or end-point marker) (1.5369ms)
-✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.4921ms)
-✔ createInitialState reads config at call time (0.8784ms)
-✔ createInitialState does not share objects with config (0.1954ms)
-ℹ tests 25
+✔ config holds the Prototype 1 starting values (0.7417ms)
+✔ config is a plain, mutable object (0.1199ms)
+✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.9925ms)
+✔ the ship triangle is narrower than equilateral (0.0957ms)
+✔ each spawned narrow ship, outline included, lies fully inside the map without touching an edge (0.2452ms)
+✔ each spawn heading points at the other spawn (within 1 degree) (0.139ms)
+✔ the starting gauge is in the power phase (1.8593ms)
+✔ power sweeps with elapsed time, stays within 0..1 and turns back at both ends (1.568ms)
+✔ first Space locks distance = power x maxMove (0.3332ms)
+✔ first Space reads maxMove at call time (override to 200) (0.2423ms)
+✔ sweep speeds are read from config at call time (0.3803ms)
+✔ direction phase: needle sweeps with time within -max..max, backward starts false (1.5361ms)
+✔ Shift flips backward in the direction phase only (0.484ms)
+✔ second Space launches and keeps the needle, backward and distance it had (0.1867ms)
+✔ Space, Shift and time change nothing in the moving phase (0.4321ms)
+✔ no function mutates the state passed in (0.9261ms)
+✔ keyFromEvent maps Space and both Shift keys and ignores key repeat (0.2445ms)
+✔ fitScale fills one window dimension and keeps the aspect ratio (1.0511ms)
+✔ shipPoints is a narrow isosceles triangle with its tip along the heading (0.3168ms)
+✔ drawShips draws outlines only: stroke, no fill or gradient (0.3862ms)
+✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.3359ms)
+✔ drawGauge only reads state and draws only around the active ship (2.2327ms)
+✔ gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of base size (read from config) (0.1482ms)
+✔ power bar sits below the active ship, clear of its body, centred on it (0.2013ms)
+✔ the power bar does not move when the dial appears or flips (any heading) (0.3658ms)
+✔ direction dial is on the nose side when forward and the tail side when backward, on the long axis (1.0738ms)
+✔ the dial size does not depend on the locked distance (no path preview) (0.3369ms)
+✔ gauges follow the ship: a moved ship carries its gauges along (0.1292ms)
+✔ near the map edges every gauge part stays inside the map (0.4228ms)
+✔ the power bar does not overlap the direction dial (3.1657ms)
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.6354ms)
+✔ createInitialState reads config at call time (0.8386ms)
+✔ createInitialState does not share objects with config (0.1932ms)
+ℹ tests 33
 ℹ suites 0
-ℹ pass 25
+ℹ pass 33
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 96.1217
+ℹ duration_ms 98.3684
 PASS unit tests
 PASS input browser runs
 PASS input browser output
