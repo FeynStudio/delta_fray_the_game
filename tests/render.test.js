@@ -116,24 +116,35 @@ test('drawGauge only reads state and draws only around the active ship', () => {
   assert.equal(calls.length, 0, 'nothing drawn in the moving phase');
 });
 
-test('gauges are scaled: power bar 50% and dial 70% of their base size (read from config)', () => {
+test('gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of base size (read from config)', () => {
   const { bar, dial } = gaugeLayout(gaugeState(0, { phase: 'direction' }));
   assert.ok(Math.abs(bar.w - config.gaugeBarWidth * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(bar.h - config.gaugeBarHeight * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(dial.r - config.gaugeDialRadius * config.gaugeDialScale) < 1e-9);
-  assert.equal(config.gaugePowerScale, 0.5);
-  assert.equal(config.gaugeDialScale, 0.7);
+  assert.ok(Math.abs(config.gaugePowerScale - 0.5 * 0.6) < 1e-9);
+  assert.ok(Math.abs(config.gaugeDialScale - 0.7 * 0.8) < 1e-9);
 });
 
-test('power bar sits just below the active ship, centred on it', () => {
+test('power bar sits below the active ship, clear of its body, centred on it', () => {
   for (const turn of [0, 1]) {
     const state = gaugeState(turn, { phase: 'power' });
     const ship = state.ships[turn];
     const { bar } = gaugeLayout(state);
     const lowest = Math.max(...shipPoints(ship, config.shipSize, config.shipWidth).map((p) => p.y));
-    assert.ok(bar.y > lowest, 'below the ship');
-    assert.ok(bar.y - lowest <= config.gaugePowerGap + config.shipLineWidth + config.gaugeLineWidth, 'right below');
+    assert.ok(bar.y > lowest + config.shipLineWidth, 'below the ship body');
+    assert.ok(bar.y - ship.y <= reach(), 'still close to the ship');
     assert.ok(Math.abs(bar.x + bar.w / 2 - ship.x) < 1e-9, 'centred under the ship');
+  }
+});
+
+test('the power bar does not move when the dial appears or flips (any heading)', () => {
+  for (const heading of [0, 45, 90, 135, 180, 237, 270, 315]) {
+    const ships = testShips(640, 400, heading);
+    const base = gaugeLayout(gaugeState(0, { phase: 'power' }, ships)).bar;
+    for (const backward of [false, true]) {
+      const { bar } = gaugeLayout(gaugeState(0, { phase: 'direction', backward }, ships));
+      assert.deepEqual(bar, base, `heading ${heading} backward ${backward}`);
+    }
   }
 });
 
@@ -190,7 +201,7 @@ test('near the map edges every gauge part stays inside the map', () => {
 });
 
 test('the power bar does not overlap the direction dial', () => {
-  for (const heading of [0, 45, 90, 135, 180, 270]) {
+  for (let heading = 0; heading < 360; heading += 15) {
     for (const backward of [false, true]) {
       const { bar, dial } = gaugeLayout(gaugeState(0, { phase: 'direction', backward }, testShips(640, 400, heading)));
       // Sample the whole bar: no point may fall inside the dial's half-disc.

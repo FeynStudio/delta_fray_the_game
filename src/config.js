@@ -16,10 +16,12 @@ const config = {
   // Drawn size = base size x scale.
   gaugeBarWidth: 240,
   gaugeBarHeight: 14,
-  gaugePowerScale: 0.5,
+  gaugePowerScale: 0.3, // 60% of the earlier 0.5 (human, 2026-11-08)
   gaugeDialRadius: 46,
-  gaugeDialScale: 0.7,
-  gaugePowerGap: 6, // space between the ship (or the dial, if it hangs lower) and the power bar below it
+  gaugeDialScale: 0.56, // 80% of the earlier 0.7 (human, 2026-11-08)
+  // The power bar sits this far below the farthest point the dial can ever reach from the ship centre,
+  // so it never overlaps the dial and never moves when the dial appears or flips.
+  gaugePowerGap: 4,
   gaugeDialGap: 4, // space between the nose (forward) or tail (backward) and the dial's flat side
   gaugeEdgeMargin: 4, // gauges are kept at least this far inside the map edges
   gaugeLineWidth: 2,

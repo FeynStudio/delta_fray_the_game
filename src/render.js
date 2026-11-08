@@ -76,21 +76,16 @@ export function drawShips(ctx, state) {
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), Math.max(lo, hi));
 const rad = (deg) => (deg * Math.PI) / 180;
 
-// Lowest and highest y of a half-disc (radius r, centre y cy) whose arc faces angle a (radians).
-function halfDiscYRange(cy, r, a) {
-  const s = Math.sin(a), c = Math.abs(Math.cos(a));
-  return { top: cy - r * (s <= 0 ? 1 : c), bottom: cy + r * (s >= 0 ? 1 : c) };
-}
-
 // Gauge layout on the ship whose turn it is, in game units, from config at call time.
 // Follows the ship's current position and heading, so the gauges move with it.
 // - dial: a half-disc of fixed size (never scaled by distance) whose flat side sits just past the nose
 //   (forward) or just past the tail (backward), on the ship's long axis, arc facing away from the ship.
-// - bar: centred under the ship, just below it, or below the dial when the dial hangs lower.
+// - bar: centred under the ship, a fixed distance below it: just past the farthest point the dial can
+//   reach in any heading or direction, so the bar never overlaps the dial and never moves with the phase.
 // Near a map edge both are clamped inside the map; the bar moves above the ship if it does not fit below.
 export function gaugeLayout(state) {
   const ship = state.ships[state.turn];
-  const { backward, phase } = state.gauge;
+  const { backward } = state.gauge;
   const W = config.worldWidth, H = config.worldHeight, m = config.gaugeEdgeMargin;
   const half = config.gaugeLineWidth / 2;
   const pts = shipPoints(ship, config.shipSize, config.shipWidth);
@@ -113,16 +108,11 @@ export function gaugeLayout(state) {
 
   const w = config.gaugeBarWidth * config.gaugePowerScale;
   const bh = config.gaugeBarHeight * config.gaugePowerScale;
-  const shipEdge = config.shipLineWidth / 2 + half;
-  let below = Math.max(...pts.map((p) => p.y)) + shipEdge;
-  let above = Math.min(...pts.map((p) => p.y)) - shipEdge;
-  if (phase === 'direction') {
-    const d = halfDiscYRange(dial.y, r, facing);
-    below = Math.max(below, d.bottom + half);
-    above = Math.min(above, d.top - half);
-  }
-  let y = below + config.gaugePowerGap;
-  if (y + bh > H - m) y = above - config.gaugePowerGap - bh;
+  // The nose is the ship point farthest from its centre, so a forward dial reaches farthest.
+  const dialReach = Math.hypot(pts[0].x - ship.x, pts[0].y - ship.y) + push + r + half;
+  const offset = dialReach + config.gaugePowerGap;
+  let y = ship.y + offset;
+  if (y + bh > H - m) y = ship.y - offset - bh;
   const bar = { x: clamp(ship.x - w / 2, m, W - m - w), y: clamp(y, m, H - m - bh), w, h: bh };
   return { bar, dial };
 }
