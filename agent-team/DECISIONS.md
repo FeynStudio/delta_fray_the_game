@@ -16,3 +16,6 @@ Decided by human in session, 2026-11-08: "confirm all changes and looks good."
 
 Decided by human in session, 2026-11-08: "accept 1 and 2."
 Context: answers the main session's two questions after review round 1: (1) accept the human's own browser check plus unit tests in place of a screenshot showing the gauges for Done-when 5; (2) keep T-002 as one task at about 529 changed lines.
+
+Decided by human in session, 2026-11-08: "refuse the move and leave ship where it is."
+Context: answers the coordinator's question about a move longer than maxMove (refuse vs. shorten to maxMove).
