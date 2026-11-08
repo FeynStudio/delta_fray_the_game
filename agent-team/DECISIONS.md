@@ -5,3 +5,5 @@ Decided by human in session, 2026-11-08: "the mock screen's size looks right. ma
 Decided by human in session, 2026-11-08: "field render looks good."
 
 Decided by human in session, 2026-11-08: "T-002 build the whole sequence"
+
+Decided by human in session, 2026-11-08: "dark blue wording is very hard to see, switch to a different color"

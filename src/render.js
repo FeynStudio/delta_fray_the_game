@@ -2,6 +2,14 @@
 // Drawing happens in game units; fitCanvas sets a transform that scales the world to the screen.
 import config from './config.js';
 
+// All drawing colours in one place. Lines must stay readable on the near-black background:
+// the light grey 'dim' (map border, inactive gauge parts) has about 8:1 contrast against it.
+export const COLORS = {
+  background: '#05060f',
+  dim: '#9aa5b8',
+  ships: ['#4fd1ff', '#ff6b6b'], // active gauge parts use the active player's ship colour
+};
+
 // Largest world-to-CSS-pixel scale that fits the window while keeping the aspect ratio.
 export function fitScale(viewWidth, viewHeight, worldWidth, worldHeight) {
   return Math.min(viewWidth / worldWidth, viewHeight / worldHeight);
@@ -39,14 +47,14 @@ export function shipPoints(ship, size, width) {
 }
 
 export function drawMap(ctx) {
-  ctx.fillStyle = '#05060f';
+  ctx.fillStyle = COLORS.background;
   ctx.fillRect(0, 0, config.worldWidth, config.worldHeight);
-  ctx.strokeStyle = '#3a4a7a';
+  ctx.strokeStyle = COLORS.dim;
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, config.worldWidth - 2, config.worldHeight - 2);
 }
 
-const SHIP_COLORS = ['#4fd1ff', '#ff6b6b'];
+const SHIP_COLORS = COLORS.ships;
 
 export function drawShips(ctx, state) {
   state.ships.forEach((ship, i) => {
@@ -75,7 +83,7 @@ export function gaugeLayout() {
   };
 }
 
-const GAUGE_DIM = '#3a4a7a';
+const GAUGE_DIM = COLORS.dim;
 const rad = (deg) => (deg * Math.PI) / 180;
 
 // Power bar: fills with the reading in the power phase; shows the locked reading (dim) in the direction phase.
