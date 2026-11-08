@@ -2,6 +2,8 @@
 
 ## Project
 - Purpose: Retro, web-based, real-time, pay-to-play multiplayer space game.
+- Design doc: docs/DESIGN.md (source of truth for game design; read before writing briefs).
+- Task briefs: agent-team/tasks/T-###.md, copied from agent-team/tasks/_TEMPLATE.md.
 - Stack: TypeScript 5, React, Vite; npm; Vitest for tests; Supabase for data; app code in src/, tests in tests/.
 - Run locally: npm ci, then cp .env.example .env, then npm run dev (opens at http://localhost:5173). Never edit .env values.
 - Verify: `./scripts/verify.sh T-###`; run npm ci first. Must pass before any task is called done.

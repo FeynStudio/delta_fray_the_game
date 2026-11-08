@@ -38,5 +38,3 @@ guard "no-magic-numbers" '(^|[^[:alnum:]_$])(1280|960|150|900)([^[:alnum:]_$]|$)
   src "Read tunable values from src/config.js" "config.js"
  
 exit $FAIL
- 
-Claude finished the response

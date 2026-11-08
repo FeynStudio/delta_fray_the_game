@@ -71,5 +71,3 @@ fi
  
 echo "RESULT: $([ $FAIL = 0 ] && echo PASS || echo FAIL)" | tee -a "$LOG"
 exit $FAIL
- 
-Claude finished the response
