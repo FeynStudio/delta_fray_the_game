@@ -6,6 +6,6 @@ export function createInitialState() {
   return {
     turn: 0,
     ships: config.spawns.map((s) => ({ x: s.x, y: s.y, heading: s.heading, alive: true })),
-    gauge: { phase: 'power', power: 0, needle: 0, backward: false, distance: 0 },
+    gauge: { phase: 'power', power: 0, needle: 0, backward: false, distance: 0, sweep: 1 },
   };
 }

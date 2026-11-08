@@ -65,7 +65,64 @@ export function drawShips(ctx, state) {
   });
 }
 
+// Gauge panel layout at the bottom center of the map, in game units, from config at call time.
+export function gaugeLayout() {
+  const cx = config.worldWidth / 2;
+  const barY = config.worldHeight - config.gaugeMargin - config.gaugeBarHeight;
+  return {
+    bar: { x: cx - config.gaugeBarWidth / 2, y: barY, w: config.gaugeBarWidth, h: config.gaugeBarHeight },
+    dial: { x: cx, y: barY - config.gaugeGap - config.gaugeDialRadius, r: config.gaugeDialRadius },
+  };
+}
+
+const GAUGE_DIM = '#3a4a7a';
+const rad = (deg) => (deg * Math.PI) / 180;
+
+// Power bar: fills with the reading in the power phase; shows the locked reading (dim) in the direction phase.
+export function drawPowerBar(ctx, state) {
+  const { phase, power } = state.gauge;
+  const { bar } = gaugeLayout();
+  const color = SHIP_COLORS[state.turn % SHIP_COLORS.length];
+  ctx.lineWidth = config.gaugeLineWidth;
+  ctx.strokeStyle = phase === 'power' ? color : GAUGE_DIM;
+  ctx.strokeRect(bar.x, bar.y, bar.w, bar.h);
+  ctx.fillStyle = phase === 'power' ? color : GAUGE_DIM;
+  ctx.fillRect(bar.x, bar.y, bar.w * Math.min(Math.max(power, 0), 1), bar.h);
+}
+
+// Direction dial in the panel, turned to the active ship's heading so the needle points the way the
+// ship will travel. Only the active 180-degree side is drawn: around the nose (forward) or tail (backward).
+// Fixed size, never scaled by distance, and never drawn at the ship: no path or end-point preview.
+export function drawDirectionDial(ctx, state) {
+  const { needle, backward } = state.gauge;
+  const ship = state.ships[state.turn];
+  const { dial } = gaugeLayout();
+  const center = ship.heading + (backward ? 180 : 0);
+  const max = config.gaugeNeedleMax;
+  ctx.lineWidth = config.gaugeLineWidth;
+  ctx.strokeStyle = GAUGE_DIM;
+  ctx.beginPath();
+  ctx.arc(dial.x, dial.y, dial.r, rad(center - max), rad(center + max));
+  ctx.closePath();
+  ctx.stroke();
+  const a = rad(center + needle);
+  ctx.strokeStyle = SHIP_COLORS[state.turn % SHIP_COLORS.length];
+  ctx.beginPath();
+  ctx.moveTo(dial.x, dial.y);
+  ctx.lineTo(dial.x + Math.cos(a) * dial.r, dial.y + Math.sin(a) * dial.r);
+  ctx.stroke();
+}
+
+// The active gauge: power bar in the power phase, plus the direction dial in the direction phase.
+export function drawGauge(ctx, state) {
+  const { phase } = state.gauge;
+  if (phase !== 'power' && phase !== 'direction') return;
+  drawPowerBar(ctx, state);
+  if (phase === 'direction') drawDirectionDial(ctx, state);
+}
+
 export function drawFrame(ctx, state) {
   drawMap(ctx);
   drawShips(ctx, state);
+  drawGauge(ctx, state);
 }

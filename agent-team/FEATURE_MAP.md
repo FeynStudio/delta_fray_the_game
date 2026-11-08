@@ -22,7 +22,8 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 3. Controls & Gauges
 - What it does: "I press Space to set distance, Shift to flip backward, Space again to launch."
-- Where it lives: src/input.js, gauge drawing in src/render.js
+- Where it lives: src/input.js (pure: stepGauge(state, ms), pressKey(state, 'Space' | 'Shift'), keyFromEvent(event)); keydown listener, animation loop and debug API in src/game.js; drawGauge / drawPowerBar / drawDirectionDial in src/render.js (panel at the bottom center of the map); sweep speeds, needle range and gauge layout in src/config.js (gauge*) (T-002)
+- Gauge state notes (T-002): the gauge also carries sweep: 1 | -1 (direction the active reading moves in), so a gauge edited through setState keeps sweeping smoothly. Both readings bounce back and forth. needle stays within -gaugeNeedleMax..+gaugeNeedleMax, positive = clockwise; backward: false measures it from the nose (world angle = heading + needle), backward: true from the tail (world angle = heading + 180 + needle). Shift toggles backward in the direction phase only. step(ms) only advances the gauge for now; in the moving phase it does nothing until the movement slice.
 - How a user reaches it: keyboard during their turn
 - How an agent drives it: __game.press('Space'), __game.step(ms), __game.press('Shift'), __game.press('Space'), then check getState().gauge; verify.sh --feature input
 - Inputs: Space at a 60% power reading; no Shift; Space at a 30° needle reading

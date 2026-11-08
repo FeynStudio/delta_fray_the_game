@@ -1,0 +1,44 @@
+commit: e29f9be  branch: task/T-002-controls-and-gauges  2026-11-08T14:44:10Z
+PASS guards
+PASS lint
+✔ config holds the Prototype 1 starting values (0.6802ms)
+✔ config is a plain, mutable object (0.1137ms)
+✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.8543ms)
+✔ the ship triangle is narrower than equilateral (0.1088ms)
+✔ each spawned narrow ship, outline included, lies fully inside the map without touching an edge (0.2466ms)
+✔ each spawn heading points at the other spawn (within 1 degree) (0.1327ms)
+✔ fitScale fills one window dimension and keeps the aspect ratio (0.7648ms)
+✔ shipPoints is a narrow isosceles triangle with its tip along the heading (0.2627ms)
+✔ drawShips draws outlines only: stroke, no fill or gradient (0.9393ms)
+✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.2452ms)
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.6071ms)
+✔ createInitialState reads config at call time (0.969ms)
+✔ createInitialState does not share objects with config (0.2957ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.8906
+PASS unit tests
+FAIL input browser runs
+--- expected/input-smoke.json	2026-11-08 09:43:55.645516300 -0500
++++ agent-team/evidence/T-002/input-smoke.json	2026-11-08 09:44:12.946314100 -0500
+@@ -1,12 +1,3 @@
+ {
+-  "starts on the power gauge": true,
+-  "first Space locks distance": true,
+-  "distance is 60% of max at a 60% reading": true,
+-  "direction defaults to forward": true,
+-  "second Space launches with no confirm step": true,
+-  "direction locked at 30 forward": true,
+-  "Shift ignored after direction is locked": true,
+-  "Shift flips the direction gauge to backward": true,
+-  "a real Space keypress locks distance": true,
+-  "key repeat does not count as a second press": true
++  "error": "browser exited early (code 0)"
+ }
+FAIL input browser output
+RESULT: FAIL

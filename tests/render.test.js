@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { drawShips, fitCanvas, fitScale, shipPoints } from '../src/render.js';
+import { drawGauge, drawShips, fitCanvas, fitScale, gaugeLayout, shipPoints } from '../src/render.js';
+import { createInitialState } from '../src/rules.js';
 
 const W = config.worldWidth;
 const H = config.worldHeight;
@@ -59,4 +60,43 @@ test('fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks
     assert.ok(Math.abs(w / h - W / H) <= 0.01, 'aspect kept');
     assert.ok(Math.abs(canvas.width - w * dpr) <= 2 && Math.abs(canvas.height - h * dpr) <= 2, 'sharp');
   }
+});
+
+test('drawGauge only reads state and draws inside the gauge panel (no path or end-point marker)', () => {
+  const deepFreeze = (o) => {
+    if (o && typeof o === 'object') { Object.values(o).forEach(deepFreeze); Object.freeze(o); }
+    return o;
+  };
+  const { dial } = gaugeLayout();
+  const panelTop = dial.y - dial.r;
+  const base = createInitialState();
+  const cases = [
+    { phase: 'power', power: 0.6 },
+    { phase: 'direction', power: 0.6, distance: 0.6 * config.maxMove, needle: 30, backward: false },
+    { phase: 'direction', power: 1, distance: config.maxMove, needle: -90, backward: true },
+  ];
+  for (const turn of [0, 1]) {
+    for (const g of cases) {
+      const state = deepFreeze({ ...structuredClone(base), turn, gauge: { ...base.gauge, ...g } });
+      const before = structuredClone(state);
+      const calls = [];
+      const ctx = new Proxy({}, {
+        get: (t, k) => (k in t ? t[k] : (...args) => calls.push([k, ...args])),
+        set: (t, k, v) => { t[k] = v; return true; },
+      });
+      drawGauge(ctx, state);
+      assert.deepEqual(state, before, 'state unchanged');
+      assert.ok(calls.some(([k]) => k === 'stroke' || k === 'strokeRect'), `${g.phase}: something is drawn`);
+      for (const [k, x, y] of calls) {
+        if (['moveTo', 'lineTo', 'arc', 'fillRect', 'strokeRect'].includes(k)) {
+          assert.ok(y >= panelTop - 1e-9 && y <= H, `${k} at y ${y} is outside the gauge panel`);
+          assert.ok(x >= 0 && x <= W, `${k} at x ${x} is outside the map`);
+        }
+      }
+      if (g.phase === 'direction') assert.ok(calls.some(([k]) => k === 'arc'), 'direction dial drawn');
+    }
+  }
+  const calls = [];
+  drawGauge(new Proxy({}, { get: () => (...a) => calls.push(a) }), deepFreeze({ ...base, gauge: { ...base.gauge, phase: 'moving' } }));
+  assert.equal(calls.length, 0, 'nothing drawn in the moving phase');
 });
