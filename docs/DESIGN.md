@@ -27,7 +27,7 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 ## Game Constants (starting values, in config.js)
 
 - Map: 1280 × 960 units
-- Ship: equilateral triangle, 30 units per side
+- Ship: The two long sides are still 30 units, but the back edge is now 16 units instead of 30, which makes the tip about 31 degrees.
 - Max move distance: 150 units
 - Spawn points: opposite edges, \~900 units apart
 - Gauge sweep: slow (careful aim, not reflexes)

@@ -26,7 +26,7 @@
 ### Map & Dimensions (starting values, tune in playtest)
 
 - Map: 1280 × 960 game units, scaled to fill the screen at any resolution (hit math stays in game units).
-- Ship: equilateral triangle, \~30 units per side, with a visible heading.
+- Ship: The two long sides are still 30 units, but the back edge is now 16 units instead of 30, which makes the tip about 31 degrees with a visible heading.
 - Max move distance: \~150 units.
 - Spawn points: opposite edges, \~900 units apart (opponents meet in roughly 3–6 moves).
 
