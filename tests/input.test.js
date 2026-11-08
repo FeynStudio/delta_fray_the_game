@@ -3,8 +3,8 @@
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { createInitialState } from '../src/rules.js';
-import { keyFromEvent, pressKey, stepGauge } from '../src/input.js';
+import { applyMove, createInitialState } from '../src/rules.js';
+import { keyFromEvent, moveFromGauge, pointAlong, pressKey, startMove, stepGauge, stepMove } from '../src/input.js';
 
 const original = structuredClone(config);
 afterEach(() => Object.assign(config, structuredClone(original)));
@@ -146,4 +146,65 @@ test('keyFromEvent maps Space and both Shift keys and ignores key repeat', () =>
   assert.equal(keyFromEvent({ code: 'ShiftRight', repeat: false }), 'Shift');
   assert.equal(keyFromEvent({ code: 'Space', repeat: true }), null);
   assert.equal(keyFromEvent({ code: 'KeyA', repeat: false }), null);
+});
+
+// A locked gauge (second Space pressed) on ship 0 with the given heading.
+const locked = (heading, gauge) => {
+  const s = createInitialState();
+  s.ships[0] = { ...s.ships[0], heading };
+  return deepFreeze({ ...s, gauge: { ...s.gauge, phase: 'moving', ...gauge } });
+};
+
+test('moveFromGauge: 60% power, needle 30, forward, heading 0 gives 0.6 x maxMove at 30 (FEATURE_MAP 3)', () => {
+  const m = moveFromGauge(locked(0, { distance: 0.6 * config.maxMove, needle: 30, backward: false }));
+  assert.ok(near(m.distance, 0.6 * config.maxMove));
+  assert.equal(m.angle, 30);
+  assert.equal(m.backward, false);
+});
+
+test('moveFromGauge: forward = heading + needle, backward = heading + 180 + needle, within 0..360', () => {
+  const cases = [
+    [0, -30, false, 330], [90, 45, false, 135], [180, 90, false, 270], [300, 80, false, 20],
+    [0, 30, true, 210], [180, 0, true, 0], [90, -60, true, 210], [270, 90, true, 180],
+  ];
+  for (const [heading, needle, backward, angle] of cases) {
+    const m = moveFromGauge(locked(heading, { distance: 50, needle, backward }));
+    assert.ok(near(m.angle, angle), `heading ${heading} needle ${needle} backward ${backward}: ${m.angle}`);
+    assert.equal(m.backward, backward);
+    assert.equal(m.distance, 50);
+  }
+});
+
+test('moveFromGauge uses the ship whose turn it is', () => {
+  const s = createInitialState();
+  const st = deepFreeze({ ...s, turn: 1, gauge: { ...s.gauge, phase: 'moving', distance: 10, needle: 10 } });
+  assert.equal(moveFromGauge(st).angle, s.ships[1].heading + 10);
+});
+
+test('pointAlong: start, middle and end of the segment, never past either end', () => {
+  const a = { x: 100, y: 200 }, b = { x: 160, y: 120 };
+  assert.deepEqual(pointAlong(a, b, 0), a);
+  assert.deepEqual(pointAlong(a, b, 0.5), { x: 130, y: 160 });
+  assert.deepEqual(pointAlong(a, b, 1), b);
+  assert.deepEqual(pointAlong(a, b, 1.7), b);
+  assert.deepEqual(pointAlong(a, b, -0.3), a);
+});
+
+test('startMove/stepMove: constant speed along the segment, ends exactly at the applyMove result', () => {
+  const T = config.moveAnimMs;
+  const s = locked(0, { distance: 0.6 * config.maxMove, needle: 30, backward: false });
+  const end = applyMove(s, moveFromGauge(s));
+  let m = startMove(s, end);
+  assert.equal(m.ships[0].heading, 30, 'forward move turns the ship as it starts');
+  assert.deepEqual(m.ships[0].x, s.ships[0].x);
+  const half = stepMove(deepFreeze(m), T / 2);
+  const mid = pointAlong(s.ships[0], end.ships[0], 0.5);
+  assert.ok(near(half.ships[0].x, mid.x) && near(half.ships[0].y, mid.y));
+  assert.equal(half.gauge.phase, 'moving');
+  m = stepMove(deepFreeze(half), T * 10);
+  assert.deepEqual(m.ships, end.ships);
+  assert.deepEqual(m.gauge, createInitialState().gauge);
+  assert.equal(m.turn, 0);
+  assert.equal('anim' in m, false);
+  assert.deepEqual(stepMove(deepFreeze(m), T), m, 'nothing to animate after the move');
 });

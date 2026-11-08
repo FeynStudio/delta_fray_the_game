@@ -23,7 +23,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 3. Controls & Gauges
 - What it does: "I press Space to set distance, Shift to flip backward, Space again to launch."
 - Where it lives: src/input.js (pure: stepGauge(state, ms), pressKey(state, 'Space' | 'Shift'), keyFromEvent(event)); keydown listener, animation loop and debug API in src/game.js; drawGauge / drawPowerBar / drawDirectionDial / gaugeLayout(state) in src/render.js (drawn only on the ship whose turn it is and following its position and heading every frame: power bar at 0.3 of base size a fixed distance below the ship that clears the dial in every heading, so it never moves with the phase; fixed-size direction dial at 0.56 of base size just in front of the nose, or just behind the tail when backward, on the long axis; clamped inside the map near edges); sweep speeds, needle range and gauge layout in src/config.js (gauge*) (T-002)
-- Gauge state notes (T-002): the gauge also carries sweep: 1 | -1 (direction the active reading moves in), so a gauge edited through setState keeps sweeping smoothly. Both readings bounce back and forth. needle stays within -gaugeNeedleMax..+gaugeNeedleMax, positive = clockwise; backward: false measures it from the nose (world angle = heading + needle), backward: true from the tail (world angle = heading + 180 + needle). Shift toggles backward in the direction phase only. step(ms) only advances the gauge for now; in the moving phase it does nothing until the movement slice.
+- Gauge state notes (T-002): the gauge also carries sweep: 1 | -1 (direction the active reading moves in), so a gauge edited through setState keeps sweeping smoothly. Both readings bounce back and forth. needle stays within -gaugeNeedleMax..+gaugeNeedleMax, positive = clockwise; backward: false measures it from the nose (world angle = heading + needle), backward: true from the tail (world angle = heading + 180 + needle). Shift toggles backward in the direction phase only. In the moving phase step(ms) runs the move animation instead (section 4).
 - How a user reaches it: keyboard during their turn
 - How an agent drives it: __game.press('Space'), __game.step(ms), __game.press('Shift'), __game.press('Space'), then check getState().gauge; verify.sh --feature input
 - Inputs: Space at a 60% power reading; no Shift; Space at a 30° needle reading
@@ -33,9 +33,9 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 4. Movement
 - What it does: "My ship flies the distance and direction I chose."
-- Where it lives: src/rules.js (math), animation in src/render.js
+- Where it lives: src/rules.js applyMove(state, move) and wrapDegrees (math; a move longer than config.maxMove is refused and the state returned unchanged, human decision 2026-11-08); src/input.js moveFromGauge(state) (locked gauge to Move), pointAlong(from, to, t), startMove(state, end) and stepMove(state, ms) (animation progress kept in state.anim = { from, to, elapsed }; the ship goes along the straight segment at constant speed and ends exactly on the applyMove result, then the gauge returns to the power phase with the same turn); src/game.js press() launches on the second Space and step(ms) runs stepMove; drawShips in src/render.js draws the ship where state puts it (no path, trail or end marker); animation length config.moveAnimMs (T-003)
 - How a user reaches it: the second Space press
-- How an agent drives it: unit test calling rules.applyMove(state, {distance, angle}); verify.sh --feature movement
+- How an agent drives it: unit test calling rules.applyMove(state, {distance, angle}); tests/game.test.js loads src/game.js in Node with a stubbed DOM and drives __game.press/step; verify.sh --feature movement
 - Inputs: ship at (200, 480) heading 0°, move 150 units at 0°
 - Correct output looks like: ship ends at (350, 480). A forward move turns the heading to the travel direction; a backward move keeps the heading.
 - Known traps: degrees vs. radians; y-axis pointing down on canvas; allowing distance over 150; letting the animation, not rules.js, decide the final position

@@ -8,6 +8,7 @@ const config = {
   shipWidth: 16, // width of the back edge; narrower than shipSize makes a slim triangle
   shipLineWidth: 2, // outline thickness; ships are drawn as an outline only
   maxMove: 150,
+  moveAnimMs: 600, // one move takes this long on screen, at constant speed along a straight line
   // Gauges (src/input.js). Slow sweeps favor careful aim over reflexes (docs/PLAN.md "Controls").
   gaugePowerSweepMs: 2000, // power reading 0 -> 1 (then back) takes this long
   gaugeNeedleSweepMs: 3000, // needle crosses its whole range (-max -> +max) in this long

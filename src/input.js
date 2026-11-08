@@ -8,8 +8,14 @@
 // - needle is in degrees within -config.gaugeNeedleMax..+config.gaugeNeedleMax, same rotation sense as
 //   heading (positive = clockwise on screen). backward: false measures it from the ship's nose
 //   (world angle = heading + needle); backward: true measures it from the ship's tail
-//   (world angle = heading + 180 + needle). The movement slice turns this into a world angle.
+//   (world angle = heading + 180 + needle). moveFromGauge turns this into a world angle.
+//
+// Move animation (T-003): after the second Space, game.js gets the end state from rules.applyMove and
+// calls startMove, which keeps state.anim = { from: {x, y}, to: ship, elapsed }. stepMove moves the ship
+// along the straight segment from -> to at constant speed and, after config.moveAnimMs, sets it to
+// exactly `to` (the applyMove result), drops anim and puts the gauge back in the power phase.
 import config from './config.js';
+import { createInitialState, wrapDegrees } from './rules.js';
 
 // Moves value by delta along a line that bounces between min and max (a triangle wave).
 // Returns the new value and the direction it is now moving in.
@@ -59,4 +65,45 @@ export function keyFromEvent(event) {
   if (event.code === 'Space') return 'Space';
   if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') return 'Shift';
   return null;
+}
+
+// Turns the locked gauge into a Move for the ship whose turn it is (convention at the top of this file).
+export function moveFromGauge(state) {
+  const { distance, needle, backward } = state.gauge;
+  const heading = state.ships[state.turn].heading;
+  return { distance, angle: wrapDegrees(heading + (backward ? 180 : 0) + needle), backward };
+}
+
+// Point at fraction t of the straight segment from -> to. t is clamped to 0..1, so it never overshoots.
+export function pointAlong(from, to, t) {
+  const k = Math.min(Math.max(t, 0), 1);
+  return { x: from.x + (to.x - from.x) * k, y: from.y + (to.y - from.y) * k };
+}
+
+const withShip = (state, ship) => ({
+  ...state,
+  ships: state.ships.map((s, j) => (j === state.turn ? ship : s)),
+});
+
+// Starts the move animation towards end (the rules.applyMove result for this state).
+// A forward move turns the ship to its new heading as the move starts.
+export function startMove(state, end) {
+  const ship = state.ships[state.turn];
+  const to = end.ships[state.turn];
+  const anim = { from: { x: ship.x, y: ship.y }, to, elapsed: 0 };
+  return { ...withShip(state, { ...ship, heading: to.heading }), anim };
+}
+
+// Advances the move animation by ms. Does nothing unless a move is running.
+export function stepMove(state, ms) {
+  const a = state.anim;
+  if (!a || state.gauge.phase !== 'moving' || !(ms > 0)) return state;
+  const elapsed = a.elapsed + ms;
+  if (elapsed >= config.moveAnimMs) {
+    const { anim: _done, ...rest } = withShip(state, a.to);
+    return { ...rest, gauge: createInitialState().gauge };
+  }
+  const ship = state.ships[state.turn];
+  const p = pointAlong(a.from, a.to, elapsed / config.moveAnimMs);
+  return { ...withShip(state, { ...ship, x: p.x, y: p.y }), anim: { ...a, elapsed } };
 }

@@ -1,6 +1,6 @@
 // Owns the single game state object and connects rules, input and rendering.
-import { createInitialState } from './rules.js';
-import { keyFromEvent, pressKey, stepGauge } from './input.js';
+import { applyMove, createInitialState } from './rules.js';
+import { keyFromEvent, moveFromGauge, pressKey, startMove, stepGauge, stepMove } from './input.js';
 import { drawFrame, fitCanvas } from './render.js';
 import log from './log.js';
 
@@ -14,14 +14,20 @@ function fit() {
   drawFrame(ctx, state);
 }
 
-// Same path for real keys and the debug API.
+// Same path for real keys and the debug API. The second Space launches the move: the end state comes
+// from rules.applyMove, and the animation only shows the ship getting there.
 function press(key) {
+  const launching = state.gauge.phase === 'direction';
   state = pressKey(state, key);
+  if (launching && state.gauge.phase === 'moving') {
+    state = startMove(state, applyMove(state, moveFromGauge(state)));
+  }
 }
 
-// Advances the game clock. For now only the gauge sweep; the move animation comes in a later slice.
+// Advances the game clock: the gauge sweep, or the move animation while a move runs.
+// Passing the turn (endTurn) comes with the turns slice.
 function step(ms) {
-  state = stepGauge(state, ms);
+  state = stepMove(stepGauge(state, ms), ms);
 }
 
 window.addEventListener('keydown', (event) => {
