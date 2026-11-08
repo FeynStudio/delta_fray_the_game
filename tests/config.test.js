@@ -9,6 +9,8 @@ test('config holds the Prototype 1 starting values', () => {
   assert.equal(config.worldWidth, 1280);
   assert.equal(config.worldHeight, 960);
   assert.equal(config.shipSize, 30);
+  assert.equal(config.shipWidth, 16);
+  assert.equal(config.shipLineWidth, 2);
   assert.equal(config.maxMove, 150);
   assert.equal(config.spawns.length, 2);
   for (const s of config.spawns) {
@@ -31,11 +33,16 @@ test('spawns are on opposite sides of the map, 850 to 950 units apart', () => {
   assert.ok(dist >= 850 && dist <= 950, `spawns are ${dist} units apart`);
 });
 
-test('each spawned ship triangle lies fully inside the map without touching an edge', () => {
+test('the ship triangle is narrower than equilateral', () => {
+  assert.ok(config.shipWidth > 0 && config.shipWidth < config.shipSize);
+});
+
+test('each spawned narrow ship, outline included, lies fully inside the map without touching an edge', () => {
+  const m = config.shipLineWidth / 2; // round-joined stroke reaches this far past each corner
   for (const s of config.spawns) {
-    for (const p of shipPoints(s, config.shipSize)) {
-      assert.ok(p.x > 0 && p.x < config.worldWidth, `corner x ${p.x} is not inside the map`);
-      assert.ok(p.y > 0 && p.y < config.worldHeight, `corner y ${p.y} is not inside the map`);
+    for (const p of shipPoints(s, config.shipSize, config.shipWidth)) {
+      assert.ok(p.x - m > 0 && p.x + m < config.worldWidth, `corner x ${p.x} is not inside the map`);
+      assert.ok(p.y - m > 0 && p.y + m < config.worldHeight, `corner y ${p.y} is not inside the map`);
     }
   }
 });

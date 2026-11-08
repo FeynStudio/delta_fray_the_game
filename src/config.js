@@ -4,7 +4,9 @@
 const config = {
   worldWidth: 1280,
   worldHeight: 960,
-  shipSize: 30, // equilateral triangle side length
+  shipSize: 30, // length of each of the two long sides (tip to back corner)
+  shipWidth: 16, // width of the back edge; narrower than shipSize makes a slim triangle
+  shipLineWidth: 2, // outline thickness; ships are drawn as an outline only
   maxMove: 150,
   // Opposite sides of the map on the horizontal center line, 900 units apart, facing each other.
   spawns: [

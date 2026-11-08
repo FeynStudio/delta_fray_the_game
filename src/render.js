@@ -23,14 +23,19 @@ export function fitCanvas(canvas, viewWidth, viewHeight, dpr) {
   return ctx;
 }
 
-// Triangle corners in game units: tip points along the heading, centroid at the ship position.
-export function shipPoints(ship, size) {
-  const r = size / Math.sqrt(3); // centroid-to-corner distance of an equilateral triangle
+// Slim isosceles triangle in game units: two long sides of length size, back edge of length width.
+// Tip points along the heading; the centroid sits at the ship position. Returns [tip, back1, back2].
+export function shipPoints(ship, size, width) {
+  const length = Math.sqrt(size * size - (width / 2) * (width / 2)); // tip to back edge
   const h = (ship.heading * Math.PI) / 180;
-  return [0, 120, 240].map((offset) => {
-    const a = h + (offset * Math.PI) / 180;
-    return { x: ship.x + r * Math.cos(a), y: ship.y + r * Math.sin(a) };
-  });
+  const fx = Math.cos(h), fy = Math.sin(h); // forward
+  const px = -fy, py = fx; // perpendicular
+  const backX = ship.x - (fx * length) / 3, backY = ship.y - (fy * length) / 3;
+  return [
+    { x: ship.x + (fx * 2 * length) / 3, y: ship.y + (fy * 2 * length) / 3 },
+    { x: backX + (px * width) / 2, y: backY + (py * width) / 2 },
+    { x: backX - (px * width) / 2, y: backY - (py * width) / 2 },
+  ];
 }
 
 export function drawMap(ctx) {
@@ -46,19 +51,17 @@ const SHIP_COLORS = ['#4fd1ff', '#ff6b6b'];
 export function drawShips(ctx, state) {
   state.ships.forEach((ship, i) => {
     if (!ship.alive) return;
-    const [tip, left, right] = shipPoints(ship, config.shipSize);
+    // Outline only: no fill, no shading. The slim shape shows the heading.
+    const [tip, left, right] = shipPoints(ship, config.shipSize, config.shipWidth);
     ctx.beginPath();
     ctx.moveTo(tip.x, tip.y);
     ctx.lineTo(left.x, left.y);
     ctx.lineTo(right.x, right.y);
     ctx.closePath();
-    ctx.fillStyle = SHIP_COLORS[i % SHIP_COLORS.length];
-    ctx.fill();
-    // Nose marker so the heading is visible at a glance.
-    ctx.beginPath();
-    ctx.arc(tip.x, tip.y, config.shipSize / 10, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
+    ctx.lineJoin = 'round'; // keeps the stroke within lineWidth / 2 of each corner
+    ctx.lineWidth = config.shipLineWidth;
+    ctx.strokeStyle = SHIP_COLORS[i % SHIP_COLORS.length];
+    ctx.stroke();
   });
 }
 
