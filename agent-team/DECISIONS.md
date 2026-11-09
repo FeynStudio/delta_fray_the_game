@@ -25,3 +25,63 @@ Context: the human was asked whether the team should build and review T-004 (hit
 
 Decided by human in session, 2026-11-09: "Any part (Recommended)"
 Context: the wall rule. The question was whether a ship dies when ANY part of its swept triangle touches or crosses the map edge, or only when its CENTER reaches the edge.
+
+Decided by human in session, 2026-11-09: "do not build anything yet."
+Context: applies to T-006..T-012. Briefs only; no build, branch or worktree until the human says to build.
+
+Decided by human in session, 2026-11-09: "answer to T-006 is A2 as no destroy if the ship hasn't moved since it spawned."
+Context: answers T-006's question (option A2). Conflicts with "Spawn protection" in docs/DESIGN.md "Do NOT Add" and docs/PLAN.md "Deferred Decisions"; docs update left to the human (see BACKLOG).
+
+Decided by human in session, 2026-11-09: "asnswer to T-007 is play does not wait for explosion; explosion look like triangle line breaking in uneven pieces and falls outward from ship's location and scale down 50% over 1 second; ship dies at wall's explosion appear inside the map."
+Context: answers T-007's three questions (waiting, look and length, wall position).
+
+Decided by human in session, 2026-11-09: "add T-009 as ship moving backwards should flip the ship image so the tip of triangle heads backwards during motion."
+Context: new request, briefed as T-009.
+
+Decided by human in session, 2026-11-09: "add T-010 as ship outline gradually disapear but maintain in loop in quick sucsessions to simulate spawn protection animation."
+Context: new request, briefed as T-010 (DRAFT; blink timing and fade questions open).
+
+Decided by human in session, 2026-11-09: "add T=011 as adding a retro game name wording on middle top of page as decal. the retro name decal is on top of all game mechanism so ship movement will not be impacted."
+Context: new request, briefed as T-011 ("T=011" as typed means T-011; DRAFT, title text open).
+
+Decided by human in session, 2026-11-09: "add T-012 as adding a score count for each ship in the corner to keep track of amount of enemy ships destroyed. destroying 1 enemy ship plus 1 score. hitting wall and die minus 2 points."
+Context: new request, briefed as T-012 (DRAFT; start value, negatives, corners and hit-then-wall open).
+
+Decided by human in session, 2026-11-09: "400ms"
+Context: answers question 1, T-010 blink cycle length (how long one fade cycle lasts).
+
+Decided by human in session, 2026-11-09: "fade to invisible"
+Context: answers question 2, T-010 fade depth (fade to fully invisible, or to a faint outline).
+
+Decided by human in session, 2026-11-09: "fade out then snap back"
+Context: answers question 3, T-010 loop shape (fade out then snap back to full, or a smooth fade out and in).
+
+Decided by human in session, 2026-11-09: "Delta Fray"
+Context: answers question 4, T-011 title text (the exact words the decal shows).
+
+Decided by human in session, 2026-11-09: "0"
+Context: answers question 5, T-012 starting score for both players.
+
+Decided by human in session, 2026-11-09: "yes"
+Context: answers question 6, T-012 whether a score can go below 0 (for example a wall death at 0 gives -2).
+
+Decided by human in session, 2026-11-09: "player 1 is top-left; player 2 is top-right; each in its ship colour"
+Context: answers question 7, T-012 which corners show the scores.
+
+Decided by human in session, 2026-11-09: "yes"
+Context: answers question 8, T-012 hit-then-wall in one move: whether both +1 and -2 apply (net -1).
+
+Decided by human in session, 2026-11-09: "ship point along the path when aim at an angle; game mechanism should flip the ship model first along the aim angle, then proceed as a forward movement"
+Context: answers question 9, T-009: (a) whether the drawn tip sticking out about 10 units past the hit area is OK, and (b) whether the tip points straight back or along the path when the aim is angled. Changes T-009 from a render-only flip to a rules change (T-009 back to DRAFT, see its open question).
+
+Decided by human in session, 2026-11-09: "yes"
+Context: answers question 10, T-006: whether a zero-distance move ends spawn protection.
+
+Decided by human in session, 2026-11-09: "do not consider prototype 2 yet"
+Context: answers question 11, Prototype 2 timing and stack (BACKLOG question closed for now).
+
+Decided by human in session, 2026-11-09: "keep the new heading just like a forward move with updated direction."
+Context: answers T-009 Q-A: after a backward move ends, does the ship keep its new heading (option 1, needs a separate brief changing expected/movement.json that the human approves) or turn back to its original heading (option 2). Option 1 chosen: T-009 READY (on hold); the expected/movement.json change is briefed as T-013, whose exact diff still needs the human's approval.
+
+Decided by human in session, 2026-11-09: "sending the gauge back to the power phase without moving the ship."
+Context: answers the T-003 step(ms) recovery question: when step(ms) finds the game in phase 'moving' with no `anim`, what should happen. Briefed as T-014 (READY, on hold).
