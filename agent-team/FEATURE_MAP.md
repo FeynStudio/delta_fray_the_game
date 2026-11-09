@@ -43,22 +43,22 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 5. Hit Detection & Edges
 - What it does: "If my path sweeps over the enemy, it explodes. If I reach the wall, I explode."
-- Where it lives: src/rules.js resolveMove(state, move) (applyMove, then the convex hull of the mover's start and end triangles in its new heading, as input.startMove turns the ship before it moves; separating axis test against each living enemy, touching counts; the mover is destroyed if any hull corner touches or crosses 0..config.worldWidth or 0..config.worldHeight, human decision 2026-11-09; a move over maxMove returns the state unchanged) and shipPoints(ship, size, width) (the one ship triangle, also drawn by render.js); tests in tests/hits.test.js (T-004). Called by src/game.js press() for every launched move (T-005).
+- Where it lives: src/rules.js resolveMove(state, move) (applyMove, then the convex hull of the mover's start and end triangles in its new heading, as input.startMove turns the ship before it moves; separating axis test against each living enemy, touching counts, except an enemy for which isSpawnProtected(state, j) is true, which survives the sweep (human decision 2026-11-09, A2; T-006); the mover is destroyed if any hull corner touches or crosses 0..config.worldWidth or 0..config.worldHeight, human decision 2026-11-09; a move over maxMove returns the state unchanged) and shipPoints(ship, size, width) (the one ship triangle, also drawn by render.js); tests in tests/hits.test.js (T-004) and tests/spawn.test.js (T-006). Called by src/game.js press() for every launched move (T-005).
 - How a user reaches it: automatically after every move
 - How an agent drives it: unit tests calling rules.resolveMove(state, move); verify.sh --feature hits
 - Inputs: ship A at (200, 480), enemy B at (300, 490), A moves 150 at 0°
-- Correct output looks like: B is destroyed; A survives at (350, 480). Hit-then-wall destroys both. Grazing contact counts as a hit.
+- Correct output looks like: B is destroyed; A survives at (350, 480). Hit-then-wall destroys both. Grazing contact counts as a hit. An enemy that has not moved since it spawned and still sits on its spawn point survives (spawn protection, T-006); a protected mover that reaches the wall still dies.
 - Known traps: checking only the end position instead of the swept area; missing grazing contacts; tunneling through the enemy on long moves; checking the wall before the enemy
 - Owner role: Reviewer owns the test cases; Owner owns the code
 
 6. Respawn & Turns
 - What it does: "When a ship is destroyed, a new one appears at its spawn point and play continues."
-- Where it lives: src/rules.js endTurn(state) (pure: every ship with alive: false is replaced by config.spawns[i], read at call time, with alive: true; living ships unchanged; turn flips exactly once, also after a double kill; other fields kept); src/game.js step(ms) (turn manager: when the move animation ends it puts the resolved end state in place and calls endTurn once, so the next player starts on the power gauge; nothing else changes the turn, so there is no turn timer); tests in tests/turns.test.js and tests/game.test.js (T-005). A destroyed enemy stays drawn until the move ends and reappears at its spawn in the same step.
+- Where it lives: src/rules.js endTurn(state) (pure: every ship with alive: false is replaced by config.spawns[i], read at call time, with alive: true and unmovedSinceSpawn: true; living ships unchanged; turn flips exactly once, also after a double kill; other fields kept); src/game.js step(ms) (turn manager: when the move animation ends it puts the resolved end state in place and calls endTurn once, so the next player starts on the power gauge; nothing else changes the turn, so there is no turn timer); tests in tests/turns.test.js and tests/game.test.js (T-005). A destroyed enemy stays drawn until the move ends and reappears at its spawn in the same step.
 - How a user reaches it: automatically after a destruction or the end of a move
 - How an agent drives it: __game.setState() with a destroyed ship, then getState(); verify.sh --feature turns
 - Inputs: Player 1 destroys Player 2's ship
 - Correct output looks like: Player 2's ship reappears at its spawn point, it becomes Player 2's turn, the game never ends, and there is no turn timer
-- Known traps: skipping a turn after a double kill; making spawn points attackable; adding spawn protection (deferred)
+- Known traps: skipping a turn after a double kill; making spawn points attackable. Spawn protection is settled (human decision 2026-11-09, A2, T-006): a ship that has not moved since it spawned (createInitialState or endTurn respawn) and still sits on its spawn point cannot be destroyed by an enemy sweep; any accepted move of its own ends it, including a distance-0 launch (human decision 2026-11-09). No time limit and no other protection. Traps: a protection flag alone would survive a setState teleport (scripts/smoke.mjs turnsProbe copies ship 1 from getState()), so isSpawnProtected also checks the position; ships without the field (scenario states) are not protected.
 - Owner role: Owner
 
 7. Config
@@ -85,12 +85,13 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 - Smoke checks save a screenshot next to their output in agent-team/evidence/T-###/ for the reviewer.
 - Every slice must keep guards green, so src/rules.js has to exist from slice 1 (it may start with just the functions below as they are built).
 - Config: src/config.js has a default export of one plain, mutable object with at least worldWidth, worldHeight, shipSize, maxMove and spawns: [{x, y, heading}, {x, y, heading}]. Rules read it at call time, so a scenario can override values.
-- State: { turn: 0 | 1, ships: [{x, y, heading, alive}, {x, y, heading, alive}], gauge }. Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
+- State: { turn: 0 | 1, ships: [{x, y, heading, alive, unmovedSinceSpawn?}, {x, y, heading, alive, unmovedSinceSpawn?}], gauge }. unmovedSinceSpawn (T-006) is true from createInitialState or an endTurn respawn until the ship's own accepted move sets it to false; a ship without it is treated as false. Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
 - Move: { distance, angle, backward? }. angle is the world travel direction in degrees (same convention as heading).
 - Rules (pure, return a new state, never mutate input; run-scenario.mjs freezes inputs to enforce this):
-  - createInitialState(): builds { turn: 0, ships at config.spawns[i] with alive: true, gauge } from config at call time (T-001). game.js uses it to start the game.
-  - applyMove(state, move): moves ships[state.turn]; forward moves set heading to angle, backward moves keep it.
-  - resolveMove(state, move): applyMove plus swept-area hits and walls; destroyed ships get alive: false. No respawn, no turn change.
-  - endTurn(state): respawns destroyed ships at config.spawns[i] and passes the turn. game.js calls it after the move animation.
+  - createInitialState(): builds { turn: 0, ships at config.spawns[i] with alive: true and unmovedSinceSpawn: true, gauge } from config at call time (T-001). game.js uses it to start the game.
+  - applyMove(state, move): moves ships[state.turn]; forward moves set heading to angle, backward moves keep it; sets the mover's unmovedSinceSpawn to false for any accepted move (distance 0 included); a move over maxMove returns the state unchanged.
+  - resolveMove(state, move): applyMove plus swept-area hits and walls; destroyed ships get alive: false, except a spawn-protected enemy, which stays alive. No respawn, no turn change.
+  - isSpawnProtected(state, i): true only if ships[i] is alive, has unmovedSinceSpawn === true and sits on config.spawns[i] (read at call time, within 1e-9). Used by resolveMove; T-010 draws it.
+  - endTurn(state): respawns destroyed ships at config.spawns[i] with unmovedSinceSpawn: true (living ships unchanged) and passes the turn. game.js calls it after the move animation.
 - Gauge (in getState().gauge): { phase: 'power' | 'direction' | 'moving', power: 0..1, needle: degrees relative to the ship's heading (0 = straight ahead), backward: boolean, distance }. distance = power × maxMove once locked.
 - Debug API: getState() returns a copy; setState(state) accepts a modified copy; press() and real keydown events both work and keydown with repeat is ignored; step(ms) finishes the move animation and calls endTurn.

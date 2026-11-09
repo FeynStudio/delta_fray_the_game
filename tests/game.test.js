@@ -109,7 +109,7 @@ test('turns smoke scenario: enemy destroyed on the path respawns, attacker stays
   ], 1, 0);
   game.step(10000);
   const s = game.getState();
-  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true });
+  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true, unmovedSinceSpawn: true });
   assert.ok(s.ships[0].alive === true && near(s.ships[0].x, 200 + config.maxMove) && near(s.ships[0].y, 480),
     JSON.stringify(s.ships[0]));
   assert.equal(s.turn, 1);
@@ -134,7 +134,7 @@ test('a move into the wall: the mover is back at its spawn point, alive, and the
   launchFrom(0, [{ x: 1200, y: 480, heading: 0, alive: true }, enemy], 1, 0);
   game.step(T());
   const s = game.getState();
-  assert.deepEqual(s.ships[0], { ...config.spawns[0], alive: true });
+  assert.deepEqual(s.ships[0], { ...config.spawns[0], alive: true, unmovedSinceSpawn: true });
   assert.deepEqual(s.ships[1], enemy);
   assert.equal(s.turn, 1);
   assert.equal(s.gauge.phase, 'power');
@@ -178,7 +178,7 @@ test('double kill through the game: both respawn, the turn passes once, and the 
   ], 1, 0);
   game.step(T());
   const s = game.getState();
-  assert.deepEqual(s.ships, [{ ...config.spawns[0], alive: true }, { ...config.spawns[1], alive: true }]);
+  assert.deepEqual(s.ships, [{ ...config.spawns[0], alive: true, unmovedSinceSpawn: true }, { ...config.spawns[1], alive: true, unmovedSinceSpawn: true }]);
   assert.equal(s.turn, 1);
   // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
   // so the ship whose turn it is is always alive when it launches.

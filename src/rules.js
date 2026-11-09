@@ -1,11 +1,12 @@
 // Pure game rules only (see docs/DESIGN.md Architecture Rules). Reads config at call time.
 import config from './config.js';
 
-// Builds the starting state: player 1 to move, both ships alive at their spawn points.
+// Builds the starting state: player 1 to move, both ships alive at their spawn points and
+// spawn protected (unmovedSinceSpawn: true, see isSpawnProtected).
 export function createInitialState() {
   return {
     turn: 0,
-    ships: config.spawns.map((s) => ({ x: s.x, y: s.y, heading: s.heading, alive: true })),
+    ships: config.spawns.map((s) => ({ x: s.x, y: s.y, heading: s.heading, alive: true, unmovedSinceSpawn: true })),
     gauge: { phase: 'power', power: 0, needle: 0, backward: false, distance: 0, sweep: 1 },
   };
 }
@@ -18,7 +19,8 @@ export function wrapDegrees(deg) {
 // Moves the ship whose turn it is by move.distance along move.angle (degrees, 0 = +x, 90 = +y).
 // A forward move turns the heading to the travel angle; a backward move keeps it.
 // A move longer than config.maxMove is refused: the state comes back unchanged
-// (human decision, 2026-11-08). No hits, walls, respawn or turn change here.
+// (human decision, 2026-11-08). Any accepted move, also one of distance 0, sets the mover's
+// unmovedSinceSpawn to false (human decision, 2026-11-09). No hits, walls, respawn or turn change here.
 export function applyMove(state, move) {
   if (move.distance > config.maxMove) return state;
   const i = state.turn;
@@ -29,6 +31,7 @@ export function applyMove(state, move) {
     x: ship.x + Math.cos(a) * move.distance,
     y: ship.y + Math.sin(a) * move.distance,
     heading: move.backward ? ship.heading : wrapDegrees(move.angle),
+    unmovedSinceSpawn: false,
   };
   return { ...state, ships: state.ships.map((s, j) => (j === i ? moved : s)) };
 }
@@ -51,6 +54,18 @@ export function shipPoints(ship, size, width) {
 
 // Floating-point slack in game units, so shapes that only just touch still count as touching.
 const TOUCH = 1e-9;
+
+// Spawn protection (human decision 2026-11-09, A2): ships[i] cannot be destroyed by an enemy's swept
+// area while it is alive, has not moved since it spawned (unmovedSinceSpawn === true) and still sits
+// on config.spawns[i] (read at call time, within TOUCH). The position check only matters for test
+// states moved through setState; in play only the ship's own move changes its position.
+// Ships without the field (scenario states) are not protected.
+export function isSpawnProtected(state, i) {
+  const ship = state.ships[i];
+  const spawn = config.spawns[i];
+  return Boolean(ship && spawn && ship.alive === true && ship.unmovedSinceSpawn === true
+    && Math.abs(ship.x - spawn.x) <= TOUCH && Math.abs(ship.y - spawn.y) <= TOUCH);
+}
 
 // Convex hull of points (monotone chain), counter-clockwise in screen axes, collinear points dropped.
 function convexHull(points) {
@@ -88,8 +103,8 @@ function polygonsOverlap(a, b) {
 // applyMove plus hits and walls (FEATURE_MAP sections 5 and 9). The mover's triangle, already turned
 // to its new heading as the move starts (as input.startMove draws it), sweeps the convex hull of its
 // start and end triangles. Every living enemy whose triangle overlaps or touches that area is
-// destroyed; the whole path counts, so an enemy hit before the wall is still destroyed. The mover is
-// destroyed if any part of the swept area touches or crosses a map edge (human decision 2026-11-09).
+// destroyed unless it is spawn protected (isSpawnProtected, human decision 2026-11-09); the whole path
+// counts, so an enemy hit before the wall is still destroyed. The mover is destroyed if any part of the swept area touches or crosses a map edge (human decision 2026-11-09).
 // Destroyed ships get alive: false where they are: no clamping, respawn or turn change here.
 // A move over config.maxMove is refused and the state comes back unchanged (applyMove).
 export function resolveMove(state, move) {
@@ -104,21 +119,24 @@ export function resolveMove(state, move) {
   const hitsWall = swept.some((p) => p.x <= TOUCH || p.y <= TOUCH || p.x >= W - TOUCH || p.y >= H - TOUCH);
   const ships = moved.ships.map((ship, j) => {
     if (j === i) return hitsWall ? { ...ship, alive: false } : ship;
-    if (ship.alive && polygonsOverlap(swept, shape(ship))) return { ...ship, alive: false };
+    if (ship.alive && !isSpawnProtected(moved, j) && polygonsOverlap(swept, shape(ship))) {
+      return { ...ship, alive: false };
+    }
     return ship;
   });
   return { ...moved, ships };
 }
 
 // Ends the turn after a move (FEATURE_MAP sections 6 and 9): every destroyed ship (alive: false) is
-// replaced by a new one at config.spawns[i] (read at call time), living ships stay as they are, and
+// replaced by a new, spawn protected one at config.spawns[i] (read at call time, unmovedSinceSpawn:
+// true), living ships stay as they are (their unmovedSinceSpawn too), and
 // the turn passes to the other player exactly once, also after a double kill. Other fields are kept.
 // When to call it is up to game.js (after the move animation). No turn timer, no end of game.
 export function endTurn(state) {
   const ships = state.ships.map((ship, i) => {
     if (ship.alive !== false) return ship;
     const { x, y, heading } = config.spawns[i];
-    return { x, y, heading, alive: true };
+    return { x, y, heading, alive: true, unmovedSinceSpawn: true };
   });
   return { ...state, ships, turn: state.turn === 0 ? 1 : 0 };
 }

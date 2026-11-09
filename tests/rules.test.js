@@ -13,7 +13,7 @@ test('createInitialState starts on turn 0 with both ships alive at their spawns'
   assert.equal(state.turn, 0);
   assert.equal(state.ships.length, 2);
   state.ships.forEach((ship, i) => {
-    assert.deepEqual(ship, { ...config.spawns[i], alive: true });
+    assert.deepEqual(ship, { ...config.spawns[i], alive: true, unmovedSinceSpawn: true });
   });
   assert.ok('gauge' in state);
 });
@@ -21,7 +21,7 @@ test('createInitialState starts on turn 0 with both ships alive at their spawns'
 test('createInitialState reads config at call time', () => {
   config.spawns = [{ x: 100, y: 200, heading: 45 }, config.spawns[1]];
   const state = createInitialState();
-  assert.deepEqual(state.ships[0], { x: 100, y: 200, heading: 45, alive: true });
+  assert.deepEqual(state.ships[0], { x: 100, y: 200, heading: 45, alive: true, unmovedSinceSpawn: true });
 });
 
 test('createInitialState does not share objects with config', () => {
