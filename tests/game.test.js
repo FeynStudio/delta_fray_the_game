@@ -178,7 +178,10 @@ test('double kill through the game: both respawn, the turn passes once, and the 
   ], 1, 0);
   game.step(T());
   const s = game.getState();
-  assert.deepEqual(s.ships, [{ ...config.spawns[0], alive: true, unmovedSinceSpawn: true }, { ...config.spawns[1], alive: true, unmovedSinceSpawn: true }]);
+  assert.deepEqual(s.ships, [
+    { ...config.spawns[0], alive: true, unmovedSinceSpawn: true },
+    { ...config.spawns[1], alive: true, unmovedSinceSpawn: true },
+  ]);
   assert.equal(s.turn, 1);
   // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
   // so the ship whose turn it is is always alive when it launches.

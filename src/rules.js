@@ -104,7 +104,8 @@ function polygonsOverlap(a, b) {
 // to its new heading as the move starts (as input.startMove draws it), sweeps the convex hull of its
 // start and end triangles. Every living enemy whose triangle overlaps or touches that area is
 // destroyed unless it is spawn protected (isSpawnProtected, human decision 2026-11-09); the whole path
-// counts, so an enemy hit before the wall is still destroyed. The mover is destroyed if any part of the swept area touches or crosses a map edge (human decision 2026-11-09).
+// counts, so an enemy hit before the wall is still destroyed. The mover is destroyed if any part of
+// the swept area touches or crosses a map edge (human decision 2026-11-09).
 // Destroyed ships get alive: false where they are: no clamping, respawn or turn change here.
 // A move over config.maxMove is refused and the state comes back unchanged (applyMove).
 export function resolveMove(state, move) {
