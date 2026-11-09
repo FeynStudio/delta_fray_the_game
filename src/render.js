@@ -122,7 +122,7 @@ export function drawPowerBar(ctx, state) {
 
 // Direction dial at the active ship: only the active 180-degree side is drawn, in front of the nose
 // (forward) or behind the tail (backward). Fixed size, never scaled by the locked distance, so it marks
-// no path or end point (docs/DESIGN.md "Do NOT Add").
+// no path or end point (docs/ARCHITECTURE.md "Do NOT Add").
 export function drawDirectionDial(ctx, state) {
   const { needle } = state.gauge;
   const { dial } = gaugeLayout(state);

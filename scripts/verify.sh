@@ -11,8 +11,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 case $FEATURE in
-  all|render|input|movement|hits|turns|config) ;;
-  *) echo "Unknown feature: '$FEATURE' (use render|input|movement|hits|turns|config|all)"; exit 2;;
+  all|render|input|movement|hits|turns|config|balance) ;;
+  *) echo "Unknown feature: '$FEATURE' (use render|input|movement|hits|turns|config|balance|all)"; exit 2;;
 esac
 OUT=agent-team/evidence/$TASK; mkdir -p "$OUT"
 LOG="$OUT/$LABEL-$FEATURE.log"; FAIL=0
@@ -68,6 +68,10 @@ if want config; then
   check "config: override honored" node scripts/run-scenario.mjs scenarios/config-override.json --out "$OUT/config.json"
   check "config output" diff -u expected/config.json "$OUT/config.json"
 fi
- 
+
+if want balance; then
+  check "balance sim" node sim/balance.mjs --games 2000 --out "$OUT/balance.json"
+fi
+
 echo "RESULT: $([ $FAIL = 0 ] && echo PASS || echo FAIL)" | tee -a "$LOG"
 exit $FAIL

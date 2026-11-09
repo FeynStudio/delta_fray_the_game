@@ -1,4 +1,4 @@
-# CLAUDE.md — Galaxy Shooter
+# ARCHITECTURE.md — Galaxy Shooter
 
 ## Project Summary
 

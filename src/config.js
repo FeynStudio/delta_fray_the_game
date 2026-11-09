@@ -1,4 +1,4 @@
-// All tunable game numbers live here (docs/DESIGN.md "Game Constants").
+// All tunable game numbers live here (docs/ARCHITECTURE.md "Game Constants").
 // One plain, mutable object: rules read it at call time, so tests and scenarios can override values.
 // Units are game units, never screen pixels. Heading in degrees: 0 = right (+x), 90 = down (+y).
 const config = {

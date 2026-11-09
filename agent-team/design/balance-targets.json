@@ -1,0 +1,4 @@
+{
+  "movesToFirstEncounter": { "stat": "median", "min": 3, "max": 35 },
+  "edgeDeathRate":         { "stat": "mean",   "max": 0.10 }
+}
