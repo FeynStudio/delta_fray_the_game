@@ -10,10 +10,12 @@
 //   (world angle = heading + needle); backward: true measures it from the ship's tail
 //   (world angle = heading + 180 + needle). moveFromGauge turns this into a world angle.
 //
-// Move animation (T-003): after the second Space, game.js gets the end state from rules.applyMove and
-// calls startMove, which keeps state.anim = { from: {x, y}, to: ship, elapsed }. stepMove moves the ship
-// along the straight segment from -> to at constant speed and, after config.moveAnimMs, sets it to
-// exactly `to` (the applyMove result), drops anim and puts the gauge back in the power phase.
+// Move animation (T-003, T-005): after the second Space, game.js gets the end state from
+// rules.resolveMove and calls startMove, which keeps state.anim = { from: {x, y}, to: ship, ships,
+// elapsed } (ships = every ship as the end state has it, so an enemy destroyed on the way is kept).
+// stepMove moves only the mover along the straight segment from -> to at constant speed and, after
+// config.moveAnimMs, puts in all of `ships` (the mover exactly at `to`), drops anim and puts the gauge
+// back in the power phase. Passing the turn (rules.endTurn) is game.js's job.
 import config from './config.js';
 import { createInitialState, wrapDegrees } from './rules.js';
 
@@ -85,12 +87,12 @@ const withShip = (state, ship) => ({
   ships: state.ships.map((s, j) => (j === state.turn ? ship : s)),
 });
 
-// Starts the move animation towards end (the rules.applyMove result for this state).
+// Starts the move animation towards end (the rules.resolveMove result for this state).
 // A forward move turns the ship to its new heading as the move starts.
 export function startMove(state, end) {
   const ship = state.ships[state.turn];
   const to = end.ships[state.turn];
-  const anim = { from: { x: ship.x, y: ship.y }, to, elapsed: 0 };
+  const anim = { from: { x: ship.x, y: ship.y }, to, ships: end.ships, elapsed: 0 };
   return { ...withShip(state, { ...ship, heading: to.heading }), anim };
 }
 
@@ -101,7 +103,8 @@ export function stepMove(state, ms) {
   const elapsed = a.elapsed + ms;
   if (elapsed >= config.moveAnimMs) {
     const { anim: _done, ...rest } = withShip(state, a.to);
-    return { ...rest, gauge: createInitialState().gauge };
+    const ships = a.ships ?? rest.ships; // an anim loaded without ships (older state) moves only the mover
+    return { ...rest, ships, gauge: createInitialState().gauge };
   }
   const ship = state.ships[state.turn];
   const p = pointAlong(a.from, a.to, elapsed / config.moveAnimMs);

@@ -1,0 +1,153 @@
+commit: e00b63a  branch: task/T-005-turns  2026-11-09T05:36:14Z
+PASS guards
+PASS lint
+✔ config holds the Prototype 1 starting values (1.6851ms)
+✔ config is a plain, mutable object (0.1836ms)
+✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.2553ms)
+✔ the ship triangle is narrower than equilateral (0.1492ms)
+✔ each spawned narrow ship, outline included, lies fully inside the map without touching an edge (0.3786ms)
+✔ each spawn heading points at the other spawn (within 1 degree) (0.2087ms)
+[game] game started {
+  turn: 0,
+  ships: [
+    { x: 190, y: 480, heading: 0, alive: true },
+    { x: 1090, y: 480, heading: 180, alive: true }
+  ],
+  gauge: {
+    phase: 'power',
+    power: 0,
+    needle: 0,
+    backward: false,
+    distance: 0,
+    sweep: 1
+  }
+}
+✔ second Space flies ship 0 to the applyMove end point; gauge back to power, same turn (3.9777ms)
+✔ with Shift the ship moves toward its tail side and keeps its heading (0.3448ms)
+✔ halfway: still moving, Space and Shift change nothing, ship not yet at its end point (0.4255ms)
+✔ a large step never takes the ship past the applyMove end point (0.3203ms)
+✔ a real Space keydown launches the move like press(); key repeat is ignored (0.3623ms)
+✔ FEATURE_MAP 5 example: the swept path destroys the enemy, the attacker survives at the end (2.4633ms)
+✔ grazing contact counts: touching the swept area destroys, a little further away survives (0.3396ms)
+✔ grazing contact counts tip to tip along the path (0.4531ms)
+✔ no tunneling: an enemy fully between the start and end of a max-distance move is destroyed (0.2926ms)
+✔ an enemy behind the start survives, as does one well beside the path (0.2873ms)
+✔ stopping short of the enemy misses (0.8444ms)
+✔ the wall on each of the four edges destroys the mover, forward and backward (0.4751ms)
+✔ any part counts at the wall: the centre stays inside but the tip touches or crosses the edge (0.2182ms)
+✔ any part counts at the wall: a back corner grazing the top edge while moving along it (0.1918ms)
+✔ a backward move: the tail crossing the wall destroys the mover, stopping before it is safe (0.2596ms)
+✔ hit then wall destroys both (0.2329ms)
+✔ turn 1 can destroy the turn 0 ship (0.2462ms)
+✔ a move longer than maxMove is refused: state unchanged, nobody destroyed (0.1489ms)
+✔ no respawn and no turn change: dead ships keep x, y and heading; other fields carry over (0.3385ms)
+✔ an already destroyed enemy stays as it is (0.1846ms)
+✔ the swept triangle uses the heading the ship turns to as the move starts (0.1882ms)
+✔ shipWidth is read at call time: a near miss becomes a hit with wider ships (0.1328ms)
+✔ shipSize is read at call time: a near miss tip to tip becomes a hit with longer ships (0.1209ms)
+✔ world size is read at call time for the wall (0.1512ms)
+✔ hits use the same triangle that render.js draws (1.4277ms)
+✔ the starting gauge is in the power phase (1.3165ms)
+✔ power sweeps with elapsed time, stays within 0..1 and turns back at both ends (1.1343ms)
+✔ first Space locks distance = power x maxMove (0.2319ms)
+✔ first Space reads maxMove at call time (override to 200) (0.8728ms)
+✔ sweep speeds are read from config at call time (0.3591ms)
+✔ direction phase: needle sweeps with time within -max..max, backward starts false (0.7444ms)
+✔ Shift flips backward in the direction phase only (0.601ms)
+✔ second Space launches and keeps the needle, backward and distance it had (0.247ms)
+✔ Space, Shift and time change nothing in the moving phase (0.3024ms)
+✔ no function mutates the state passed in (0.7903ms)
+✔ keyFromEvent maps Space and both Shift keys and ignores key repeat (0.1539ms)
+✔ moveFromGauge: 60% power, needle 30, forward, heading 0 gives 0.6 x maxMove at 30 (FEATURE_MAP 3) (0.3002ms)
+✔ moveFromGauge: forward = heading + needle, backward = heading + 180 + needle, within 0..360 (0.2053ms)
+✔ moveFromGauge uses the ship whose turn it is (0.1087ms)
+✔ pointAlong: start, middle and end of the segment, never past either end (0.1669ms)
+✔ startMove/stepMove: constant speed along the segment, ends exactly at the applyMove result (0.3958ms)
+✔ forward moves at 0, 90, 180 and 270 go right, down, left and up and turn the heading (2.4378ms)
+✔ 45 degrees uses degrees, not radians (0.3945ms)
+✔ forward heading is kept within 0 to 360 (0.3796ms)
+✔ a backward move travels along the angle and keeps the heading (0.3241ms)
+✔ only the ship whose turn it is moves; every other field is carried over (0.9297ms)
+✔ works without a gauge field (scenario states have none) (0.2811ms)
+✔ a move longer than maxMove is refused; exactly maxMove is made (human decision 2026-11-08) (0.6078ms)
+✔ distance comes from the move and the limit from config at call time (maxMove 200) (0.2233ms)
+✔ fitScale fills one window dimension and keeps the aspect ratio (0.9451ms)
+✔ shipPoints is a narrow isosceles triangle with its tip along the heading (0.3166ms)
+✔ drawShips draws outlines only: stroke, no fill or gradient (0.7978ms)
+✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.2544ms)
+✔ drawGauge only reads state and draws only around the active ship (1.8173ms)
+✔ gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of base size (read from config) (0.1312ms)
+✔ power bar sits below the active ship, clear of its body, centred on it (0.1941ms)
+✔ the power bar does not move when the dial appears or flips (any heading) (0.39ms)
+✔ direction dial is on the nose side when forward and the tail side when backward, on the long axis (0.3699ms)
+✔ the dial size does not depend on the locked distance (no path preview) (0.3163ms)
+✔ gauges follow the ship: a moved ship carries its gauges along (0.1373ms)
+✔ near the map edges every gauge part stays inside the map (0.4219ms)
+✔ the power bar does not overlap the direction dial (3.096ms)
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.4423ms)
+✔ createInitialState reads config at call time (0.8176ms)
+✔ createInitialState does not share objects with config (0.19ms)
+ℹ tests 71
+ℹ suites 0
+ℹ pass 71
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.7884
+PASS unit tests
+FAIL turns scenario runs
+--- expected/turns.json	2026-11-09 00:36:04.595094000 -0500
++++ agent-team/evidence/T-005/turns.json	2026-11-09 00:36:15.883210400 -0500
+@@ -1,30 +1,14 @@
+ {
+   "destroyed enemy respawns and it becomes their turn (FEATURE_MAP 6)": {
+-    "turn": 1,
+-    "ships.1.alive": true,
+-    "ships.1.x": 1090,
+-    "ships.1.y": 480,
+-    "ships.1.heading": 180,
+-    "ships.0.x": 350
++    "error": "src/rules.js does not export endTurn()"
+   },
+   "ship that hits the wall respawns": {
+-    "turn": 1,
+-    "ships.0.alive": true,
+-    "ships.0.x": 190,
+-    "ships.0.y": 480,
+-    "ships.0.heading": 0,
+-    "ships.1.x": 600
++    "error": "src/rules.js does not export endTurn()"
+   },
+   "double kill does not skip a turn": {
+-    "turn": 1,
+-    "ships.0.alive": true,
+-    "ships.0.x": 190,
+-    "ships.1.alive": true,
+-    "ships.1.x": 1090
++    "error": "src/rules.js does not export endTurn()"
+   },
+   "plain move passes the turn back": {
+-    "turn": 0,
+-    "ships.0.x": 190,
+-    "ships.1.x": 990
++    "error": "src/rules.js does not export endTurn()"
+   }
+ }
+FAIL turns output
+PASS turns browser runs
+--- expected/turns-smoke.json	2026-11-09 00:36:04.595094000 -0500
++++ agent-team/evidence/T-005/turns-smoke.json	2026-11-09 00:36:17.284510000 -0500
+@@ -1,7 +1,7 @@
+ {
+-  "destroyed enemy respawns at its spawn point": true,
++  "destroyed enemy respawns at its spawn point": false,
+   "attacker survives at the end of its move": true,
+-  "turn passes to player 2": true,
++  "turn passes to player 2": false,
+   "next move starts on the power gauge": true,
+-  "no turn timer": true
++  "no turn timer": false
+ }
+FAIL turns browser output
+RESULT: FAIL

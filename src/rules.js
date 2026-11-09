@@ -109,3 +109,16 @@ export function resolveMove(state, move) {
   });
   return { ...moved, ships };
 }
+
+// Ends the turn after a move (FEATURE_MAP sections 6 and 9): every destroyed ship (alive: false) is
+// replaced by a new one at config.spawns[i] (read at call time), living ships stay as they are, and
+// the turn passes to the other player exactly once, also after a double kill. Other fields are kept.
+// When to call it is up to game.js (after the move animation). No turn timer, no end of game.
+export function endTurn(state) {
+  const ships = state.ships.map((ship, i) => {
+    if (ship.alive !== false) return ship;
+    const { x, y, heading } = config.spawns[i];
+    return { x, y, heading, alive: true };
+  });
+  return { ...state, ships, turn: state.turn === 0 ? 1 : 0 };
+}

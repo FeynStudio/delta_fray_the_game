@@ -33,7 +33,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 4. Movement
 - What it does: "My ship flies the distance and direction I chose."
-- Where it lives: src/rules.js applyMove(state, move) and wrapDegrees (math; a move longer than config.maxMove is refused and the state returned unchanged, human decision 2026-11-08); src/input.js moveFromGauge(state) (locked gauge to Move), pointAlong(from, to, t), startMove(state, end) and stepMove(state, ms) (animation progress kept in state.anim = { from, to, elapsed }; the ship goes along the straight segment at constant speed and ends exactly on the applyMove result, then the gauge returns to the power phase with the same turn); src/game.js press() launches on the second Space and step(ms) runs stepMove; drawShips in src/render.js draws the ship where state puts it (no path, trail or end marker); animation length config.moveAnimMs (T-003)
+- Where it lives: src/rules.js applyMove(state, move) and wrapDegrees (math; a move longer than config.maxMove is refused and the state returned unchanged, human decision 2026-11-08); src/input.js moveFromGauge(state) (locked gauge to Move), pointAlong(from, to, t), startMove(state, end) and stepMove(state, ms) (animation progress kept in state.anim = { from, to, ships, elapsed }, where ships is every ship of the rules.resolveMove end state; only the mover goes along the straight segment at constant speed, and at the end all of anim.ships is put in place, so the mover ends exactly on the rules result and a destroyed enemy stays destroyed; the gauge returns to the power phase); src/game.js press() launches on the second Space with rules.resolveMove, and step(ms) runs stepMove and, in the step where the animation ends, calls rules.endTurn once (section 6) (T-003, T-005); drawShips in src/render.js draws the ship where state puts it (no path, trail or end marker); animation length config.moveAnimMs (T-003)
 - How a user reaches it: the second Space press
 - How an agent drives it: unit test calling rules.applyMove(state, {distance, angle}); tests/game.test.js loads src/game.js in Node with a stubbed DOM and drives __game.press/step; verify.sh --feature movement
 - Inputs: ship at (200, 480) heading 0°, move 150 units at 0°
@@ -43,7 +43,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 5. Hit Detection & Edges
 - What it does: "If my path sweeps over the enemy, it explodes. If I reach the wall, I explode."
-- Where it lives: src/rules.js resolveMove(state, move) (applyMove, then the convex hull of the mover's start and end triangles in its new heading, as input.startMove turns the ship before it moves; separating axis test against each living enemy, touching counts; the mover is destroyed if any hull corner touches or crosses 0..config.worldWidth or 0..config.worldHeight, human decision 2026-11-09; a move over maxMove returns the state unchanged) and shipPoints(ship, size, width) (the one ship triangle, also drawn by render.js); tests in tests/hits.test.js (T-004). Not called by src/game.js yet (T-005).
+- Where it lives: src/rules.js resolveMove(state, move) (applyMove, then the convex hull of the mover's start and end triangles in its new heading, as input.startMove turns the ship before it moves; separating axis test against each living enemy, touching counts; the mover is destroyed if any hull corner touches or crosses 0..config.worldWidth or 0..config.worldHeight, human decision 2026-11-09; a move over maxMove returns the state unchanged) and shipPoints(ship, size, width) (the one ship triangle, also drawn by render.js); tests in tests/hits.test.js (T-004). Called by src/game.js press() for every launched move (T-005).
 - How a user reaches it: automatically after every move
 - How an agent drives it: unit tests calling rules.resolveMove(state, move); verify.sh --feature hits
 - Inputs: ship A at (200, 480), enemy B at (300, 490), A moves 150 at 0°
@@ -53,7 +53,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 6. Respawn & Turns
 - What it does: "When a ship is destroyed, a new one appears at its spawn point and play continues."
-- Where it lives: src/rules.js (respawn), src/game.js (turn manager)
+- Where it lives: src/rules.js endTurn(state) (pure: every ship with alive: false is replaced by config.spawns[i], read at call time, with alive: true; living ships unchanged; turn flips exactly once, also after a double kill; other fields kept); src/game.js step(ms) (turn manager: when the move animation ends it puts the resolved end state in place and calls endTurn once, so the next player starts on the power gauge; nothing else changes the turn, so there is no turn timer); tests in tests/turns.test.js and tests/game.test.js (T-005). A destroyed enemy stays drawn until the move ends and reappears at its spawn in the same step.
 - How a user reaches it: automatically after a destruction or the end of a move
 - How an agent drives it: __game.setState() with a destroyed ship, then getState(); verify.sh --feature turns
 - Inputs: Player 1 destroys Player 2's ship

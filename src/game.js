@@ -1,5 +1,5 @@
 // Owns the single game state object and connects rules, input and rendering.
-import { applyMove, createInitialState } from './rules.js';
+import { createInitialState, endTurn, resolveMove } from './rules.js';
 import { keyFromEvent, moveFromGauge, pressKey, startMove, stepGauge, stepMove } from './input.js';
 import { drawFrame, fitCanvas } from './render.js';
 import log from './log.js';
@@ -15,19 +15,22 @@ function fit() {
 }
 
 // Same path for real keys and the debug API. The second Space launches the move: the end state comes
-// from rules.applyMove, and the animation only shows the ship getting there.
+// from rules.resolveMove (hits and walls), and the animation only shows the ship getting there.
 function press(key) {
   const launching = state.gauge.phase === 'direction';
   state = pressKey(state, key);
   if (launching && state.gauge.phase === 'moving') {
-    state = startMove(state, applyMove(state, moveFromGauge(state)));
+    state = startMove(state, resolveMove(state, moveFromGauge(state)));
   }
 }
 
-// Advances the game clock: the gauge sweep, or the move animation while a move runs.
-// Passing the turn (endTurn) comes with the turns slice.
+// Advances the game clock: the gauge sweep, or the move animation while a move runs. In the step
+// where the move animation finishes, the resolved end state is in place and rules.endTurn runs once:
+// destroyed ships respawn and the other player's turn starts on the power gauge. No turn timer.
 function step(ms) {
+  const wasMoving = Boolean(state.anim);
   state = stepMove(stepGauge(state, ms), ms);
+  if (wasMoving && !state.anim) state = endTurn(state);
 }
 
 window.addEventListener('keydown', (event) => {

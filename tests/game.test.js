@@ -1,9 +1,10 @@
 // Loads the real src/game.js in Node with a minimal stubbed DOM and ?debug=1, then drives the move
-// through window.__game (pattern: tests/rules.test.js; values come from config).
+// through window.__game (pattern: tests/rules.test.js; values come from config). T-005: the end of
+// every move comes from rules.resolveMove, and the step that finishes it calls rules.endTurn once.
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { applyMove, createInitialState } from '../src/rules.js';
+import { applyMove, createInitialState, resolveMove } from '../src/rules.js';
 
 const listeners = {};
 let game;
@@ -37,7 +38,7 @@ function launch(power, needle, backward = false) {
   game.press('Space');
 }
 
-test('second Space flies ship 0 to the applyMove end point; gauge back to power, same turn', () => {
+test('second Space flies ship 0 to the rules end point; gauge back to power, turn passes to 1', () => {
   const start = createInitialState();
   launch(0.6, 30);
   game.step(T() + 1);
@@ -46,7 +47,7 @@ test('second Space flies ship 0 to the applyMove end point; gauge back to power,
   assert.ok(near(s.ships[0].x, end.x) && near(s.ships[0].y, end.y), JSON.stringify(s.ships[0]));
   assert.equal(s.ships[0].heading, 30);
   assert.deepEqual(s.ships[1], start.ships[1]);
-  assert.equal(s.turn, 0);
+  assert.equal(s.turn, 1);
   assert.equal(s.gauge.phase, 'power');
 });
 
@@ -92,4 +93,94 @@ test('a real Space keydown launches the move like press(); key repeat is ignored
   assert.equal(game.getState().gauge.phase, 'moving');
   game.step(T());
   assert.equal(game.getState().gauge.phase, 'power');
+});
+
+// Loads ships and turn, then locks power, a forward needle and launches (same as launch()).
+function launchFrom(turn, ships, power, needle) {
+  const s = createInitialState();
+  game.setState({ ...s, turn, ships });
+  launch(power, needle);
+}
+
+test('turns smoke scenario: enemy destroyed on the path respawns, attacker stays, turn 1 on power', () => {
+  launchFrom(0, [
+    { x: 200, y: 480, heading: 0, alive: true },
+    { x: 300, y: 490, heading: 180, alive: true },
+  ], 1, 0);
+  game.step(10000);
+  const s = game.getState();
+  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true });
+  assert.ok(s.ships[0].alive === true && near(s.ships[0].x, 200 + config.maxMove) && near(s.ships[0].y, 480),
+    JSON.stringify(s.ships[0]));
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+  assert.equal('anim' in s, false);
+});
+
+test('the end point is the resolveMove result: the enemy stays drawn alive until the move ends', () => {
+  const ships = [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }];
+  launchFrom(0, ships, 1, 0);
+  const end = resolveMove({ turn: 0, ships }, { distance: config.maxMove, angle: 0 });
+  assert.equal(end.ships[1].alive, false, 'resolveMove destroys the enemy');
+  game.step(T() / 2);
+  const mid = game.getState();
+  assert.equal(mid.gauge.phase, 'moving');
+  assert.equal(mid.turn, 0);
+  assert.deepEqual(mid.ships[1], ships[1]);
+});
+
+test('a move into the wall: the mover is back at its spawn point, alive, and the turn has passed', () => {
+  const enemy = { x: 600, y: 200, heading: 180, alive: true };
+  launchFrom(0, [{ x: 1200, y: 480, heading: 0, alive: true }, enemy], 1, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.deepEqual(s.ships[0], { ...config.spawns[0], alive: true });
+  assert.deepEqual(s.ships[1], enemy);
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+});
+
+test('a plain move passes the turn, and the next Space, Space moves the other ship', () => {
+  const start = createInitialState();
+  launch(0.5, 0);
+  game.step(T());
+  const after0 = game.getState();
+  assert.equal(after0.turn, 1);
+  assert.ok(near(after0.ships[0].x, start.ships[0].x + 0.5 * config.maxMove));
+  assert.deepEqual(after0.ships[1], start.ships[1]);
+  launch(0.4, 0); // ship 1 faces heading 180, so a forward move goes toward -x
+  game.step(T());
+  const after1 = game.getState();
+  assert.equal(after1.turn, 0);
+  assert.deepEqual(after1.ships[0], after0.ships[0]);
+  assert.ok(near(after1.ships[1].x, start.ships[1].x - 0.4 * config.maxMove), JSON.stringify(after1.ships[1]));
+  assert.equal(after1.gauge.phase, 'power');
+});
+
+test('later steps never change the turn again: no turn timer and no second endTurn', () => {
+  launch(0.5, 0);
+  game.step(T() + 1);
+  const ended = game.getState();
+  assert.equal(ended.turn, 1);
+  for (const ms of [1, T(), T() * 3, 600000]) {
+    game.step(ms);
+    const s = game.getState();
+    assert.equal(s.turn, 1, `after step(${ms})`);
+    assert.deepEqual(s.ships, ended.ships);
+  }
+  assert.equal(game.getState().gauge.phase, 'power');
+});
+
+test('double kill through the game: both respawn, the turn passes once, and the next mover is alive', () => {
+  launchFrom(0, [
+    { x: 1150, y: 480, heading: 0, alive: true },
+    { x: 1220, y: 480, heading: 180, alive: true },
+  ], 1, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.deepEqual(s.ships, [{ ...config.spawns[0], alive: true }, { ...config.spawns[1], alive: true }]);
+  assert.equal(s.turn, 1);
+  // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
+  // so the ship whose turn it is is always alive when it launches.
+  assert.equal(s.ships[s.turn].alive, true);
 });
