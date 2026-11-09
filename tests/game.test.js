@@ -4,7 +4,7 @@
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { applyMove, createInitialState, resolveMove } from '../src/rules.js';
+import { applyMove, createInitialState, resolveMove, shipPoints } from '../src/rules.js';
 
 const listeners = {};
 let game;
@@ -183,4 +183,91 @@ test('double kill through the game: both respawn, the turn passes once, and the 
   // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
   // so the ship whose turn it is is always alive when it launches.
   assert.equal(s.ships[s.turn].alive, true);
+});
+
+// ---- explosions (T-007): decoration only, play does not wait (human, 2026-11-09) ----
+const inMap = (e) => shipPoints(e, config.shipSize, config.shipWidth)
+  .every((p) => p.x >= 0 && p.x <= config.worldWidth && p.y >= 0 && p.y <= config.worldHeight);
+
+test('explosion after a hit: one entry at the enemy where it was hit; turn and gauge as before T-007', () => {
+  const ships = [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }];
+  launchFrom(0, ships, 1, 0);
+  game.step(T() - 1);
+  assert.equal((game.getState().explosions ?? []).length, 0, 'nothing explodes before the move ends');
+  game.step(1);
+  const s = game.getState();
+  assert.deepEqual(s.explosions, [{ ship: 1, x: 300, y: 490, heading: 180, elapsed: 0 }]);
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true });
+});
+
+test('explosion after a wall death: centre moved so the whole triangle is inside the map', () => {
+  const enemy = { x: 600, y: 200, heading: 180, alive: true };
+  launchFrom(0, [{ x: 1200, y: 480, heading: 0, alive: true }, enemy], 1, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.equal(s.explosions.length, 1);
+  const e = s.explosions[0];
+  assert.equal(e.ship, 0);
+  assert.equal(e.heading, 0);
+  assert.equal(e.elapsed, 0);
+  assert.ok(inMap(e), JSON.stringify(e));
+  assert.ok(e.x > 1200 && e.x < 1200 + config.maxMove && e.y === 480, 'shortest shift back from the end point');
+  const tip = shipPoints(e, config.shipSize, config.shipWidth)[0];
+  assert.ok(Math.abs(tip.x - config.worldWidth) < 1e-9, 'moved only as far as needed: tip on the edge');
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+});
+
+test('explosions after a double kill: two entries, enemy where hit, mover inside the map', () => {
+  launchFrom(0, [
+    { x: 1150, y: 480, heading: 0, alive: true },
+    { x: 1220, y: 480, heading: 180, alive: true },
+  ], 1, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.equal(s.explosions.length, 2);
+  const byShip = Object.fromEntries(s.explosions.map((e) => [e.ship, e]));
+  assert.deepEqual(byShip[1], { ship: 1, x: 1220, y: 480, heading: 180, elapsed: 0 });
+  assert.ok(inMap(byShip[0]), JSON.stringify(byShip[0]));
+  assert.equal(s.turn, 1);
+});
+
+test('no explosion after a plain move', () => {
+  launch(0.5, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.equal((s.explosions ?? []).length, 0);
+  assert.equal(s.turn, 1);
+});
+
+test('an explosion is present at explosionMs - 1 and gone at explosionMs; turn, ships, gauge untouched', () => {
+  launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
+  game.step(T());
+  const ended = game.getState();
+  game.step(config.explosionMs - 1);
+  const late = game.getState();
+  assert.equal(late.explosions.length, 1);
+  assert.equal(late.explosions[0].elapsed, config.explosionMs - 1);
+  game.step(1);
+  const gone = game.getState();
+  assert.equal(gone.explosions.length, 0);
+  for (const s of [late, gone]) {
+    assert.equal(s.turn, ended.turn);
+    assert.deepEqual(s.ships, ended.ships);
+    assert.equal(s.gauge.phase, 'power');
+  }
+});
+
+test('the next player can press Space while an explosion plays, and its move ends on time', () => {
+  launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
+  game.step(T());
+  launch(0.4, 0); // player 2, explosion still playing
+  assert.equal(game.getState().gauge.phase, 'moving');
+  assert.equal(game.getState().explosions.length, 1);
+  game.step(T());
+  const s = game.getState();
+  assert.equal(s.turn, 0, 'turn passed once, in the step the move ended');
+  assert.equal(s.explosions.length, config.explosionMs > T() ? 1 : 0);
 });

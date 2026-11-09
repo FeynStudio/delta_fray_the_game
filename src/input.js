@@ -17,7 +17,7 @@
 // config.moveAnimMs, puts in all of `ships` (the mover exactly at `to`), drops anim and puts the gauge
 // back in the power phase. Passing the turn (rules.endTurn) is game.js's job.
 import config from './config.js';
-import { createInitialState, wrapDegrees } from './rules.js';
+import { createInitialState, shipPoints, wrapDegrees } from './rules.js';
 
 // Moves value by delta along a line that bounces between min and max (a triangle wave).
 // Returns the new value and the direction it is now moving in.
@@ -109,4 +109,41 @@ export function stepMove(state, ms) {
   const ship = state.ships[state.turn];
   const p = pointAlong(a.from, a.to, elapsed / config.moveAnimMs);
   return { ...withShip(state, { ...ship, x: p.x, y: p.y }), anim: { ...a, elapsed } };
+}
+
+// Explosions (T-007): decoration that plays over the next turn; play never waits for them.
+// state.explosions = [{ ship, x, y, heading, elapsed }]: ship index, centre, heading and ms since it began.
+// game.js calls startExplosions in the step where the move animation ends (before rules.endTurn
+// respawns the destroyed ships) and stepExplosions every step. Neither touches turn, ships or gauge.
+
+// Shortest shift that puts all three ship points within 0..worldWidth and 0..worldHeight.
+export function insideMap(ship) {
+  const pts = shipPoints(ship, config.shipSize, config.shipWidth);
+  const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const shift = (lo, hi, max) => Math.max(0, -lo) - Math.max(0, hi - max);
+  return {
+    x: ship.x + shift(Math.min(...xs), Math.max(...xs), config.worldWidth),
+    y: ship.y + shift(Math.min(...ys), Math.max(...ys), config.worldHeight),
+  };
+}
+
+// Adds one explosion per destroyed ship (alive: false). A hit enemy explodes where it was hit; the
+// mover can only be destroyed by the wall, so its explosion is moved inside the map (human, 2026-11-09).
+export function startExplosions(state) {
+  const born = state.ships.flatMap((ship, i) => {
+    if (ship.alive !== false) return [];
+    const centre = i === state.turn ? insideMap(ship) : { x: ship.x, y: ship.y };
+    return [{ ship: i, x: centre.x, y: centre.y, heading: ship.heading, elapsed: 0 }];
+  });
+  if (born.length === 0) return state;
+  return { ...state, explosions: [...(state.explosions ?? []), ...born] };
+}
+
+// Ages every explosion by ms and removes those that reached config.explosionMs.
+export function stepExplosions(state, ms) {
+  if (!state.explosions || !(ms > 0)) return state;
+  const explosions = state.explosions
+    .map((e) => ({ ...e, elapsed: e.elapsed + ms }))
+    .filter((e) => e.elapsed < config.explosionMs);
+  return { ...state, explosions };
 }
