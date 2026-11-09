@@ -1,4 +1,4 @@
-# Galaxy Shooter — Plan
+# Galaxy Shooter — Plan (Game name change to Delta Fray)
 
 ## Vision
 
@@ -37,7 +37,7 @@
 3. Space (2nd press): locks direction and launches immediately. No confirm step.
 
 - Gauges sweep slowly, favoring careful, skill-based aim over reflexes.
-- Heading: forward moves turn the ship to face its travel direction. Backward moves keep its heading (mainly visual).
+- Heading: forward moves turn the ship to face its travel direction. Backward moves turns the ship to face its new travel direction as well.
 - No turn timer.
 
 ### Rules
@@ -45,8 +45,15 @@
 - Hit: any enemy inside the swept path is destroyed.
 - Edges are solid. A ship that reaches an edge is destroyed.
 - If a path destroys an enemy and then reaches the edge, both ships are destroyed.
-- Destroyed ships respawn at their side's spawn point (spawn points can't be attacked).
+- Destroyed ships respawn at their side's spawn point (spawn points can't be attacked until ship moves away from its spawn no matter how small the move).
 - No path preview and no kill confirmation before launch. Judging the path is part of the challenge.
+
+### New Design Plans
+
+- Ships are drawn where triangel point facing selected angel at the start of backward move and the actual movement follow regular movement pattern. 
+- Spawn-protection animation.
+- Game title at the top middle, drawn over everything. 
+- Score in the corners. 
 
 ## Tech — Prototype 1
 
@@ -69,7 +76,6 @@
 ## Deferred Decisions
 
 - Wraparound map edges.
-- Spawn protection.
 - Whether the cat-and-mouse dynamic (first ship in range strikes first) feels good. Decide after playtesting.
 
 ## Roadmap
