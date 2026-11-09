@@ -1,0 +1,34 @@
+{
+  "max move straight ahead (FEATURE_MAP 4)": {
+    "ships.0.x": 350,
+    "ships.0.y": 480,
+    "ships.0.heading": 0,
+    "ships.1.x": 1090,
+    "ships.1.y": 480
+  },
+  "forward move turns the heading; 90 degrees is down": {
+    "ships.0.x": 200,
+    "ships.0.y": 580,
+    "ships.0.heading": 90
+  },
+  "backward move keeps the heading": {
+    "ships.0.x": 100,
+    "ships.0.y": 480,
+    "ships.0.heading": 0
+  },
+  "diagonal move uses degrees, not radians": {
+    "ships.0.x": 270.711,
+    "ships.0.y": 550.711,
+    "ships.0.heading": 45
+  },
+  "heading stays within 0 to 360": {
+    "ships.0.x": 200,
+    "ships.0.y": 430,
+    "ships.0.heading": 270
+  },
+  "only the player whose turn it is moves": {
+    "ships.0.x": 200,
+    "ships.1.x": 990,
+    "ships.1.heading": 180
+  }
+}
