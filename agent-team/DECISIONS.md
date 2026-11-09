@@ -85,3 +85,6 @@ Context: answers T-009 Q-A: after a backward move ends, does the ship keep its n
 
 Decided by human in session, 2026-11-09: "sending the gauge back to the power phase without moving the ship."
 Context: answers the T-003 step(ms) recovery question: when step(ms) finds the game in phase 'moving' with no `anim`, what should happen. Briefed as T-014 (READY, on hold).
+
+Decided by human in session, 2026-11-09: "release briefs hold but don't start building"
+Context: lifts the "do not build anything yet." hold (2026-11-09) on briefs T-006, T-007, T-009, T-010, T-011, T-012, T-013 and T-014 (T-008 never carried a hold line). No build was started; each brief's Depends on lines and approval gates (T-013's exact diff) still apply.
