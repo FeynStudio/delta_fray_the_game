@@ -6,7 +6,7 @@
 // No npm dependencies: talks to the browser over the DevTools protocol with Node's built-in WebSocket.
 // Set CHROME_PATH to pick a browser; otherwise Chrome, then Edge, is used.
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,15 +60,29 @@ async function launchBrowser(exe, profile) {
     '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
   const exited = new Promise((done) => proc.once('exit', done));
+  // Chrome prints "DevTools listening on ws://..." to stderr when it has a console. Started from a shell
+  // without one (e.g. an agent's shell on Windows), chrome.exe hands off to a detached browser and exits 0
+  // without printing it, so also read the DevToolsActivePort file the browser writes into the profile.
+  const portFile = join(profile, 'DevToolsActivePort');
   const wsUrl = await new Promise((ok, fail) => {
     let buf = '';
-    const timer = setTimeout(() => fail(new Error('browser did not start within 20s')), 20000);
+    let settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true; clearTimeout(timer); clearInterval(poll); fn(value);
+    };
+    const timer = setTimeout(() => finish(fail, new Error('browser did not start within 20s')), 20000);
+    const poll = setInterval(() => {
+      if (!existsSync(portFile)) return;
+      const [port, path] = readFileSync(portFile, 'utf8').split(/\r?\n/);
+      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`);
+    }, 100);
     proc.stderr.on('data', (d) => {
       buf += d;
       const m = buf.match(/DevTools listening on (ws:\/\/\S+)/);
-      if (m) { clearTimeout(timer); ok(m[1]); }
+      if (m) finish(ok, m[1]);
     });
-    exited.then((code) => { clearTimeout(timer); fail(new Error(`browser exited early (code ${code})`)); });
+    exited.then((code) => { if (code !== 0) finish(fail, new Error(`browser exited early (code ${code})`)); });
   });
   const cdp = connect(wsUrl);
   await cdp.ready;
@@ -114,8 +128,18 @@ async function launchBrowser(exe, profile) {
       }
     },
     async close() {
+      // Ask the browser itself to quit: proc may be only the launcher, which a detached browser outlives.
+      const closing = cdp.send('Browser.close').then(() => null, (err) => err);
+      const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
+      if (closeErr) process.stderr.write(`Browser.close failed: ${closeErr.message}\n`);
       cdp.close();
       proc.kill();
+      // The browser removes its profile lockfile as it exits; wait for that so the profile can be deleted.
+      const lockfile = join(profile, 'lockfile');
+      for (const deadline = Date.now() + 10000; existsSync(lockfile) && Date.now() < deadline;) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      if (existsSync(lockfile)) process.stderr.write('browser still holds its profile after 10s\n');
       await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
     },
   };
