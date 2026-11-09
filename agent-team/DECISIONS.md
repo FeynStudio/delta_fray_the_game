@@ -88,3 +88,6 @@ Context: answers the T-003 step(ms) recovery question: when step(ms) finds the g
 
 Decided by human in session, 2026-11-09: "release briefs hold but don't start building"
 Context: lifts the "do not build anything yet." hold (2026-11-09) on briefs T-006, T-007, T-009, T-010, T-011, T-012, T-013 and T-014 (T-008 never carried a hold line). No build was started; each brief's Depends on lines and approval gates (T-013's exact diff) still apply.
+
+Decided by human in session, 2026-11-09: "Yes, go ahead (Recommended)"
+Context: answers "Was your /night-shift run the go-ahead to build T-006 and the next READY briefs?" (asked after T-006 review round 1 found no recorded go-ahead). Go-ahead for the night-shift run: T-006, then T-007 and T-008, oldest first, one at a time.
