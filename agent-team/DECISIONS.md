@@ -19,3 +19,9 @@ Context: answers the main session's two questions after review round 1: (1) acce
 
 Decided by human in session, 2026-11-08: "refuse the move and leave ship where it is."
 Context: answers the coordinator's question about a move longer than maxMove (refuse vs. shorten to maxMove).
+
+Decided by human in session, 2026-11-09: "Build T-004 now (Recommended)"
+Context: the human was asked whether the team should build and review T-004 (hits) in this run, since T-005 (turns) can only start after T-004 is merged.
+
+Decided by human in session, 2026-11-09: "Any part (Recommended)"
+Context: the wall rule. The question was whether a ship dies when ANY part of its swept triangle touches or crosses the map edge, or only when its CENTER reaches the edge.
