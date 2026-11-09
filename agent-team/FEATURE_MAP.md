@@ -12,7 +12,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 2. Map & Rendering
 - What it does: "I see the play area full screen with two triangle ships."
-- Where it lives: src/render.js, src/config.js
+- Where it lives: src/render.js, src/config.js (ship triangle: rules.shipPoints, re-exported by render.js, T-004)
 - How a user reaches it: open index.html through a local server (e.g., npx serve .)
 - How an agent drives it: ?debug=1, then __game.getState(); screenshot the canvas; verify.sh --feature render
 - Inputs: world 1280 × 960 units, browser window 1920 × 1080
@@ -43,7 +43,7 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 5. Hit Detection & Edges
 - What it does: "If my path sweeps over the enemy, it explodes. If I reach the wall, I explode."
-- Where it lives: src/rules.js
+- Where it lives: src/rules.js resolveMove(state, move) (applyMove, then the convex hull of the mover's start and end triangles in its new heading, as input.startMove turns the ship before it moves; separating axis test against each living enemy, touching counts; the mover is destroyed if any hull corner touches or crosses 0..config.worldWidth or 0..config.worldHeight, human decision 2026-11-09; a move over maxMove returns the state unchanged) and shipPoints(ship, size, width) (the one ship triangle, also drawn by render.js); tests in tests/hits.test.js (T-004). Not called by src/game.js yet (T-005).
 - How a user reaches it: automatically after every move
 - How an agent drives it: unit tests calling rules.resolveMove(state, move); verify.sh --feature hits
 - Inputs: ship A at (200, 480), enemy B at (300, 490), A moves 150 at 0°

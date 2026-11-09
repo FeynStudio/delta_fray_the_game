@@ -1,6 +1,10 @@
 // All canvas drawing. Each draw<Thing>(ctx, state) only reads state, never changes it.
 // Drawing happens in game units; fitCanvas sets a transform that scales the world to the screen.
 import config from './config.js';
+import { shipPoints } from './rules.js';
+
+// The ship shape lives in rules.js so hits use the same triangle that is drawn; re-exported here.
+export { shipPoints };
 
 // All drawing colours in one place. Lines must stay readable on the near-black background:
 // the light grey 'dim' (map border, inactive gauge parts) has about 8:1 contrast against it.
@@ -29,21 +33,6 @@ export function fitCanvas(canvas, viewWidth, viewHeight, dpr) {
   const ctx = canvas.getContext('2d');
   ctx.setTransform(canvas.width / config.worldWidth, 0, 0, canvas.height / config.worldHeight, 0, 0);
   return ctx;
-}
-
-// Slim isosceles triangle in game units: two long sides of length size, back edge of length width.
-// Tip points along the heading; the centroid sits at the ship position. Returns [tip, back1, back2].
-export function shipPoints(ship, size, width) {
-  const length = Math.sqrt(size * size - (width / 2) * (width / 2)); // tip to back edge
-  const h = (ship.heading * Math.PI) / 180;
-  const fx = Math.cos(h), fy = Math.sin(h); // forward
-  const px = -fy, py = fx; // perpendicular
-  const backX = ship.x - (fx * length) / 3, backY = ship.y - (fy * length) / 3;
-  return [
-    { x: ship.x + (fx * 2 * length) / 3, y: ship.y + (fy * 2 * length) / 3 },
-    { x: backX + (px * width) / 2, y: backY + (py * width) / 2 },
-    { x: backX - (px * width) / 2, y: backY - (py * width) / 2 },
-  ];
 }
 
 export function drawMap(ctx) {
