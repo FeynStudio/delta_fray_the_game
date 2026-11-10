@@ -5,6 +5,7 @@ import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
 import { applyMove, createInitialState, resolveMove, shipPoints } from '../src/rules.js';
+import { moveFromGauge } from '../src/input.js';
 
 const listeners = {};
 let game;
@@ -275,6 +276,7 @@ test('the next player can press Space while an explosion plays, and its move end
   assert.equal(s.explosions.length, config.explosionMs > T() ? 1 : 0);
 });
 
+<<<<<<< HEAD
 // ---- score (T-012): scores change in the step where the move animation ends, never before ----
 test('score after a hit: unchanged during the animation, +1 for the mover in the step it ends', () => {
   launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
@@ -335,4 +337,41 @@ test('a state loaded without scores starts from [0, 0] when a move ends', () => 
   launch(1, 0);
   game.step(T());
   assert.deepEqual(game.getState().scores, [config.scoreWall, 0]);
+=======
+// T-014: a moving phase with no anim (debug setState only) recovers on the next step: gauge back to
+// the power phase for the same player, ships unmoved, no endTurn (human decision 2026-11-09).
+test('moving phase with no anim: step goes back to power, same player, ships unmoved; then plays on', () => {
+  const s = createInitialState();
+  const ships = [
+    { ...s.ships[0], x: 400, y: 300, heading: 45, unmovedSinceSpawn: false },
+    { ...s.ships[1], x: 800, y: 600, heading: 200, unmovedSinceSpawn: false },
+  ];
+  const gauge = { phase: 'moving', power: 0.6, needle: 30, backward: true, distance: 0.6 * config.maxMove, sweep: 1 };
+  game.setState({ ...s, turn: 1, ships, gauge });
+  game.step(16);
+  const r = game.getState();
+  assert.deepEqual(r.gauge, createInitialState().gauge);
+  assert.deepEqual(r.ships, ships);
+  assert.equal(r.turn, 1);
+  assert.equal('anim' in r, false);
+  for (const ms of [1, T(), T() * 10]) {
+    game.step(ms);
+    const later = game.getState();
+    assert.equal(later.turn, 1, `after step(${ms})`);
+    assert.deepEqual(later.ships, ships, `after step(${ms})`);
+  }
+  launch(0.4, 0);
+  const launched = game.getState();
+  assert.equal(launched.gauge.phase, 'moving');
+  assert.ok(launched.anim, 'Space, Space starts a normal move animation');
+  const locked = { ...launched, ships }; // the ships as they were before startMove turned the mover
+  const end = resolveMove(locked, moveFromGauge(locked)).ships[1];
+  game.step(T());
+  const after = game.getState();
+  assert.ok(near(after.ships[1].x, end.x) && near(after.ships[1].y, end.y), JSON.stringify(after.ships[1]));
+  assert.equal(after.ships[1].heading, end.heading);
+  assert.deepEqual(after.ships[0], ships[0]);
+  assert.equal(after.turn, 0);
+  assert.equal(after.gauge.phase, 'power');
+>>>>>>> task/T-014-moving-no-anim-recovery
 });

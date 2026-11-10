@@ -208,3 +208,40 @@ test('startMove/stepMove: constant speed along the segment, ends exactly at the 
   assert.equal('anim' in m, false);
   assert.deepEqual(stepMove(deepFreeze(m), T), m, 'nothing to animate after the move');
 });
+
+// T-014: a moving phase with no anim (only reachable through the debug setState) is put back to the
+// power phase on the next step(ms) > 0, ship unmoved, turn unchanged (human decision 2026-11-09).
+const stuck = (turn, extra = {}) => {
+  const s = createInitialState();
+  const ships = [
+    { ...s.ships[0], x: 400, y: 300, heading: 45, unmovedSinceSpawn: false },
+    { ...s.ships[1], x: 800, y: 600, heading: 200, unmovedSinceSpawn: false },
+  ];
+  const gauge = { phase: 'moving', power: 0.6, needle: 30, backward: true, distance: 0.6 * config.maxMove, sweep: 1 };
+  return deepFreeze({ ...s, turn, ships, gauge, ...extra });
+};
+
+test('stepMove: moving phase with no anim goes back to the power phase, ships and turn unchanged', () => {
+  for (const turn of [0, 1]) {
+    const st = stuck(turn);
+    const r = stepMove(st, 16);
+    assert.deepEqual(r.gauge, createInitialState().gauge, `turn ${turn}`);
+    assert.deepEqual(r.ships, st.ships, `turn ${turn}`);
+    assert.equal(r.turn, turn);
+    assert.equal('anim' in r, false);
+    assert.equal(st.gauge.phase, 'moving', 'input not mutated');
+  }
+});
+
+test('stepMove: moving phase with no anim and ms 0 changes nothing', () => {
+  const st = stuck(1);
+  assert.deepEqual(stepMove(st, 0), st);
+  assert.equal(stepMove(st, 0).gauge.phase, 'moving');
+});
+
+test('stepMove recovery carries every other state field over unchanged', () => {
+  const st = stuck(0, { scores: [3, -2] });
+  const r = stepMove(st, 16);
+  assert.deepEqual(r, { ...st, gauge: createInitialState().gauge });
+  assert.deepEqual(r.scores, [3, -2]);
+});
