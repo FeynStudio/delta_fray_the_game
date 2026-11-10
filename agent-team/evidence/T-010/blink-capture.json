@@ -1,0 +1,151 @@
+{
+  "commit": "b098297",
+  "url": "/index.html?debug=1",
+  "viewport": "1920x1080 dpr 1",
+  "frames": [
+    {
+      "file": "blink-start-0ms.png",
+      "clock": 0,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ]
+    },
+    {
+      "file": "blink-start-100ms.png",
+      "clock": 100,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.746
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.748
+        }
+      ]
+    },
+    {
+      "file": "blink-start-200ms.png",
+      "clock": 200,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        }
+      ]
+    },
+    {
+      "file": "blink-start-300ms.png",
+      "clock": 300,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.25
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ]
+    },
+    {
+      "file": "blink-start-400ms.png",
+      "clock": 400,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ]
+    },
+    {
+      "file": "blink-after-p1-move-300ms.png",
+      "clock": 1500,
+      "turn": 1,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 265,
+          "y": 480,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ]
+    }
+  ]
+}
