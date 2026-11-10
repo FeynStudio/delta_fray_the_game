@@ -1,4 +1,4 @@
-// Controls and gauges (docs/DESIGN.md "Controls"). Pure functions: each takes the state and
+// Controls and gauges (docs/ARCHITECTURE.md "Controls"). Pure functions: each takes the state and
 // returns a state, never mutating the input. No DOM here; game.js wires keyboard events to pressKey.
 // Reads config at call time.
 //

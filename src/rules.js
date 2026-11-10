@@ -1,4 +1,4 @@
-// Pure game rules only (see docs/DESIGN.md Architecture Rules). Reads config at call time.
+// Pure game rules only (see docs/ARCHITECTURE.md Architecture Rules). Reads config at call time.
 import config from './config.js';
 
 // Builds the starting state: player 1 to move, both ships alive at their spawn points.

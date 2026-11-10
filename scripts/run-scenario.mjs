@@ -52,8 +52,9 @@ try {
   for (const c of scenario.cases) {
     try {
       // Reset config, then apply the scenario's and the case's overrides.
+      // Overrides come from scenario files checked into the repo, not from user input.
       for (const key of Object.keys(config)) if (!(key in original)) delete config[key];
-      Object.assign(config, structuredClone(original), scenario.overrides ?? {}, c.overrides ?? {});
+      Object.assign(config, structuredClone(original), scenario.overrides ?? {}, c.overrides ?? {}); // nosemgrep: javascript.lang.security.insecure-object-assign.insecure-object-assign
 
       let state = deepFreeze(structuredClone(c.state));
       for (const step of c.steps) {

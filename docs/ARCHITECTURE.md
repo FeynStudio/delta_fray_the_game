@@ -1,4 +1,4 @@
-# CLAUDE.md — Galaxy Shooter
+# ARCHITECTURE.md — Galaxy Shooter
 
 ## Project Summary
 
@@ -42,7 +42,7 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 
 - Enemy inside the swept path is destroyed (any part counts).
 - Reaching a map edge destroys the moving ship. Hitting an enemy and then the edge destroys both.
-- Destroyed ships respawn at their spawn point. Spawn points can't be attacked. Endless play.
+- Destroyed ships respawn at their spawn point. Spawn points can't be attacked until ship moves away from its spawn no matter how small the move. Endless play.
 - No turn timer.
 
 ## Do NOT Add
@@ -50,7 +50,6 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 - Path preview or kill confirmation before launch
 - Dodging or evasion mechanics
 - Map wraparound
-- Spawn protection
 - Any feature not in the plan without asking first
 
 ## Workflow

@@ -60,7 +60,7 @@ async function launchBrowser(exe, profile) {
     '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
   const exited = new Promise((done) => proc.once('exit', done));
-  // Chrome prints "DevTools listening on ws://..." to stderr when it has a console. Started from a shell
+  // Chrome prints "DevTools listening on <websocket url>" to stderr when it has a console. Started from a shell
   // without one (e.g. an agent's shell on Windows), chrome.exe hands off to a detached browser and exits 0
   // without printing it, so also read the DevToolsActivePort file the browser writes into the profile.
   const portFile = join(profile, 'DevToolsActivePort');
@@ -75,7 +75,8 @@ async function launchBrowser(exe, profile) {
     const poll = setInterval(() => {
       if (!existsSync(portFile)) return;
       const [port, path] = readFileSync(portFile, 'utf8').split(/\r?\n/);
-      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`);
+      // Local DevTools on 127.0.0.1 only speaks plain ws (no wss); nothing leaves the machine.
+      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
     }, 100);
     proc.stderr.on('data', (d) => {
       buf += d;
