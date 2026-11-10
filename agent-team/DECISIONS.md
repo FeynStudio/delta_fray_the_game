@@ -91,3 +91,6 @@ Context: lifts the "do not build anything yet." hold (2026-11-09) on briefs T-00
 
 Decided by human in session, 2026-11-09: "Yes, go ahead (Recommended)"
 Context: answers "Was your /night-shift run the go-ahead to build T-006 and the next READY briefs?" (asked after T-006 review round 1 found no recorded go-ahead). Go-ahead for the night-shift run: T-006, then T-007 and T-008, oldest first, one at a time.
+
+Decided by human in session, 2026-11-10: "T-012, T-013, T-014 (Recommended)"
+Context: answers "Go-ahead for tonight's night-shift build: which 3 READY briefs should I build?" (options: T-012, T-013, T-014; T-009, T-010, T-011; don't build tonight). Go-ahead for this night-shift run: T-012, then T-013, then T-014, one at a time. T-013 still stops BLOCKED for the human's approval of the exact expected/movement.json diff; that approval is not given by this answer.
