@@ -41,6 +41,13 @@ const config = {
   // Spawn protection blink (T-010): a protected ship's outline fades out, then snaps back, every cycle.
   protectionBlinkMs: 400, // one fade cycle lasts this long (human, 2026-11-09)
   protectionMinAlpha: 0, // opacity at the end of each fade: 0 = fully invisible (human, 2026-11-09)
+  // Title decal (T-011): the game name at the top centre of the map, outline only, drawn over everything.
+  // Decoration only: not in state or rules, so it never affects movement, hits or walls.
+  titleText: 'Delta Fray', // exactly as the human typed it (2026-11-09); drawn upper-cased
+  titleFontSize: 48, // game units, monospace
+  titleTop: 16, // distance of the top of the text below the map's top edge
+  titleLetterSpacing: 8, // game units between letters
+  titleLineWidth: 1.5, // outline thickness of the letters
   // Opposite sides of the map on the horizontal center line, 900 units apart, facing each other.
   spawns: [
     { x: 190, y: 480, heading: 0 },
