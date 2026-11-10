@@ -94,3 +94,6 @@ Context: answers "Was your /night-shift run the go-ahead to build T-006 and the 
 
 Decided by human in session, 2026-11-10: "T-012, T-013, T-014 (Recommended)"
 Context: answers "Go-ahead for tonight's night-shift build: which 3 READY briefs should I build?" (options: T-012, T-013, T-014; T-009, T-010, T-011; don't build tonight). Go-ahead for this night-shift run: T-012, then T-013, then T-014, one at a time. T-013 still stops BLOCKED for the human's approval of the exact expected/movement.json diff; that approval is not given by this answer.
+
+Decided by human in session, 2026-11-10: "approve T-013 spec change"
+Context: approves the exact diff on branch task/T-013-backward-heading-spec, as shown to the human: expected/movement.json, case "backward move keeps the heading", "ships.0.heading": 0 to 180 (x 100 and y 480 unchanged). Clears the Approval gate; T-009 may now be built from this branch. Merge T-013 then T-009 back to back.
