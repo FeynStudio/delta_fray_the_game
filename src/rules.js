@@ -2,13 +2,34 @@
 import config from './config.js';
 
 // Builds the starting state: player 1 to move, both ships alive at their spawn points and
-// spawn protected (unmovedSinceSpawn: true, see isSpawnProtected).
+// spawn protected (unmovedSinceSpawn: true, see isSpawnProtected), both scores at config.scoreStart.
 export function createInitialState() {
   return {
     turn: 0,
     ships: config.spawns.map((s) => ({ x: s.x, y: s.y, heading: s.heading, alive: true, unmovedSinceSpawn: true })),
     gauge: { phase: 'power', power: 0, needle: 0, backward: false, distance: 0, sweep: 1 },
+    scores: config.spawns.map(() => config.scoreStart),
   };
+}
+
+// The players' scores (T-012). A state without scores (scenario or older test states) counts as every
+// player on config.scoreStart, read at call time. Always returns a new array.
+export function currentScores(state) {
+  return state.scores ? [...state.scores] : state.ships.map(() => config.scoreStart);
+}
+
+// New scores for the move that took `before` to `after` (after = resolveMove(before, move)), T-012.
+// Only the mover (before.turn) scores: config.scoreKill for each enemy that went from alive to
+// destroyed, plus config.scoreWall if the mover itself was destroyed (only the wall destroys it), so
+// hit-then-wall gets both. No clamping: scores may go below 0 (human, 2026-11-09). Inputs not changed.
+export function scoreMove(before, after) {
+  const scores = currentScores(before);
+  const i = before.turn;
+  before.ships.forEach((ship, j) => {
+    if (ship.alive === false || after.ships[j].alive !== false) return;
+    scores[i] += j === i ? config.scoreWall : config.scoreKill;
+  });
+  return scores;
 }
 
 // Keeps an angle in degrees within 0 (inclusive) to 360 (exclusive), e.g. -90 -> 270, 450 -> 90.

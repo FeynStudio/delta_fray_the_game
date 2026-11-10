@@ -32,6 +32,12 @@ const config = {
   explosionEndScale: 0.5, // each piece's length goes from 1 to this over explosionMs
   explosionCuts: [0.35, 0.6, 0.45], // each side (tip-left, left-right, right-tip) is cut once at this fraction
   explosionSpeed: 40, // game units per second each piece moves away from the ship's centre
+  // Score (T-012): each player's score, drawn in their corner. Scores may go below 0 (human, 2026-11-09).
+  scoreStart: 0, // both players start here
+  scoreKill: 1, // added to the mover for each enemy its move destroys
+  scoreWall: -2, // added to the mover when its move ends at the wall (hit-then-wall gets both)
+  scoreFontSize: 28, // game units
+  scoreMargin: 16, // distance of the score text from the map's top and side edges
   // Opposite sides of the map on the horizontal center line, 900 units apart, facing each other.
   spawns: [
     { x: 190, y: 480, heading: 0 },

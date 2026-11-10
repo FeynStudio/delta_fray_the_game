@@ -100,3 +100,6 @@ Context: approves the exact diff on branch task/T-013-backward-heading-spec, as 
 
 Decided by human in session, 2026-11-10: "start work on T-009"
 Context: the human ran /run-task with "start work on T-009" after approving the exact T-013 diff (ccf20b7). Go-ahead to build T-009 on branch task/T-009-backward-turn, created from ccf20b7. Not a merge or push approval.
+
+Decided by human in session, 2026-11-10: "Fix branch, you merge (Recommended)"
+Context: answers "Master has committed conflict markers in tests/game.test.js, FEATURE_MAP.md and REPEATS.md, and its tests don't run. How should I fix it before T-009 is reviewed?" The coordinator resolves them on branch fix/master-conflict-markers (keeping both sides) and the human merges it; then master is merged into task/T-009-backward-turn before T-009 review.
