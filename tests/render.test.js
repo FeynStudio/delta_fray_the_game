@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import config from '../src/config.js';
 import {
   COLORS, drawExplosions, drawGauge, drawScores, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout,
-  protectionAlpha, shipPoints,
+  drawFrame, protectionAlpha, shipPoints,
 } from '../src/render.js';
 import { createInitialState, isSpawnProtected } from '../src/rules.js';
 
@@ -399,4 +399,50 @@ test('drawShips: a state without clock draws a protected ship at full opacity (c
   drawShips(ctx, createInitialState());
   assert.deepEqual(strokes.map((s) => s.alpha), [1, 1]);
   assert.equal(t.globalAlpha, 1);
+});
+
+// Respawn turn (T-010 review round 1): ship 1 was just destroyed, its explosion is running in the same
+// colour, and the respawned ship 1 sits on its spawn, protected, blinking. Only that ship's outline is
+// drawn below full opacity; the explosion pieces, the other ship, the scores, the map and the gauge are not.
+test('respawn turn with an explosion running: only the respawned protected ship blinks', () => {
+  const P = config.protectionBlinkMs;
+  const base = createInitialState();
+  const ships = [
+    { x: 1020, y: 480, heading: 0, alive: true, unmovedSinceSpawn: false }, // the mover, not protected
+    { ...config.spawns[1], alive: true, unmovedSinceSpawn: true }, // respawned by endTurn
+  ];
+  const explosions = [{ ship: 1, x: 1000, y: 480, heading: 180, elapsed: 100 }];
+  for (const [clock, want] of [[P * 5 + P / 4, 0.75], [P * 5 + (3 * P) / 4, 0.25], [P * 5 + P - 10, 0.025]]) {
+    const state = deepFreeze(structuredClone({ ...base, turn: 1, ships, explosions, scores: [1, 0], clock }));
+    const copy = structuredClone(state);
+    assert.equal(isSpawnProtected(state, 1), true);
+
+    // drawShips alone: 2 ship strokes, alpha only on ship 1.
+    const one = alphaCtx();
+    drawShips(one.ctx, state);
+    assert.deepEqual(one.strokes.map((s) => s.color), COLORS.ships);
+    assert.equal(one.strokes[0].alpha, 1);
+    assert.ok(Math.abs(one.strokes[1].alpha - want) < 1e-9, `clock ${clock}: ${one.strokes[1].alpha}`);
+    assert.equal(one.t.globalAlpha, 1);
+
+    // The whole frame: every draw call other than ship 1's outline happens at globalAlpha 1.
+    const calls = [];
+    const t = { globalAlpha: 1 };
+    const ctx = new Proxy(t, {
+      get: (o, k) => (k in o ? o[k] : (...args) => calls.push({ k, alpha: o.globalAlpha, color: o.strokeStyle ?? o.fillStyle })),
+      set: (o, k, v) => { o[k] = v; return true; },
+    });
+    drawFrame(ctx, state);
+    const strokes = calls.filter((c) => c.k === 'stroke' || c.k === 'strokeRect');
+    const faded = calls.filter((c) => /^(stroke|strokeRect|fill|fillRect|fillText)$/.test(c.k) && c.alpha !== 1);
+    assert.equal(faded.length, 1, `exactly one faded draw call: ${JSON.stringify(faded)}`);
+    assert.ok(Math.abs(faded[0].alpha - want) < 1e-9);
+    // Order in drawFrame: map border, explosion pieces (ship 1 colour, alpha 1), ship 0, ship 1 (faded), gauge.
+    assert.equal(strokes[1].color, COLORS.ships[1], 'explosion stroke in ship 1 colour');
+    assert.equal(strokes[1].alpha, 1, 'explosion pieces at full opacity');
+    assert.equal(strokes[3], faded[0], 'the faded call is ship 1 outline, after the explosion and ship 0');
+    assert.ok(strokes.slice(4).length > 0 && strokes.slice(4).every((c) => c.alpha === 1), 'gauge at full opacity');
+    assert.equal(t.globalAlpha, 1);
+    assert.deepEqual(state, copy, 'state unchanged');
+  }
 });
