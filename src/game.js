@@ -6,7 +6,8 @@ import {
 import { drawFrame, fitCanvas } from './render.js';
 import log from './log.js';
 
-let state = createInitialState();
+// clock (T-010): game time in ms, advanced only by step(ms); render.js reads it for the protection blink.
+let state = { ...createInitialState(), clock: 0 };
 
 const canvas = document.getElementById('game');
 let ctx = null;
@@ -36,7 +37,9 @@ function press(key) {
 // Explosions (T-007) age on every step and start, one per destroyed ship, in that same step, just
 // before endTurn respawns the ships; they never hold up or change the turn.
 // The scores change in that same step (T-012), so they never change before the player sees the hit.
+// The game clock (state.clock, T-010) grows by exactly ms on every step; a state without it starts at 0.
 function step(ms) {
+  state = { ...state, clock: (state.clock ?? 0) + ms };
   const wasMoving = Boolean(state.anim);
   const scores = state.anim?.scores;
   state = stepMove(stepGauge(stepExplosions(state, ms), ms), ms);

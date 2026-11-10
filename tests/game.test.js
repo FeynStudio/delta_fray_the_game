@@ -4,12 +4,15 @@
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { applyMove, createInitialState, resolveMove, shipPoints, wrapDegrees } from '../src/rules.js';
+import {
+  applyMove, createInitialState, isSpawnProtected, resolveMove, shipPoints, wrapDegrees,
+} from '../src/rules.js';
 import { gaugeLayout } from '../src/render.js';
 import { moveFromGauge } from '../src/input.js';
 
 const listeners = {};
 let game;
+let loaded;
 
 before(async () => {
   const ctx = new Proxy({}, { get: () => () => {} }); // every canvas call is a no-op
@@ -22,6 +25,7 @@ before(async () => {
   globalThis.requestAnimationFrame = () => 0; // the loop is driven by step() in these tests
   await import('../src/game.js');
   game = window.__game;
+  loaded = game.getState(); // the state game.js starts with, before any test's setState (T-010)
 });
 
 beforeEach(() => game.setState(createInitialState()));
@@ -419,4 +423,44 @@ test('moving phase with no anim: step goes back to power, same player, ships unm
   assert.deepEqual(after.ships[0], ships[0]);
   assert.equal(after.turn, 0);
   assert.equal(after.gauge.phase, 'power');
+});
+
+// ---- game clock and spawn protection blink (T-010) ----
+
+test('the game starts with clock 0 and both ships spawn protected', () => {
+  assert.equal(loaded.clock, 0);
+  assert.equal(isSpawnProtected(loaded, 0), true);
+  assert.equal(isSpawnProtected(loaded, 1), true);
+});
+
+test('step(ms) grows the clock by exactly ms, in every phase and across the end of a move', () => {
+  game.setState({ ...createInitialState(), clock: 0 });
+  let want = 0;
+  for (const ms of [16, 0, 1, 250, 33.5]) {
+    game.step(ms);
+    want += ms;
+    assert.equal(game.getState().clock, want, `after step(${ms})`);
+  }
+  launch(0.5, 0); // moving phase
+  for (const ms of [T() / 2, T() / 2 + 1, 16]) {
+    game.step(ms);
+    want += ms;
+    assert.equal(game.getState().clock, want, `moving / after the move, step(${ms})`);
+  }
+  assert.equal(game.getState().turn, 1, 'the move ended and the turn passed');
+  game.setState(createInitialState()); // a state without clock counts from 0
+  game.step(40);
+  assert.equal(game.getState().clock, 40);
+});
+
+test("after player 1's first move only player 2's ship is still protected (blinks)", () => {
+  const s0 = game.getState();
+  assert.equal(isSpawnProtected(s0, 0), true);
+  assert.equal(isSpawnProtected(s0, 1), true);
+  launch(0.5, 0);
+  game.step(T());
+  const s = game.getState();
+  assert.equal(s.turn, 1);
+  assert.equal(isSpawnProtected(s, 0), false, "player 1's ship moved: no longer protected");
+  assert.equal(isSpawnProtected(s, 1), true, "player 2's ship has not moved: still protected");
 });

@@ -1,7 +1,7 @@
 // All canvas drawing. Each draw<Thing>(ctx, state) only reads state, never changes it.
 // Drawing happens in game units; fitCanvas sets a transform that scales the world to the screen.
 import config from './config.js';
-import { currentScores, shipPoints } from './rules.js';
+import { currentScores, isSpawnProtected, shipPoints } from './rules.js';
 
 // The ship shape lives in rules.js so hits use the same triangle that is drawn; re-exported here.
 export { shipPoints };
@@ -45,9 +45,21 @@ export function drawMap(ctx) {
 
 const SHIP_COLORS = COLORS.ships;
 
+// Opacity of a spawn-protected ship's outline at game clock clockMs (T-010). Each cycle of
+// config.protectionBlinkMs falls linearly from 1 toward config.protectionMinAlpha, then snaps back to 1
+// at the start of the next cycle (no fade back in). Both values are read at call time.
+export function protectionAlpha(clockMs) {
+  const period = config.protectionBlinkMs;
+  const t = (((clockMs % period) + period) % period) / period;
+  return 1 - (1 - config.protectionMinAlpha) * t;
+}
+
+// A spawn-protected ship (rules.isSpawnProtected) blinks with protectionAlpha(state.clock); every other
+// ship is drawn at full opacity, and globalAlpha is back at 1 after each ship.
 export function drawShips(ctx, state) {
   state.ships.forEach((ship, i) => {
     if (!ship.alive) return;
+    const blinking = isSpawnProtected(state, i);
     // Outline only: no fill, no shading. The slim shape shows the heading.
     const [tip, left, right] = shipPoints(ship, config.shipSize, config.shipWidth);
     ctx.beginPath();
@@ -58,7 +70,9 @@ export function drawShips(ctx, state) {
     ctx.lineJoin = 'round'; // keeps the stroke within lineWidth / 2 of each corner
     ctx.lineWidth = config.shipLineWidth;
     ctx.strokeStyle = SHIP_COLORS[i % SHIP_COLORS.length];
+    ctx.globalAlpha = blinking ? protectionAlpha(state.clock ?? 0) : 1;
     ctx.stroke();
+    ctx.globalAlpha = 1;
   });
 }
 

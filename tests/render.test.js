@@ -2,9 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
 import {
-  COLORS, drawExplosions, drawGauge, drawScores, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout, shipPoints,
+  COLORS, drawExplosions, drawGauge, drawScores, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout,
+  protectionAlpha, shipPoints,
 } from '../src/render.js';
-import { createInitialState } from '../src/rules.js';
+import { createInitialState, isSpawnProtected } from '../src/rules.js';
 
 const W = config.worldWidth;
 const H = config.worldHeight;
@@ -315,4 +316,87 @@ test('drawScores: a state without scores draws 0 for both; margins come from con
     ['0', config.scoreMargin, config.scoreMargin],
     ['0', W - config.scoreMargin, config.scoreMargin],
   ]);
+});
+
+// ---- spawn protection blink (T-010, human answers 2026-11-09: 400 ms, fade to invisible, snap back) ----
+test('protectionAlpha: 1, 0.75, 0.5, 0.25 at 0, 1/4, 1/2, 3/4 of the period and 1 again at one period', () => {
+  const P = config.protectionBlinkMs;
+  assert.equal(P, 400);
+  assert.equal(config.protectionMinAlpha, 0);
+  const want = [[0, 1], [P / 4, 0.75], [P / 2, 0.5], [(3 * P) / 4, 0.25], [P, 1]];
+  for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms) - a) < 1e-9, `${ms} ms: ${protectionAlpha(ms)}`);
+  // repeats exactly every period
+  for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms + 3 * P) - a) < 1e-9, `${ms + 3 * P} ms`);
+});
+
+test('protectionAlpha falls strictly within a cycle (no fade back in) and snaps back to 1', () => {
+  const P = config.protectionBlinkMs;
+  let prev = protectionAlpha(0);
+  for (let ms = 1; ms <= (3 * P) / 4; ms += 1) {
+    const a = protectionAlpha(ms);
+    assert.ok(a < prev, `${ms} ms: ${a} not below ${prev}`);
+    assert.ok(a > 0 && a <= 1, `${ms} ms in range`);
+    prev = a;
+  }
+  assert.ok(protectionAlpha(P - 1) < 0.01, 'almost invisible just before the cycle ends');
+  assert.equal(protectionAlpha(P), 1);
+});
+
+test('protectionAlpha reads period and minimum from config at call time', () => {
+  const saved = { p: config.protectionBlinkMs, m: config.protectionMinAlpha };
+  try {
+    config.protectionBlinkMs = 800;
+    const want = [[0, 1], [200, 0.75], [400, 0.5], [600, 0.25], [800, 1]];
+    for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms) - a) < 1e-9, `period 800, ${ms} ms`);
+    config.protectionMinAlpha = 0.2;
+    assert.ok(Math.abs(protectionAlpha(400) - 0.6) < 1e-9, 'min 0.2: halfway is 0.6');
+  } finally {
+    config.protectionBlinkMs = saved.p;
+    config.protectionMinAlpha = saved.m;
+  }
+});
+
+// Records globalAlpha at every stroke, and the value left on the context at the end.
+const alphaCtx = () => {
+  const strokes = [];
+  const t = { globalAlpha: 1 };
+  const ctx = new Proxy(t, {
+    get: (o, k) => (k in o ? o[k] : (...args) => { if (k === 'stroke') strokes.push({ alpha: o.globalAlpha, color: o.strokeStyle }); }),
+    set: (o, k, v) => { o[k] = v; return true; },
+  });
+  return { ctx, strokes, t };
+};
+
+test('drawShips: only a spawn-protected ship is drawn below full opacity; globalAlpha back at 1; state unchanged', () => {
+  const P = config.protectionBlinkMs;
+  const base = createInitialState(); // both ships protected at game start (T-006)
+  const moved = { ...base.ships[0], x: 400, unmovedSinceSpawn: false };
+  const cases = [
+    { ships: base.ships, clock: P / 4, want: [0.75, 0.75] },
+    { ships: base.ships, clock: P / 2 + 7 * P, want: [0.5, 0.5] },
+    { ships: base.ships, clock: 0, want: [1, 1] },
+    { ships: [moved, base.ships[1]], clock: (3 * P) / 4, want: [1, 0.25] },
+    { ships: [moved, { ...base.ships[1], unmovedSinceSpawn: false }], clock: P / 2, want: [1, 1] },
+  ];
+  for (const { ships, clock, want } of cases) {
+    const state = deepFreeze(structuredClone({ ...base, ships, clock, explosions: [] }));
+    const copy = structuredClone(state);
+    const { ctx, strokes, t } = alphaCtx();
+    drawShips(ctx, state);
+    assert.equal(strokes.length, 2);
+    strokes.forEach((s, i) => {
+      assert.ok(Math.abs(s.alpha - want[i]) < 1e-9, `clock ${clock}, ship ${i}: alpha ${s.alpha}, want ${want[i]}`);
+      assert.equal(s.alpha < 1, isSpawnProtected(state, i) && clock % P !== 0, `ship ${i} below 1 only when protected`);
+      assert.equal(s.color, COLORS.ships[i]);
+    });
+    assert.equal(t.globalAlpha, 1, 'globalAlpha left at 1 for the gauges and anything drawn later');
+    assert.deepEqual(state, copy, 'state unchanged');
+  }
+});
+
+test('drawShips: a state without clock draws a protected ship at full opacity (clock 0)', () => {
+  const { ctx, strokes, t } = alphaCtx();
+  drawShips(ctx, createInitialState());
+  assert.deepEqual(strokes.map((s) => s.alpha), [1, 1]);
+  assert.equal(t.globalAlpha, 1);
 });
