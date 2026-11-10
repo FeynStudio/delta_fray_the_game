@@ -1,7 +1,7 @@
 // All canvas drawing. Each draw<Thing>(ctx, state) only reads state, never changes it.
 // Drawing happens in game units; fitCanvas sets a transform that scales the world to the screen.
 import config from './config.js';
-import { shipPoints } from './rules.js';
+import { currentScores, shipPoints } from './rules.js';
 
 // The ship shape lives in rules.js so hits use the same triangle that is drawn; re-exported here.
 export { shipPoints };
@@ -193,8 +193,23 @@ export function drawExplosions(ctx, state) {
   }
 }
 
+// Each player's score (T-012): player 1 in the top-left corner, player 2 in the top-right corner, in
+// that player's ship colour, config.scoreMargin inside the map. A negative score keeps its minus sign.
+export function drawScores(ctx, state) {
+  const m = config.scoreMargin;
+  ctx.font = `${config.scoreFontSize}px monospace`;
+  ctx.textBaseline = 'top';
+  currentScores(state).forEach((score, i) => {
+    const right = i % 2 === 1;
+    ctx.textAlign = right ? 'right' : 'left';
+    ctx.fillStyle = SHIP_COLORS[i % SHIP_COLORS.length];
+    ctx.fillText(String(score), right ? config.worldWidth - m : m, m);
+  });
+}
+
 export function drawFrame(ctx, state) {
   drawMap(ctx);
+  drawScores(ctx, state);
   drawExplosions(ctx, state);
   drawShips(ctx, state);
   drawGauge(ctx, state);

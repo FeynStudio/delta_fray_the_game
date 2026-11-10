@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
 import {
-  COLORS, drawExplosions, drawGauge, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout, shipPoints,
+  COLORS, drawExplosions, drawGauge, drawScores, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout, shipPoints,
 } from '../src/render.js';
 import { createInitialState } from '../src/rules.js';
 
@@ -278,4 +278,41 @@ test('drawExplosions: nothing without explosions; strokes in the ship colour wit
   assert.deepEqual(styles, [COLORS.ships[boom.ship]]);
   assert.equal(calls.filter(([k]) => k === 'moveTo').length, 6);
   assert.ok(!calls.some(([k]) => /fill/i.test(String(k))), 'outline only');
+});
+
+// ---- score corners (T-012) ----
+test('drawScores: player 1 top-left, player 2 top-right, each in its ship colour, minus sign kept', () => {
+  const texts = [];
+  const ctx = new Proxy({}, {
+    get: (t, k) => (k in t ? t[k] : (...args) => {
+      if (k === 'fillText') texts.push({ text: args[0], x: args[1], y: args[2], color: t.fillStyle, align: t.textAlign });
+    }),
+    set: (t, k, v) => { t[k] = v; return true; },
+  });
+  const state = deepFreeze({ ...createInitialState(), scores: [-2, 7] });
+  const copy = structuredClone(state);
+  drawScores(ctx, state);
+  assert.equal(texts.length, 2);
+  const [p1, p2] = texts;
+  assert.equal(p1.text, '-2');
+  assert.ok(p1.x >= 0 && p1.x < W / 4 && p1.y >= 0 && p1.y < H / 4, JSON.stringify(p1));
+  assert.equal(p1.color, COLORS.ships[0]);
+  assert.equal(p2.text, '7');
+  assert.ok(p2.x > (3 * W) / 4 && p2.x <= W && p2.y >= 0 && p2.y < H / 4, JSON.stringify(p2));
+  assert.equal(p2.align, 'right', 'right-aligned so the text stays inside the map');
+  assert.equal(p2.color, COLORS.ships[1]);
+  assert.deepEqual(state, copy, 'state unchanged');
+});
+
+test('drawScores: a state without scores draws 0 for both; margins come from config', () => {
+  const texts = [];
+  const ctx = new Proxy({}, {
+    get: (t, k) => (k in t ? t[k] : (...args) => { if (k === 'fillText') texts.push(args); }),
+    set: (t, k, v) => { t[k] = v; return true; },
+  });
+  drawScores(ctx, { turn: 0, ships: createInitialState().ships });
+  assert.deepEqual(texts, [
+    ['0', config.scoreMargin, config.scoreMargin],
+    ['0', W - config.scoreMargin, config.scoreMargin],
+  ]);
 });

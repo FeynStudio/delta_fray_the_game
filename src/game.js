@@ -1,5 +1,5 @@
 // Owns the single game state object and connects rules, input and rendering.
-import { createInitialState, endTurn, resolveMove } from './rules.js';
+import { createInitialState, endTurn, resolveMove, scoreMove } from './rules.js';
 import {
   keyFromEvent, moveFromGauge, pressKey, startExplosions, startMove, stepExplosions, stepGauge, stepMove,
 } from './input.js';
@@ -18,11 +18,15 @@ function fit() {
 
 // Same path for real keys and the debug API. The second Space launches the move: the end state comes
 // from rules.resolveMove (hits and walls), and the animation only shows the ship getting there.
+// The move's new scores (rules.scoreMove, T-012) wait in anim.scores until the move ends.
 function press(key) {
   const launching = state.gauge.phase === 'direction';
   state = pressKey(state, key);
   if (launching && state.gauge.phase === 'moving') {
-    state = startMove(state, resolveMove(state, moveFromGauge(state)));
+    const end = resolveMove(state, moveFromGauge(state));
+    const scores = scoreMove(state, end);
+    state = startMove(state, end);
+    state = { ...state, anim: { ...state.anim, scores } };
   }
 }
 
@@ -31,10 +35,15 @@ function press(key) {
 // destroyed ships respawn and the other player's turn starts on the power gauge. No turn timer.
 // Explosions (T-007) age on every step and start, one per destroyed ship, in that same step, just
 // before endTurn respawns the ships; they never hold up or change the turn.
+// The scores change in that same step (T-012), so they never change before the player sees the hit.
 function step(ms) {
   const wasMoving = Boolean(state.anim);
+  const scores = state.anim?.scores;
   state = stepMove(stepGauge(stepExplosions(state, ms), ms), ms);
-  if (wasMoving && !state.anim) state = endTurn(startExplosions(state));
+  if (wasMoving && !state.anim) {
+    if (scores) state = { ...state, scores };
+    state = endTurn(startExplosions(state));
+  }
 }
 
 window.addEventListener('keydown', (event) => {
