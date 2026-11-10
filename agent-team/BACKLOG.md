@@ -23,8 +23,8 @@
     - RESOLVED 2026-11-09: Q-A answered, see the human decision of 2026-11-09 "keep the new heading just like a forward move with updated direction." in agent-team/DECISIONS.md (also in T-009.md and T-013.md, Decisions). T-009 READY (on hold), depends on T-006 and T-013. Spec change briefed as agent-team/tasks/T-013.md (READY, on hold; its exact expected/movement.json diff, heading 0 to 180 in "backward move keeps the heading", still needs the human's approval).
   - CLOSED (T-013 DONE 2026-11-10, merged bef0df3). agent-team/tasks/T-013.md: spec change for T-009, expected/movement.json only (2026-11-09).
   - CLOSED (T-014 DONE 2026-11-10, merged 36351c0). agent-team/tasks/T-014.md: step(ms) recovery from phase 'moving' with no anim (2026-11-09, from the T-003 item above).
-  - agent-team/tasks/T-010.md: spawn protection blink (READY 2026-11-09: 400 ms cycle, fade to invisible, fade out then snap back; depends on T-006).
-  - agent-team/tasks/T-011.md: retro title decal at the top middle (READY 2026-11-09: "Delta Fray", drawn in capitals by coordinator's choice).
+  - CLOSED (T-010 DONE 2026-11-10, merged e2305be). agent-team/tasks/T-010.md: spawn protection blink (READY 2026-11-09: 400 ms cycle, fade to invisible, fade out then snap back; depends on T-006).
+  - CLOSED (T-011 DONE 2026-11-10, merged 11518e4). agent-team/tasks/T-011.md: retro title decal at the top middle (READY 2026-11-09: "Delta Fray", drawn in capitals by coordinator's choice).
   - CLOSED (T-012 DONE 2026-11-10, merged d86885e). agent-team/tasks/T-012.md: per-player score in the corners (READY 2026-11-09: start 0, negatives allowed, P1 top-left and P2 top-right in ship colours, hit-then-wall nets -1; build after T-006).
 - CLOSED 2026-11-09 (superseded by the updated build order below). Sequencing note (coordinator, 2026-11-09): T-007, T-010, T-011 and T-012 all edit src/render.js; T-006, T-012 and T-009 all edit src/rules.js. Build one at a time; T-006 before T-010, T-012 and T-009.
   - Superseded by the build order below (2026-11-09, later): T-009 no longer edits src/render.js.
