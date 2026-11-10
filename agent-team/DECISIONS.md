@@ -103,3 +103,6 @@ Context: the human ran /run-task with "start work on T-009" after approving the 
 
 Decided by human in session, 2026-11-10: "Fix branch, you merge (Recommended)"
 Context: answers "Master has committed conflict markers in tests/game.test.js, FEATURE_MAP.md and REPEATS.md, and its tests don't run. How should I fix it before T-009 is reviewed?" The coordinator resolves them on branch fix/master-conflict-markers (keeping both sides) and the human merges it; then master is merged into task/T-009-backward-turn before T-009 review.
+
+Decided by human in session, 2026-11-10: "Build both, T-011 on T-010 (Recommended)"
+Context: answers "Go-ahead for tonight's night shift: build T-010 (protection blink) then T-011 (title decal)? Both edit src/render.js. How should T-011 be based?" Go-ahead for this night-shift run: T-010 branches from master; T-011 branches from T-010's reviewed head so it already contains T-010 (no render.js conflict); the human merges T-010 first, then T-011. Not a merge or push approval.
