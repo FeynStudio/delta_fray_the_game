@@ -18,7 +18,7 @@ function deepFreeze(value) {
 }
 
 const ship = (x, y, heading, alive = true) => ({ x, y, heading, alive });
-const spawnShip = (i) => ({ ...config.spawns[i], alive: true });
+const spawnShip = (i) => ({ ...config.spawns[i], alive: true, unmovedSinceSpawn: true });
 
 test('a destroyed ship respawns at its spawn point; the living ship is unchanged; turn 0 -> 1', () => {
   const living = ship(350, 480, 0);
@@ -58,8 +58,8 @@ test('reads config.spawns at call time (override)', () => {
   const s = deepFreeze({ turn: 0, ships: [ship(10, 10, 0, false), ship(20, 20, 0, false)] });
   const out = endTurn(s);
   assert.deepEqual(out.ships, [
-    { x: 100, y: 200, heading: 45, alive: true },
-    { x: 900, y: 700, heading: 225, alive: true },
+    { x: 100, y: 200, heading: 45, alive: true, unmovedSinceSpawn: true },
+    { x: 900, y: 700, heading: 225, alive: true, unmovedSinceSpawn: true },
   ]);
 });
 

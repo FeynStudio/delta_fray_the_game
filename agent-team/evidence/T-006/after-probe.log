@@ -1,0 +1,5 @@
+commit: 6c11243  probe: spawn sweep at game start
+ships before: [{"x":980,"y":480,"heading":0,"alive":true,"unmovedSinceSpawn":true},{"x":1090,"y":480,"heading":180,"alive":true,"unmovedSinceSpawn":true}]
+ships after resolveMove(150 at 0): [{"x":1130,"y":480,"heading":0,"alive":true,"unmovedSinceSpawn":false},{"x":1090,"y":480,"heading":180,"alive":true,"unmovedSinceSpawn":true}]
+player 2 on spawn alive after sweep: true
+isSpawnProtected exported: true
