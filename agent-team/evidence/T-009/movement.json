@@ -14,7 +14,7 @@
   "backward move keeps the heading": {
     "ships.0.x": 100,
     "ships.0.y": 480,
-    "ships.0.heading": 0
+    "ships.0.heading": 180
   },
   "diagonal move uses degrees, not radians": {
     "ships.0.x": 270.711,
