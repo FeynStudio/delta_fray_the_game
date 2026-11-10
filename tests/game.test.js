@@ -274,3 +274,65 @@ test('the next player can press Space while an explosion plays, and its move end
   assert.equal(s.turn, 0, 'turn passed once, in the step the move ended');
   assert.equal(s.explosions.length, config.explosionMs > T() ? 1 : 0);
 });
+
+// ---- score (T-012): scores change in the step where the move animation ends, never before ----
+test('score after a hit: unchanged during the animation, +1 for the mover in the step it ends', () => {
+  launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
+  assert.deepEqual(game.getState().scores, [0, 0]);
+  game.step(T() - 1);
+  const mid = game.getState();
+  assert.equal(mid.gauge.phase, 'moving');
+  assert.deepEqual(mid.scores, [0, 0], 'no change before the player sees the hit');
+  game.step(1);
+  const s = game.getState();
+  assert.deepEqual(s.scores, [config.scoreKill, 0]);
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+});
+
+test('score after a wall death: unchanged during the animation, -2 for the mover when it ends', () => {
+  launchFrom(0, [{ x: 1200, y: 480, heading: 0, alive: true }, { x: 600, y: 200, heading: 180, alive: true }], 1, 0);
+  game.step(T() / 2);
+  assert.deepEqual(game.getState().scores, [0, 0]);
+  game.step(T());
+  const s = game.getState();
+  assert.deepEqual(s.scores, [config.scoreWall, 0]);
+  assert.equal(s.turn, 1);
+  assert.equal(s.gauge.phase, 'power');
+});
+
+test('scores add up over several turns; turn and gauge behave as before', () => {
+  // P1 kills P2 (+1), P2 plain move, P1 dies at the wall (-2), P2 kills P1 (+1).
+  launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
+  game.step(T());
+  assert.deepEqual(game.getState().scores, [1, 0]);
+  assert.equal(game.getState().turn, 1);
+  launch(0.2, 0);
+  game.step(T());
+  assert.deepEqual(game.getState().scores, [1, 0]);
+  assert.equal(game.getState().turn, 0);
+  let s = game.getState();
+  game.setState({ ...s, ships: [{ x: 1200, y: 480, heading: 0, alive: true }, s.ships[1]] });
+  launch(1, 0);
+  game.step(T());
+  s = game.getState();
+  assert.deepEqual(s.scores, [-1, 0]);
+  assert.equal(s.turn, 1);
+  game.setState({ ...s, ships: [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }] });
+  launch(1, 0); // ship 1 faces 180, a full forward move sweeps ship 0
+  game.step(T());
+  s = game.getState();
+  assert.deepEqual(s.scores, [-1, 1]);
+  assert.equal(s.turn, 0);
+  assert.equal(s.gauge.phase, 'power');
+  game.step(600000);
+  assert.deepEqual(game.getState().scores, [-1, 1], 'later steps never change the scores');
+});
+
+test('a state loaded without scores starts from [0, 0] when a move ends', () => {
+  const { scores: _none, ...s } = createInitialState();
+  game.setState({ ...s, ships: [{ x: 1200, y: 480, heading: 0, alive: true }, s.ships[1]] });
+  launch(1, 0);
+  game.step(T());
+  assert.deepEqual(game.getState().scores, [config.scoreWall, 0]);
+});
