@@ -12,12 +12,6 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | handoff text left stale after a later change or decision | 2 | T-002, T-006 |
 | build started without a recorded human go-ahead (latest tagged decision says don't build) | 1 | T-006 |
 | evidence log header commit does not match the code that ran (uncommitted change at run time) | 1 | T-008 |
-<<<<<<< HEAD
-<<<<<<< HEAD
 | before evidence overwritten by the after run (verify.sh writes the same artifact file names for every label) | 1 | T-012 |
-=======
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 1 | T-014 |
->>>>>>> task/T-014-moving-no-anim-recovery
-=======
 | owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 1 | T-013 |
->>>>>>> task/T-013-backward-heading-spec
