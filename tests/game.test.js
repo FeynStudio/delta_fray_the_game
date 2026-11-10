@@ -202,7 +202,7 @@ test('explosion after a hit: one entry at the enemy where it was hit; turn and g
   assert.deepEqual(s.explosions, [{ ship: 1, x: 300, y: 490, heading: 180, elapsed: 0 }]);
   assert.equal(s.turn, 1);
   assert.equal(s.gauge.phase, 'power');
-  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true });
+  assert.deepEqual(s.ships[1], { ...config.spawns[1], alive: true, unmovedSinceSpawn: true });
 });
 
 test('explosion after a wall death: centre moved so the whole triangle is inside the map', () => {
