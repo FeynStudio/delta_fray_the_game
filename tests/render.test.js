@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { drawGauge, drawShips, fitCanvas, fitScale, gaugeLayout, shipPoints } from '../src/render.js';
+import {
+  COLORS, drawExplosions, drawGauge, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout, shipPoints,
+} from '../src/render.js';
 import { createInitialState } from '../src/rules.js';
 
 const W = config.worldWidth;
@@ -217,4 +219,63 @@ test('the power bar does not overlap the direction dial', () => {
       }
     }
   }
+});
+
+// ---- explosions (T-007, human answer of 2026-11-09) ----
+const boom = { ship: 1, x: 400, y: 300, heading: 237, elapsed: 0 };
+const len = (s) => Math.hypot(s.to.x - s.from.x, s.to.y - s.from.y);
+const mid = (s) => ({ x: (s.from.x + s.to.x) / 2, y: (s.from.y + s.to.y) / 2 });
+const close = (p, q) => Math.abs(p.x - q.x) < 1e-9 && Math.abs(p.y - q.y) < 1e-9;
+
+test('explosionPieces at 0 ms: 6 segments joined end to end into the ship triangle', () => {
+  const pieces = explosionPieces(boom, 0);
+  assert.equal(pieces.length, 6);
+  const pts = shipPoints(boom, config.shipSize, config.shipWidth);
+  pieces.forEach((p, i) => assert.ok(close(p.to, pieces[(i + 1) % 6].from), `piece ${i} joins piece ${i + 1}`));
+  pts.forEach((pt, k) => assert.ok(close(pieces[2 * k].from, pt), `side ${k} starts at shipPoints[${k}]`));
+});
+
+test('explosionPieces: the two pieces of each side differ in length', () => {
+  const pieces = explosionPieces(boom, 0);
+  for (let k = 0; k < 3; k += 1) {
+    assert.ok(Math.abs(len(pieces[2 * k]) - len(pieces[2 * k + 1])) > 1e-6, `side ${k} is cut unevenly`);
+  }
+});
+
+test('explosionPieces at explosionMs: each piece is explosionEndScale of its 0 ms length', () => {
+  const start = explosionPieces(boom, 0);
+  const end = explosionPieces(boom, config.explosionMs);
+  start.forEach((p, i) => assert.ok(Math.abs(len(end[i]) - config.explosionEndScale * len(p)) < 1e-9, `piece ${i}`));
+});
+
+test('explosionPieces: at 500 ms each midpoint is explosionSpeed x 0.5 farther from the centre', () => {
+  const dist = (s) => Math.hypot(mid(s).x - boom.x, mid(s).y - boom.y);
+  const start = explosionPieces(boom, 0);
+  const half = explosionPieces(boom, 500);
+  start.forEach((p, i) => {
+    assert.ok(dist(half[i]) > dist(p), `piece ${i} moved outward`);
+    assert.ok(Math.abs(dist(half[i]) - dist(p) - config.explosionSpeed * 0.5) < 1e-9, `piece ${i} speed`);
+  });
+});
+
+test('drawExplosions: nothing without explosions; strokes in the ship colour with one; state unchanged', () => {
+  const none = [];
+  drawExplosions(recordingCtx(none), deepFreeze({ ships: [], explosions: [] }));
+  drawExplosions(recordingCtx(none), deepFreeze({ ships: [] }));
+  assert.equal(none.length, 0);
+
+  const calls = [];
+  const styles = [];
+  const ctx = new Proxy({}, {
+    get: (t, k) => (k in t ? t[k] : (...args) => calls.push([k, ...args])),
+    set: (t, k, v) => { if (k === 'strokeStyle') styles.push(v); t[k] = v; return true; },
+  });
+  const state = deepFreeze({ ships: [], explosions: [{ ...boom, elapsed: 250 }] });
+  const before = JSON.stringify(state);
+  drawExplosions(ctx, state);
+  assert.equal(JSON.stringify(state), before);
+  assert.equal(calls.filter(([k]) => k === 'stroke').length, 1);
+  assert.deepEqual(styles, [COLORS.ships[boom.ship]]);
+  assert.equal(calls.filter(([k]) => k === 'moveTo').length, 6);
+  assert.ok(!calls.some(([k]) => /fill/i.test(String(k))), 'outline only');
 });

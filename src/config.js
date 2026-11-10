@@ -26,6 +26,12 @@ const config = {
   gaugeDialGap: 4, // space between the nose (forward) or tail (backward) and the dial's flat side
   gaugeEdgeMargin: 4, // gauges are kept at least this far inside the map edges
   gaugeLineWidth: 2,
+  // Explosions (T-007): a destroyed ship's outline breaks into 6 pieces that fly outward and shrink.
+  // Decoration only: play does not wait for them (human, 2026-11-09).
+  explosionMs: 1000, // an explosion lasts this long, then it is removed
+  explosionEndScale: 0.5, // each piece's length goes from 1 to this over explosionMs
+  explosionCuts: [0.35, 0.6, 0.45], // each side (tip-left, left-right, right-tip) is cut once at this fraction
+  explosionSpeed: 40, // game units per second each piece moves away from the ship's centre
   // Opposite sides of the map on the horizontal center line, 900 units apart, facing each other.
   spawns: [
     { x: 190, y: 480, heading: 0 },

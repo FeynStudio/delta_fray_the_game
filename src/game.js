@@ -1,6 +1,8 @@
 // Owns the single game state object and connects rules, input and rendering.
 import { createInitialState, endTurn, resolveMove } from './rules.js';
-import { keyFromEvent, moveFromGauge, pressKey, startMove, stepGauge, stepMove } from './input.js';
+import {
+  keyFromEvent, moveFromGauge, pressKey, startExplosions, startMove, stepExplosions, stepGauge, stepMove,
+} from './input.js';
 import { drawFrame, fitCanvas } from './render.js';
 import log from './log.js';
 
@@ -27,10 +29,12 @@ function press(key) {
 // Advances the game clock: the gauge sweep, or the move animation while a move runs. In the step
 // where the move animation finishes, the resolved end state is in place and rules.endTurn runs once:
 // destroyed ships respawn and the other player's turn starts on the power gauge. No turn timer.
+// Explosions (T-007) age on every step and start, one per destroyed ship, in that same step, just
+// before endTurn respawns the ships; they never hold up or change the turn.
 function step(ms) {
   const wasMoving = Boolean(state.anim);
-  state = stepMove(stepGauge(state, ms), ms);
-  if (wasMoving && !state.anim) state = endTurn(state);
+  state = stepMove(stepGauge(stepExplosions(state, ms), ms), ms);
+  if (wasMoving && !state.anim) state = endTurn(startExplosions(state));
 }
 
 window.addEventListener('keydown', (event) => {

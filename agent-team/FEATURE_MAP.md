@@ -12,11 +12,11 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 2. Map & Rendering
 - What it does: "I see the play area full screen with two triangle ships."
-- Where it lives: src/render.js, src/config.js (ship triangle: rules.shipPoints, re-exported by render.js, T-004)
+- Where it lives: src/render.js, src/config.js (ship triangle: rules.shipPoints, re-exported by render.js, T-004). Explosions (T-007): render.js explosionPieces(explosion, elapsedMs) (pure: the ship's outline triangle, each side cut once at config.explosionCuts, 6 pieces whose midpoints move straight out from the centre at config.explosionSpeed units/s and that shrink about their midpoints from 1 to config.explosionEndScale over config.explosionMs) and drawExplosions(ctx, state) (outline pieces in COLORS.ships[ship], config.shipLineWidth; drawFrame calls it before drawShips)
 - How a user reaches it: open index.html through a local server (e.g., npx serve .)
 - How an agent drives it: ?debug=1, then __game.getState(); screenshot the canvas; verify.sh --feature render
 - Inputs: world 1280 × 960 units, browser window 1920 × 1080
-- Correct output looks like: world scaled to fit with aspect ratio kept; ships are 30-unit triangles at their spawn points, pointing at each other; no scrollbars
+- Correct output looks like: world scaled to fit with aspect ratio kept; ships are 30-unit triangles at their spawn points, pointing at each other; no scrollbars; a destroyed ship's outline breaks into 6 uneven pieces that fly outward and shrink to half size over 1 second while play carries on (T-007)
 - Known traps: mixing screen pixels with game units; stretching the map at other aspect ratios; blurry canvas on high-DPI screens
 - Owner role: Owner
 
@@ -53,7 +53,11 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
 
 6. Respawn & Turns
 - What it does: "When a ship is destroyed, a new one appears at its spawn point and play continues."
+<<<<<<< HEAD
 - Where it lives: src/rules.js endTurn(state) (pure: every ship with alive: false is replaced by config.spawns[i], read at call time, with alive: true and unmovedSinceSpawn: true; living ships unchanged; turn flips exactly once, also after a double kill; other fields kept); src/game.js step(ms) (turn manager: when the move animation ends it puts the resolved end state in place and calls endTurn once, so the next player starts on the power gauge; nothing else changes the turn, so there is no turn timer); tests in tests/turns.test.js and tests/game.test.js (T-005). A destroyed enemy stays drawn until the move ends and reappears at its spawn in the same step.
+=======
+- Where it lives: src/rules.js endTurn(state) (pure: every ship with alive: false is replaced by config.spawns[i], read at call time, with alive: true; living ships unchanged; turn flips exactly once, also after a double kill; other fields kept); src/game.js step(ms) (turn manager: when the move animation ends it puts the resolved end state in place and calls endTurn once, so the next player starts on the power gauge; nothing else changes the turn, so there is no turn timer); tests in tests/turns.test.js and tests/game.test.js (T-005). A destroyed enemy stays drawn until the move ends and reappears at its spawn in the same step. In that same step, before endTurn, input.startExplosions adds one entry per destroyed ship to state.explosions (a hit enemy where it was hit; the wall-killed mover moved the shortest distance that puts its whole triangle inside the map), and input.stepExplosions ages them on every step and removes them at config.explosionMs. Explosions are decoration: play does not wait for them and they never change turn, ships or gauge (T-007, human answer 2026-11-09).
+>>>>>>> task/T-007-explosions
 - How a user reaches it: automatically after a destruction or the end of a move
 - How an agent drives it: __game.setState() with a destroyed ship, then getState(); verify.sh --feature turns
 - Inputs: Player 1 destroys Player 2's ship
@@ -86,7 +90,11 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
   - input also saves one screenshot per gauge phase (T-008): input-smoke-power.png (phase 'power'), input-smoke-direction.png (phase 'direction', backward false) and input-smoke-direction-backward.png (phase 'direction', backward true, after Shift). Each is taken in its own page, separate from the pages behind the checked results; smoke.mjs reads getState().gauge just before and after each capture and fails the run with an error naming the file if the phase or backward flag is wrong. input-smoke.png (after the launch) is still written.
 - Every slice must keep guards green, so src/rules.js has to exist from slice 1 (it may start with just the functions below as they are built).
 - Config: src/config.js has a default export of one plain, mutable object with at least worldWidth, worldHeight, shipSize, maxMove and spawns: [{x, y, heading}, {x, y, heading}]. Rules read it at call time, so a scenario can override values.
+<<<<<<< HEAD
 - State: { turn: 0 | 1, ships: [{x, y, heading, alive, unmovedSinceSpawn?}, {x, y, heading, alive, unmovedSinceSpawn?}], gauge }. unmovedSinceSpawn (T-006) is true from createInitialState or an endTurn respawn until the ship's own accepted move sets it to false; a ship without it is treated as false. Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
+=======
+- State: { turn: 0 | 1, ships: [{x, y, heading, alive}, {x, y, heading, alive}], gauge }. Optional explosions: [{ ship, x, y, heading, elapsed }] (ship index, centre, heading, ms since it began; T-007), absent or [] when nothing is exploding; move animation in anim (section 4). Game units; heading in degrees, 0 = right (+x), 90 = down (+y), kept within 0 to 360.
+>>>>>>> task/T-007-explosions
 - Move: { distance, angle, backward? }. angle is the world travel direction in degrees (same convention as heading).
 - Rules (pure, return a new state, never mutate input; run-scenario.mjs freezes inputs to enforce this):
   - createInitialState(): builds { turn: 0, ships at config.spawns[i] with alive: true and unmovedSinceSpawn: true, gauge } from config at call time (T-001). game.js uses it to start the game.

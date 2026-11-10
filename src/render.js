@@ -149,8 +149,53 @@ export function drawGauge(ctx, state) {
   if (phase === 'direction') drawDirectionDial(ctx, state);
 }
 
+// The 6 line pieces of an explosion ({ ship, x, y, heading }) at elapsedMs, in game units (T-007).
+// The ship's outline triangle (shipPoints) has each side cut once at config.explosionCuts[k], so the
+// two pieces of a side differ in length. Each piece keeps its angle, moves its midpoint straight away
+// from the centre at config.explosionSpeed units per second and shrinks about its midpoint, linearly
+// from 1 at 0 ms to config.explosionEndScale at config.explosionMs. Returns [{ from, to }] x 6.
+export function explosionPieces(explosion, elapsedMs) {
+  const pts = shipPoints(explosion, config.shipSize, config.shipWidth);
+  const ms = Math.min(Math.max(elapsedMs, 0), config.explosionMs);
+  const scale = 1 + (config.explosionEndScale - 1) * (ms / config.explosionMs);
+  const travel = (config.explosionSpeed * ms) / 1000; // explosionSpeed is per second
+  const pieces = [];
+  pts.forEach((a, k) => {
+    const b = pts[(k + 1) % pts.length];
+    const t = config.explosionCuts[k];
+    const cut = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    for (const [p, q] of [[a, cut], [cut, b]]) {
+      const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+      const d = Math.hypot(mx - explosion.x, my - explosion.y);
+      const ox = d > 0 ? ((mx - explosion.x) / d) * travel : 0;
+      const oy = d > 0 ? ((my - explosion.y) / d) * travel : 0;
+      const hx = ((q.x - p.x) / 2) * scale, hy = ((q.y - p.y) / 2) * scale;
+      pieces.push({
+        from: { x: mx + ox - hx, y: my + oy - hy },
+        to: { x: mx + ox + hx, y: my + oy + hy },
+      });
+    }
+  });
+  return pieces;
+}
+
+// Every explosion in state.explosions, outline pieces in the destroyed ship's colour.
+export function drawExplosions(ctx, state) {
+  for (const e of state.explosions ?? []) {
+    ctx.beginPath();
+    for (const { from, to } of explosionPieces(e, e.elapsed)) {
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+    }
+    ctx.lineWidth = config.shipLineWidth;
+    ctx.strokeStyle = SHIP_COLORS[e.ship % SHIP_COLORS.length];
+    ctx.stroke();
+  }
+}
+
 export function drawFrame(ctx, state) {
   drawMap(ctx);
+  drawExplosions(ctx, state);
   drawShips(ctx, state);
   drawGauge(ctx, state);
 }
