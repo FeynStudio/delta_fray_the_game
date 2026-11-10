@@ -4,7 +4,8 @@
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
-import { applyMove, createInitialState, resolveMove, shipPoints } from '../src/rules.js';
+import { applyMove, createInitialState, resolveMove, shipPoints, wrapDegrees } from '../src/rules.js';
+import { gaugeLayout } from '../src/render.js';
 
 const listeners = {};
 let game;
@@ -51,16 +52,61 @@ test('second Space flies ship 0 to the rules end point; gauge back to power, tur
   assert.equal(s.gauge.phase, 'power');
 });
 
-test('with Shift the ship moves toward its tail side and keeps its heading', () => {
-  const start = createInitialState().ships[0];
-  launch(0.5, 0, true);
-  game.step(T() + 1);
-  const s = game.getState().ships[0];
-  const angle = start.heading + 180;
-  const end = applyMove(createInitialState(), { distance: 0.5 * config.maxMove, angle, backward: true }).ships[0];
-  assert.ok(near(s.x, end.x) && near(s.y, end.y), JSON.stringify(s));
-  assert.ok(s.x < start.x, 'moved toward the tail (heading 0, so -x)');
-  assert.equal(s.heading, start.heading);
+// T-009: a backward move turns the ship to the travel angle at launch, flies tip first, keeps the heading.
+const tipAhead = (ship, angle) => {
+  const tip = shipPoints(ship, config.shipSize, config.shipWidth)[0];
+  const a = (angle * Math.PI) / 180;
+  return (tip.x - ship.x) * Math.cos(a) + (tip.y - ship.y) * Math.sin(a);
+};
+
+test('with Shift the ship turns to the travel angle at launch, flies there and keeps that heading', () => {
+  for (const [heading, needle] of [[0, 0], [0, 40], [30, -40]]) {
+    const ships = [{ x: 640, y: 480, heading, alive: true }, { ...config.spawns[1], alive: true }];
+    const startState = { ...createInitialState(), ships };
+    game.setState(startState);
+    launch(0.5, needle, true);
+    const angle = wrapDegrees(heading + 180 + needle);
+    const launched = game.getState();
+    assert.equal(launched.gauge.phase, 'moving');
+    assert.ok(near(launched.ships[0].heading, angle), `needle ${needle}: heading ${launched.ships[0].heading}`);
+    assert.ok(tipAhead(launched.ships[0], angle) > 0, `needle ${needle}: tip on the travel side`);
+    game.step(T());
+    const s = game.getState();
+    const end = applyMove(startState, { distance: 0.5 * config.maxMove, angle, backward: true }).ships[0];
+    assert.ok(near(s.ships[0].x, end.x) && near(s.ships[0].y, end.y), JSON.stringify(s.ships[0]));
+    assert.ok(near(s.ships[0].heading, angle), `needle ${needle}: heading kept after the move`);
+    assert.equal(s.ships[0].alive, true);
+    assert.equal(s.turn, 1);
+    assert.equal(s.gauge.phase, 'power');
+  }
+});
+
+test('after a backward move, on its next turn the dial sits at the new nose and a forward move follows it', () => {
+  const ships = [{ x: 640, y: 480, heading: 30, alive: true }, { ...config.spawns[1], alive: true }];
+  game.setState({ ...createInitialState(), ships });
+  launch(0.5, -40, true);
+  const angle = wrapDegrees(30 + 180 - 40);
+  game.step(T());
+  launch(0.3, 0); // ship 1 makes any move
+  game.step(T());
+  const mine = game.getState();
+  assert.equal(mine.turn, 0);
+  const ship = mine.ships[0];
+  assert.ok(near(ship.heading, angle), `heading still the travel angle: ${ship.heading}`);
+  game.setState({ ...mine, gauge: { ...mine.gauge, power: 0.4 } });
+  game.press('Space');
+  const aiming = game.getState();
+  assert.equal(aiming.gauge.phase, 'direction');
+  const { dial } = gaugeLayout(aiming);
+  const a = (angle * Math.PI) / 180;
+  assert.ok((dial.x - ship.x) * Math.cos(a) + (dial.y - ship.y) * Math.sin(a) > 0, 'dial on the nose side');
+  game.setState({ ...aiming, gauge: { ...aiming.gauge, needle: 0 } });
+  game.press('Space');
+  game.step(T());
+  const moved = game.getState().ships[0];
+  const d = 0.4 * config.maxMove;
+  assert.ok(near(moved.x, ship.x + Math.cos(a) * d) && near(moved.y, ship.y + Math.sin(a) * d), JSON.stringify(moved));
+  assert.ok(near(moved.heading, angle));
 });
 
 test('halfway: still moving, Space and Shift change nothing, ship not yet at its end point', () => {

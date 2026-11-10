@@ -116,16 +116,48 @@ test('any part counts at the wall: a back corner grazing the top edge while movi
   assert.deepEqual(alive(clear), [true, true]);
 });
 
-test('a backward move: the tail crossing the wall destroys the mover, stopping before it is safe', () => {
-  const W = config.worldWidth, back = shipLength() / 3, d = config.maxMove;
+test('a backward move: the ship turns to the travel angle and its tip leads into the wall', () => {
+  const W = config.worldWidth, tip = (2 * shipLength()) / 3, d = config.maxMove;
   const enemy = ship(200, 200, 0);
-  // Heading 180 moving at 0 (backward): the tail leads toward the right wall.
-  const hit = resolveMove(state(0, ship(W - back - d + 1, 480, 180), enemy), move(d, 0, true));
+  // Heading 180 moving at 0 (backward): the ship turns to heading 0, so the tip leads to the right wall.
+  const hit = resolveMove(state(0, ship(W - tip - d + 1, 480, 180), enemy), move(d, 0, true));
   assert.ok(hit.ships[0].x < W);
-  assert.deepEqual(alive(hit), [false, true]);
-  assert.equal(hit.ships[0].heading, 180, 'backward keeps the heading');
-  const safe = resolveMove(state(0, ship(W - back - d - 1, 480, 180), enemy), move(d, 0, true));
-  assert.deepEqual(alive(safe), [true, true]);
+  assert.deepEqual(alive(hit), [false, true], 'tip 1 unit past the edge');
+  assert.equal(hit.ships[0].heading, 0, 'heading turns to the travel angle');
+  const safe = resolveMove(state(0, ship(W - tip - d - 1, 480, 180), enemy), move(d, 0, true));
+  assert.deepEqual(alive(safe), [true, true], 'tip 1 unit short of the edge');
+  assert.equal(safe.ships[0].heading, 0, 'heading turns to the travel angle');
+});
+
+test('a backward move resolves exactly like the forward move with the same angle', () => {
+  const W = config.worldWidth, H = config.worldHeight, d = config.maxMove;
+  const pick = (s) => s.ships.map(({ x, y, heading, alive: a }) => ({ x, y, heading, alive: a }));
+  for (const heading of [0, 30, 90, 200, 315]) {
+    for (const needle of [0, 30, -45, 60]) {
+      const angle = (heading + 180 + needle) % 360; // as input.moveFromGauge builds a backward move
+      const a = (angle * Math.PI) / 180;
+      const starts = [
+        // Open space, enemy far away: no hit.
+        [ship(W / 2, H / 2, heading), ship(100, 100, 0)],
+        // Enemy on the path: destroyed.
+        [ship(W / 2, H / 2, heading), ship(W / 2 + Math.cos(a) * d / 2, H / 2 + Math.sin(a) * d / 2, 90)],
+        // Path ends at a wall: mover destroyed.
+        [ship(W / 2 + Math.cos(a) * (W / 2 - d / 2), H / 2 + Math.sin(a) * (H / 2 - d / 2), heading),
+          ship(100, 100, 0)],
+      ];
+      for (const [mover, enemy] of starts) {
+        const back = resolveMove(state(0, mover, enemy), move(d, angle, true));
+        const fwd = resolveMove(state(0, mover, enemy), move(d, angle, false));
+        assert.deepEqual(pick(back), pick(fwd), `heading ${heading} needle ${needle} angle ${angle}`);
+      }
+    }
+  }
+  // The brief's angled example: heading 30, angle 240; the enemy on the path is destroyed either way.
+  const s = state(0, ship(640, 480, 30), ship(640 + Math.cos(4 * Math.PI / 3) * 60, 480 + Math.sin(4 * Math.PI / 3) * 60, 0));
+  const back = resolveMove(s, move(d, 240, true));
+  assert.deepEqual(pick(back), pick(resolveMove(s, move(d, 240, false))));
+  assert.equal(back.ships[0].heading, 240);
+  assert.deepEqual(alive(back), [true, false]);
 });
 
 test('hit then wall destroys both', () => {

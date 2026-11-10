@@ -17,7 +17,9 @@ export function wrapDegrees(deg) {
 }
 
 // Moves the ship whose turn it is by move.distance along move.angle (degrees, 0 = +x, 90 = +y).
-// A forward move turns the heading to the travel angle; a backward move keeps it.
+// Every accepted move, forward or backward, turns the heading to the travel angle (wrapped to
+// 0..360): a backward move turns the ship to face its path, then flies tip first like a forward move
+// and keeps that heading (human decisions 2026-11-09, T-009).
 // A move longer than config.maxMove is refused: the state comes back unchanged
 // (human decision, 2026-11-08). Any accepted move, also one of distance 0, sets the mover's
 // unmovedSinceSpawn to false (human decision, 2026-11-09). No hits, walls, respawn or turn change here.
@@ -30,7 +32,7 @@ export function applyMove(state, move) {
     ...ship,
     x: ship.x + Math.cos(a) * move.distance,
     y: ship.y + Math.sin(a) * move.distance,
-    heading: move.backward ? ship.heading : wrapDegrees(move.angle),
+    heading: wrapDegrees(move.angle),
     unmovedSinceSpawn: false,
   };
   return { ...state, ships: state.ships.map((s, j) => (j === i ? moved : s)) };
