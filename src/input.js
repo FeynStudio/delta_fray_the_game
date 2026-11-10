@@ -15,7 +15,8 @@
 // elapsed } (ships = every ship as the end state has it, so an enemy destroyed on the way is kept).
 // stepMove moves only the mover along the straight segment from -> to at constant speed and, after
 // config.moveAnimMs, puts in all of `ships` (the mover exactly at `to`), drops anim and puts the gauge
-// back in the power phase. Passing the turn (rules.endTurn) is game.js's job.
+// back in the power phase. Passing the turn (rules.endTurn) is game.js's job. A moving phase with no
+// anim (debug setState only) goes back to the power phase on the next step, ship unmoved, same turn.
 import config from './config.js';
 import { createInitialState, shipPoints, wrapDegrees } from './rules.js';
 
@@ -96,10 +97,16 @@ export function startMove(state, end) {
   return { ...withShip(state, { ...ship, heading: to.heading }), anim };
 }
 
-// Advances the move animation by ms. Does nothing unless a move is running.
+// Advances the move animation by ms. Does nothing unless a move is running, except that a moving
+// phase with no anim (only reachable through the debug setState) is put back to the power phase:
+// ships untouched, no move built, turn unchanged (T-014, human decision 2026-11-09).
 export function stepMove(state, ms) {
   const a = state.anim;
-  if (!a || state.gauge.phase !== 'moving' || !(ms > 0)) return state;
+  if (state.gauge.phase !== 'moving' || !(ms > 0)) return state;
+  if (!a) {
+    const { anim: _none, ...rest } = state;
+    return { ...rest, gauge: createInitialState().gauge };
+  }
   const elapsed = a.elapsed + ms;
   if (elapsed >= config.moveAnimMs) {
     const { anim: _done, ...rest } = withShip(state, a.to);
