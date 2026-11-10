@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 // Browser smoke check: serves the game, opens index.html?debug=1 in headless Chrome or Edge,
 // drives window.__game and writes named PASS/FAIL booleans as JSON (compared to expected/<feature>-smoke.json).
-// Also saves a screenshot next to --out (<out>.png) as evidence.
+// Also saves a screenshot next to --out (<out>.png) as evidence. The input feature also saves one screenshot
+// per gauge phase (<out>-power.png, <out>-direction.png, <out>-direction-backward.png), each taken in its own
+// page and checked against getState().gauge at capture time; a wrong phase fails the run.
 // Usage: node scripts/smoke.mjs --feature render|input|turns --out <file.json>
 // No npm dependencies: talks to the browser over the DevTools protocol with Node's built-in WebSocket.
 // Set CHROME_PATH to pick a browser; otherwise Chrome, then Edge, is used.
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServer } from './serve.mjs';
 
@@ -209,6 +211,21 @@ function phaseProbe() {
   return window.__game.getState().gauge.phase;
 }
 
+// Puts a fresh page into one gauge phase for a screenshot: keys is the list of presses to make.
+function phaseSetupProbe(keys) {
+  for (const k of keys) window.__game.press(k);
+}
+
+// Waits for two animation frames so the canvas shows the current state, then returns the gauge.
+function gaugeAfterFrameProbe() {
+  return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
+    () => done(window.__game.getState().gauge))));
+}
+
+function gaugeProbe() {
+  return window.__game.getState().gauge;
+}
+
 async function turnsProbe() {
   const cfg = (await import('/src/config.js')).default;
   const g = window.__game;
@@ -245,11 +262,29 @@ async function turnsProbe() {
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
 
+// Opens its own page, presses keys, then screenshots it. The gauge is read just before and just after
+// the capture; if either reading is not the wanted phase/backward, throws an error naming the file.
+async function phaseShot(browser, url, shots, suffix, keys, want) {
+  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
+  const p = await browser.open(url, FULL_HD);
+  await p.eval(phaseSetupProbe, keys);
+  const before = await p.eval(gaugeAfterFrameProbe);
+  const png = await p.screenshot();
+  const after = await p.eval(gaugeProbe);
+  for (const g of [before, after]) {
+    if (g.phase !== want.phase || g.backward !== want.backward) {
+      throw new Error(`${file}: wanted gauge phase '${want.phase}' backward ${want.backward}, `
+        + `got phase '${g.phase}' backward ${g.backward} at capture time`);
+    }
+  }
+  shots.push({ suffix, png });
+}
+
 const FEATURES = {
   async render(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r1 = await a.eval(renderProbe);
-    shots.push(await a.screenshot());
+    shots.push({ suffix: '', png: await a.screenshot() });
     const b = await browser.open(url, { width: 1000, height: 1000, dpr: 2 });
     const r2 = await b.eval(renderProbe);
     return {
@@ -269,7 +304,7 @@ const FEATURES = {
   async input(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(inputProbe);
-    shots.push(await a.screenshot());
+    shots.push({ suffix: '', png: await a.screenshot() });
     const b = await browser.open(url, FULL_HD);
     const flipped = await b.eval(shiftFlipProbe);
     const c = await browser.open(url, FULL_HD);
@@ -278,6 +313,10 @@ const FEATURES = {
     await c.key('keyDown', { autoRepeat: true });
     const afterRepeat = await c.eval(phaseProbe);
     await c.key('keyUp');
+    // Per-phase screenshots, each in its own page opened after the checked pages a, b and c are done.
+    await phaseShot(browser, url, shots, '-power', [], { phase: 'power', backward: false });
+    await phaseShot(browser, url, shots, '-direction', ['Space'], { phase: 'direction', backward: false });
+    await phaseShot(browser, url, shots, '-direction-backward', ['Space', 'Shift'], { phase: 'direction', backward: true });
     return {
       'starts on the power gauge': r.startsOnPowerGauge === true,
       'first Space locks distance': r.firstSpaceLocksDistance === true,
@@ -295,7 +334,7 @@ const FEATURES = {
   async turns(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(turnsProbe);
-    shots.push(await a.screenshot());
+    shots.push({ suffix: '', png: await a.screenshot() });
     return {
       'destroyed enemy respawns at its spawn point': r.enemyRespawnedAtSpawn === true,
       'attacker survives at the end of its move': r.attackerSurvivedAtEnd === true,
@@ -328,6 +367,7 @@ try {
 } catch (e) {
   result = { error: e.message };
   code = 1;
+  process.stderr.write(`smoke ${feature}: ${e.message}\n`);
 } finally {
   await browser?.close();
   await server?.close();
@@ -336,5 +376,5 @@ try {
 
 mkdirSync(dirname(resolve(out)), { recursive: true });
 writeFileSync(out, JSON.stringify(result, null, 2) + '\n');
-if (shots[0]) writeFileSync(out.replace(/\.json$/, '') + '.png', shots[0]);
+for (const { suffix, png } of shots) writeFileSync(`${out.replace(/\.json$/, '')}${suffix}.png`, png);
 process.exit(code);

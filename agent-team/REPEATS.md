@@ -9,5 +9,10 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | design doc left stale after a human design decision (logged to BACKLOG, not updated) | 1 | T-001 |
 | smoke screenshot cannot show the feature under review (taken in the wrong phase) | 1 | T-002 |
 | task past ~400 changed lines with no recorded split decision | 1 | T-002 |
+<<<<<<< HEAD
 | handoff text left stale after a later change or decision | 2 | T-002, T-006 |
 | build started without a recorded human go-ahead (latest tagged decision says don't build) | 1 | T-006 |
+=======
+| handoff text left stale after a later change or decision | 1 | T-002 |
+| evidence log header commit does not match the code that ran (uncommitted change at run time) | 1 | T-008 |
+>>>>>>> task/T-008-phase-screenshots
