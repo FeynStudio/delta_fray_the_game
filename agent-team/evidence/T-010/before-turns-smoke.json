@@ -1,0 +1,7 @@
+{
+  "destroyed enemy respawns at its spawn point": true,
+  "attacker survives at the end of its move": true,
+  "turn passes to player 2": true,
+  "next move starts on the power gauge": true,
+  "no turn timer": true
+}

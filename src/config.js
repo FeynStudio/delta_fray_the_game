@@ -38,6 +38,9 @@ const config = {
   scoreWall: -2, // added to the mover when its move ends at the wall (hit-then-wall gets both)
   scoreFontSize: 28, // game units
   scoreMargin: 16, // distance of the score text from the map's top and side edges
+  // Spawn protection blink (T-010): a protected ship's outline fades out, then snaps back, every cycle.
+  protectionBlinkMs: 400, // one fade cycle lasts this long (human, 2026-11-09)
+  protectionMinAlpha: 0, // opacity at the end of each fade: 0 = fully invisible (human, 2026-11-09)
   // Opposite sides of the map on the horizontal center line, 900 units apart, facing each other.
   spawns: [
     { x: 190, y: 480, heading: 0 },

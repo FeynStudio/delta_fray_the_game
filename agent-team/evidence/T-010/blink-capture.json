@@ -1,0 +1,566 @@
+{
+  "commit": "7b17e13",
+  "url": "/index.html?debug=1",
+  "viewport": "1920x1080 dpr 1",
+  "frames": [
+    {
+      "file": "blink-start-0ms.png",
+      "clock": 0,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-start-100ms.png",
+      "clock": 100,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.746
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.748
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-start-200ms.png",
+      "clock": 200,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-start-300ms.png",
+      "clock": 300,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.25
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-start-400ms.png",
+      "clock": 400,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-after-p1-move-300ms.png",
+      "clock": 1500,
+      "turn": 1,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 265,
+          "y": 480,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-respawn-explosion-0ms.png",
+      "clock": 600,
+      "turn": 1,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 1020,
+          "y": 480,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": [
+        {
+          "ship": 1,
+          "x": 1000,
+          "y": 480,
+          "elapsed": 0
+        }
+      ]
+    },
+    {
+      "file": "blink-respawn-explosion-100ms.png",
+      "clock": 700,
+      "turn": 1,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 1020,
+          "y": 480,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": [
+        {
+          "ship": 1,
+          "x": 1000,
+          "y": 480,
+          "elapsed": 100
+        }
+      ]
+    },
+    {
+      "file": "blink-respawn-explosion-300ms.png",
+      "clock": 900,
+      "turn": 1,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 1020,
+          "y": 480,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.748
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": [
+        {
+          "ship": 1,
+          "x": 1000,
+          "y": 480,
+          "elapsed": 300
+        }
+      ]
+    },
+    {
+      "file": "blink-start-390ms-power.png",
+      "clock": 390,
+      "turn": 0,
+      "phase": "power",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.025,
+          "drawnAlphaEstimate": 0.021
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.025,
+          "drawnAlphaEstimate": 0.02
+        }
+      ],
+      "gauge": {
+        "phase": "power",
+        "powerBarAlphaEstimate": 1
+      },
+      "explosions": []
+    },
+    {
+      "file": "blink-start-390ms-direction.png",
+      "clock": 390,
+      "turn": 0,
+      "phase": "direction",
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.025,
+          "drawnAlphaEstimate": 0.021
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "protected": true,
+          "expectedAlpha": 0.025,
+          "drawnAlphaEstimate": 0.02
+        }
+      ],
+      "gauge": {
+        "phase": "direction",
+        "powerBarAlphaEstimate": 0.704,
+        "dialNeedleAlphaEstimate": 1
+      },
+      "explosions": []
+    }
+  ],
+  "sequence": {
+    "file": "blink-sequence-16ms.png",
+    "stepMs": 16,
+    "cols": 9,
+    "cropWorld": {
+      "x": 130,
+      "y": 440,
+      "w": 120,
+      "h": 120
+    },
+    "note": "player 1 ship and power bar at game start, power phase; one cell per step(16), left to right",
+    "frames": [
+      {
+        "clock": 0,
+        "expectedAlpha": 1
+      },
+      {
+        "clock": 16,
+        "expectedAlpha": 0.96
+      },
+      {
+        "clock": 32,
+        "expectedAlpha": 0.92
+      },
+      {
+        "clock": 48,
+        "expectedAlpha": 0.88
+      },
+      {
+        "clock": 64,
+        "expectedAlpha": 0.84
+      },
+      {
+        "clock": 80,
+        "expectedAlpha": 0.8
+      },
+      {
+        "clock": 96,
+        "expectedAlpha": 0.76
+      },
+      {
+        "clock": 112,
+        "expectedAlpha": 0.72
+      },
+      {
+        "clock": 128,
+        "expectedAlpha": 0.68
+      },
+      {
+        "clock": 144,
+        "expectedAlpha": 0.64
+      },
+      {
+        "clock": 160,
+        "expectedAlpha": 0.6
+      },
+      {
+        "clock": 176,
+        "expectedAlpha": 0.56
+      },
+      {
+        "clock": 192,
+        "expectedAlpha": 0.52
+      },
+      {
+        "clock": 208,
+        "expectedAlpha": 0.48
+      },
+      {
+        "clock": 224,
+        "expectedAlpha": 0.44
+      },
+      {
+        "clock": 240,
+        "expectedAlpha": 0.4
+      },
+      {
+        "clock": 256,
+        "expectedAlpha": 0.36
+      },
+      {
+        "clock": 272,
+        "expectedAlpha": 0.32
+      },
+      {
+        "clock": 288,
+        "expectedAlpha": 0.28
+      },
+      {
+        "clock": 304,
+        "expectedAlpha": 0.24
+      },
+      {
+        "clock": 320,
+        "expectedAlpha": 0.2
+      },
+      {
+        "clock": 336,
+        "expectedAlpha": 0.16
+      },
+      {
+        "clock": 352,
+        "expectedAlpha": 0.12
+      },
+      {
+        "clock": 368,
+        "expectedAlpha": 0.08
+      },
+      {
+        "clock": 384,
+        "expectedAlpha": 0.04
+      },
+      {
+        "clock": 400,
+        "expectedAlpha": 1
+      },
+      {
+        "clock": 416,
+        "expectedAlpha": 0.96
+      },
+      {
+        "clock": 432,
+        "expectedAlpha": 0.92
+      },
+      {
+        "clock": 448,
+        "expectedAlpha": 0.88
+      },
+      {
+        "clock": 464,
+        "expectedAlpha": 0.84
+      },
+      {
+        "clock": 480,
+        "expectedAlpha": 0.8
+      },
+      {
+        "clock": 496,
+        "expectedAlpha": 0.76
+      },
+      {
+        "clock": 512,
+        "expectedAlpha": 0.72
+      },
+      {
+        "clock": 528,
+        "expectedAlpha": 0.68
+      },
+      {
+        "clock": 544,
+        "expectedAlpha": 0.64
+      },
+      {
+        "clock": 560,
+        "expectedAlpha": 0.6
+      },
+      {
+        "clock": 576,
+        "expectedAlpha": 0.56
+      },
+      {
+        "clock": 592,
+        "expectedAlpha": 0.52
+      },
+      {
+        "clock": 608,
+        "expectedAlpha": 0.48
+      },
+      {
+        "clock": 624,
+        "expectedAlpha": 0.44
+      },
+      {
+        "clock": 640,
+        "expectedAlpha": 0.4
+      },
+      {
+        "clock": 656,
+        "expectedAlpha": 0.36
+      },
+      {
+        "clock": 672,
+        "expectedAlpha": 0.32
+      },
+      {
+        "clock": 688,
+        "expectedAlpha": 0.28
+      },
+      {
+        "clock": 704,
+        "expectedAlpha": 0.24
+      },
+      {
+        "clock": 720,
+        "expectedAlpha": 0.2
+      },
+      {
+        "clock": 736,
+        "expectedAlpha": 0.16
+      },
+      {
+        "clock": 752,
+        "expectedAlpha": 0.12
+      },
+      {
+        "clock": 768,
+        "expectedAlpha": 0.08
+      },
+      {
+        "clock": 784,
+        "expectedAlpha": 0.04
+      },
+      {
+        "clock": 800,
+        "expectedAlpha": 1
+      }
+    ]
+  }
+}
