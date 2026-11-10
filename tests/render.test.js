@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import config from '../src/config.js';
 import {
   COLORS, drawExplosions, drawGauge, drawScores, drawShips, explosionPieces, fitCanvas, fitScale, gaugeLayout,
-  drawFrame, protectionAlpha, shipPoints,
+  drawFrame, drawTitle, protectionAlpha, shipPoints,
 } from '../src/render.js';
 import { createInitialState, isSpawnProtected } from '../src/rules.js';
 
@@ -444,5 +444,134 @@ test('respawn turn with an explosion running: only the respawned protected ship 
     assert.ok(strokes.slice(4).length > 0 && strokes.slice(4).every((c) => c.alpha === 1), 'gauge at full opacity');
     assert.equal(t.globalAlpha, 1);
     assert.deepEqual(state, copy, 'state unchanged');
+  }
+});
+
+// ---- title decal (T-011) ----
+// A stub ctx that records every method call with the drawing settings in force at that moment, and keeps
+// a real save/restore stack, so the test can see what drawTitle leaves behind for later draw calls.
+const PROPS = ['font', 'letterSpacing', 'textAlign', 'textBaseline', 'strokeStyle', 'fillStyle', 'lineWidth', 'globalAlpha'];
+const settingsCtx = () => {
+  const calls = [];
+  const stack = [];
+  const o = { font: '10px sans-serif', letterSpacing: '0px', textAlign: 'start', textBaseline: 'alphabetic', globalAlpha: 1 };
+  const snap = () => Object.fromEntries(PROPS.map((p) => [p, o[p]]));
+  const ctx = new Proxy(o, {
+    get: (t, k) => {
+      if (k === 'save') return () => { stack.push(snap()); calls.push({ k }); };
+      if (k === 'restore') return () => { Object.assign(o, stack.pop()); calls.push({ k }); };
+      return k in t ? t[k] : (...args) => calls.push({ k, args, ...snap() });
+    },
+    set: (t, k, v) => { t[k] = v; return true; },
+  });
+  return { ctx, calls, o, stack };
+};
+const DRAW = /^(stroke|fill|strokeRect|fillRect|strokeText|fillText|clearRect|drawImage)$/;
+
+// Frames with every state field present so far: clock (T-010 blink), scores (T-012), explosions (T-007),
+// unmovedSinceSpawn (T-006), and both gauge phases.
+const titleFrames = () => {
+  const base = createInitialState();
+  const P = config.protectionBlinkMs;
+  return [
+    { name: 'game start, both ships blinking', state: { ...base, clock: P / 4, explosions: [] } },
+    {
+      name: 'respawn turn, explosion running, direction phase, negative score',
+      state: {
+        ...base, turn: 1, clock: 5 * P + (3 * P) / 4, scores: [3, -2],
+        ships: [
+          { x: 1020, y: 480, heading: 0, alive: true, unmovedSinceSpawn: false },
+          { ...config.spawns[1], alive: true, unmovedSinceSpawn: true },
+        ],
+        explosions: [{ ship: 1, x: 1000, y: 480, heading: 180, elapsed: 100 }],
+        gauge: { ...base.gauge, phase: 'direction', power: 0.6, distance: 90, needle: 30 },
+      },
+    },
+    {
+      name: 'ship under the title, moving phase',
+      state: {
+        ...base, clock: 123, scores: [10, 10],
+        ships: [{ x: config.worldWidth / 2, y: 40, heading: 90, alive: true, unmovedSinceSpawn: false }, base.ships[1]],
+        gauge: { ...base.gauge, phase: 'moving' },
+      },
+    },
+    { name: 'state without clock, scores or explosions', state: { turn: 0, ships: base.ships, gauge: base.gauge } },
+  ];
+};
+
+test('config holds the title text exactly as the human typed it', () => {
+  assert.equal(config.titleText, 'Delta Fray');
+});
+
+test('drawFrame draws the title last: strokeText "DELTA FRAY", centred at worldWidth / 2 in the top half, outline only', () => {
+  for (const { name, state: s } of titleFrames()) {
+    const state = deepFreeze(structuredClone(s));
+    const copy = structuredClone(state);
+    const { ctx, calls } = settingsCtx();
+    drawFrame(ctx, state);
+    const draws = calls.filter((c) => DRAW.test(c.k));
+    const texts = draws.filter((c) => /Text$/.test(c.k));
+    const last = draws.at(-1);
+    assert.equal(last.k, 'strokeText', `${name}: the very last draw call is the title`);
+    assert.equal(texts.at(-1), last, `${name}: the last text call is the title`);
+    assert.equal(last.args[0], 'DELTA FRAY');
+    assert.equal(last.args[0], config.titleText.toUpperCase());
+    assert.equal(last.textAlign, 'center');
+    assert.equal(last.args[1], config.worldWidth / 2);
+    assert.ok(last.args[2] >= 0 && last.args[2] < config.worldHeight / 2, `${name}: y ${last.args[2]} in the top half`);
+    assert.equal(last.args[2], config.titleTop);
+    assert.equal(last.font, `${config.titleFontSize}px monospace`);
+    assert.equal(last.strokeStyle, COLORS.dim);
+    assert.equal(last.globalAlpha, 1, `${name}: the title never blinks with a protected ship`);
+    assert.ok(!draws.some((c) => /^fill/.test(c.k) && c.args?.[0] === 'DELTA FRAY'), `${name}: no filled title`);
+    // Only the scores are other text, and they come before the title.
+    assert.equal(texts.filter((c) => c.k === 'strokeText').length, 1, `${name}: one title`);
+    assert.deepEqual(state, copy, `${name}: state unchanged`);
+  }
+});
+
+test('drawTitle makes no fill call and leaves the context settings as it found them', () => {
+  const { ctx, calls, o, stack } = settingsCtx();
+  const before = Object.fromEntries(PROPS.map((p) => [p, o[p]]));
+  drawTitle(ctx);
+  assert.equal(calls[0].k, 'save');
+  assert.equal(calls.at(-1).k, 'restore');
+  assert.deepEqual(calls.filter((c) => DRAW.test(c.k)).map((c) => c.k), ['strokeText']);
+  assert.ok(!calls.some((c) => /fill/i.test(c.k)), 'no fill of any kind');
+  assert.equal(stack.length, 0);
+  assert.deepEqual(Object.fromEntries(PROPS.map((p) => [p, o[p]])), before, 'settings restored');
+});
+
+test('the scores of the next frame are not drawn with the title font or letter spacing', () => {
+  const { ctx, calls } = settingsCtx();
+  const state = { ...createInitialState(), scores: [4, -1] };
+  drawFrame(ctx, state);
+  calls.length = 0;
+  drawFrame(ctx, state);
+  const scores = calls.filter((c) => c.k === 'fillText');
+  assert.equal(scores.length, 2);
+  for (const c of scores) {
+    assert.equal(c.font, `${config.scoreFontSize}px monospace`);
+    assert.equal(c.letterSpacing, '0px');
+  }
+});
+
+test('the title comes from config at call time, upper-cased, and does not depend on state', () => {
+  const saved = { text: config.titleText, top: config.titleTop };
+  try {
+    config.titleText = 'Retro Night';
+    config.titleTop = 40;
+    const results = titleFrames().map(({ state }) => {
+      const { ctx, calls } = settingsCtx();
+      drawFrame(ctx, state);
+      return calls.filter((c) => c.k === 'strokeText').at(-1).args;
+    });
+    for (const args of results) assert.deepEqual(args, ['RETRO NIGHT', config.worldWidth / 2, 40]);
+    const alone = settingsCtx();
+    drawTitle(alone.ctx);
+    assert.deepEqual(alone.calls.find((c) => c.k === 'strokeText').args, ['RETRO NIGHT', config.worldWidth / 2, 40]);
+  } finally {
+    config.titleText = saved.text;
+    config.titleTop = saved.top;
   }
 });

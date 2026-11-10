@@ -1,0 +1,566 @@
+{
+  "commit": "1f65c10",
+  "srcOrTestsDirty": false,
+  "url": "/index.html?debug=1",
+  "viewport": "1920x1080 dpr 1 unless noted",
+  "allLastDrawIsTitle": true,
+  "frames": [
+    {
+      "file": "title-start-blink-0ms.png",
+      "note": "game start, scores 12 and -3, both ships blinking, power phase",
+      "clock": 0,
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        12,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 9,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:12",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1977,
+        "lit": 4045,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        201,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-start-blink-100ms.png",
+      "note": "game start, scores 12 and -3, both ships blinking, power phase",
+      "clock": 100,
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        12,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 9,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:12",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1968,
+        "lit": 4045,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        201,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.746
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.75,
+          "drawnAlphaEstimate": 0.748
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-start-blink-200ms.png",
+      "note": "game start, scores 12 and -3, both ships blinking, power phase",
+      "clock": 200,
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        12,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 9,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:12",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1968,
+        "lit": 4045,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        201,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-start-blink-300ms.png",
+      "note": "game start, scores 12 and -3, both ships blinking, power phase",
+      "clock": 300,
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        12,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 9,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:12",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1968,
+        "lit": 4045,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        201,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.25
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-ship-under-title-direction.png",
+      "note": "player 1 ship at (640, 44) under the title letters; player 2 blinking at 300 ms",
+      "clock": 300,
+      "turn": 0,
+      "phase": "direction",
+      "scores": [
+        12,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 11,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:12",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 2179,
+        "lit": 4698,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        201,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 640,
+          "y": 44,
+          "alive": true,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-respawn-explosion.png",
+      "note": "player 2 destroyed and respawned (protected, blinking), explosion running, score 13",
+      "clock": 700,
+      "turn": 1,
+      "phase": "power",
+      "scores": [
+        13,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 10,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:13",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1968,
+        "lit": 4045,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        192,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 1020,
+          "y": 480,
+          "alive": true,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.25,
+          "drawnAlphaEstimate": 0.248
+        }
+      ],
+      "explosions": [
+        {
+          "ship": 1,
+          "elapsed": 100
+        }
+      ]
+    },
+    {
+      "file": "title-move-toward-title.png",
+      "note": "player 2 flying up toward the title, 450 of 600 ms into its move",
+      "clock": 450,
+      "turn": 1,
+      "phase": "moving",
+      "scores": [
+        13,
+        -3
+      ],
+      "drawOrder": {
+        "calls": 7,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:13",
+          "fillText:-3",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 1968,
+        "lit": 4287,
+        "total": 38880,
+        "inkWorld": {
+          "left": 470.2,
+          "right": 804.4,
+          "centre": 637.3
+        }
+      },
+      "scoreCornerPixels": [
+        192,
+        104
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 1020,
+          "y": 480,
+          "alive": true,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        },
+        {
+          "ship": 1,
+          "x": 640,
+          "y": 47.5,
+          "alive": true,
+          "protected": false,
+          "expectedAlpha": 1,
+          "drawnAlphaEstimate": 1
+        }
+      ],
+      "explosions": []
+    },
+    {
+      "file": "title-1000x1000-dpr2.png",
+      "note": "1000x1000 window, device pixel ratio 2",
+      "clock": 200,
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        0,
+        0
+      ],
+      "drawOrder": {
+        "calls": 9,
+        "last": {
+          "call": "strokeText",
+          "text": "DELTA FRAY",
+          "alpha": 1
+        },
+        "lastIsTitle": true,
+        "titleCalls": [
+          "strokeText"
+        ],
+        "texts": [
+          "fillText:0",
+          "fillText:0",
+          "strokeText:DELTA FRAY"
+        ]
+      },
+      "titleBoxWorld": {
+        "x": 426.6666666666667,
+        "y": 4,
+        "w": 426.6666666666667,
+        "h": 72
+      },
+      "titlePixels": {
+        "nearDim": 3841,
+        "lit": 6800,
+        "total": 75371,
+        "inkWorld": {
+          "left": 469.8,
+          "right": 804.5,
+          "centre": 637.1
+        }
+      },
+      "scoreCornerPixels": [
+        274,
+        262
+      ],
+      "ships": [
+        {
+          "ship": 0,
+          "x": 190,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        },
+        {
+          "ship": 1,
+          "x": 1090,
+          "y": 480,
+          "alive": true,
+          "protected": true,
+          "expectedAlpha": 0.5,
+          "drawnAlphaEstimate": 0.5
+        }
+      ],
+      "explosions": []
+    }
+  ]
+}

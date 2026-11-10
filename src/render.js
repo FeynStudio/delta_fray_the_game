@@ -221,10 +221,28 @@ export function drawScores(ctx, state) {
   });
 }
 
+// Title decal (T-011): config.titleText upper-cased, centred at the top of the map, outline only
+// (strokeText, no fill) in COLORS.dim so anything under it stays visible. Reads nothing from state.
+// Context settings are saved and restored, so nothing drawn later inherits the title's font or spacing.
+export function drawTitle(ctx) {
+  ctx.save();
+  ctx.font = `${config.titleFontSize}px monospace`;
+  ctx.letterSpacing = `${config.titleLetterSpacing}px`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.lineWidth = config.titleLineWidth;
+  ctx.lineJoin = 'round';
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = COLORS.dim;
+  ctx.strokeText(config.titleText.toUpperCase(), config.worldWidth / 2, config.titleTop);
+  ctx.restore();
+}
+
 export function drawFrame(ctx, state) {
   drawMap(ctx);
   drawScores(ctx, state);
   drawExplosions(ctx, state);
   drawShips(ctx, state);
   drawGauge(ctx, state);
+  drawTitle(ctx); // last: the decal is over everything else
 }
