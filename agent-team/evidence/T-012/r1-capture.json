@@ -1,0 +1,140 @@
+{
+  "negative-1920x1080": {
+    "drawn": {
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        -2,
+        -4
+      ],
+      "animElapsed": null,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": []
+    },
+    "bounds": [
+      {
+        "text": "-2",
+        "left": 16,
+        "right": 46.7890625,
+        "top": 16,
+        "worldWidth": 1280,
+        "borderInner": 2
+      },
+      {
+        "text": "-4",
+        "left": 1233.2109375,
+        "right": 1264,
+        "top": 16,
+        "worldWidth": 1280,
+        "borderInner": 2
+      }
+    ]
+  },
+  "negative-1000x1000": {
+    "drawn": {
+      "turn": 0,
+      "phase": "power",
+      "scores": [
+        -2,
+        -4
+      ],
+      "animElapsed": null,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": []
+    },
+    "bounds": [
+      {
+        "text": "-2",
+        "left": 16,
+        "right": 46.7890625,
+        "top": 16,
+        "worldWidth": 1280,
+        "borderInner": 2
+      },
+      {
+        "text": "-4",
+        "left": 1233.2109375,
+        "right": 1264,
+        "top": 16,
+        "worldWidth": 1280,
+        "borderInner": 2
+      }
+    ]
+  },
+  "kill": {
+    "lastFrameBeforeEnd": {
+      "turn": 0,
+      "phase": "moving",
+      "scores": [
+        0,
+        0
+      ],
+      "animElapsed": 599,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": []
+    },
+    "nextFrame": {
+      "turn": 1,
+      "phase": "power",
+      "scores": [
+        1,
+        0
+      ],
+      "animElapsed": null,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": [
+        {
+          "ship": 1,
+          "elapsed": 0
+        }
+      ]
+    }
+  },
+  "wall": {
+    "lastFrameBeforeEnd": {
+      "turn": 0,
+      "phase": "moving",
+      "scores": [
+        0,
+        0
+      ],
+      "animElapsed": 599,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": []
+    },
+    "nextFrame": {
+      "turn": 1,
+      "phase": "power",
+      "scores": [
+        -2,
+        0
+      ],
+      "animElapsed": null,
+      "alive": [
+        true,
+        true
+      ],
+      "explosions": [
+        {
+          "ship": 0,
+          "elapsed": 0
+        }
+      ]
+    }
+  }
+}
