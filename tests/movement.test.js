@@ -44,11 +44,13 @@ test('forward heading is kept within 0 to 360', () => {
   assert.equal(wrapDegrees(-450), 270);
 });
 
-test('a backward move travels along the angle and keeps the heading', () => {
+test('a backward move travels along the angle and turns the heading to the travel angle', () => {
   const ship = applyMove(at(400, 400, 30), { distance: 100, angle: 210, backward: true }).ships[0];
   assert.ok(near(ship.x, 400 + 100 * Math.cos((210 * Math.PI) / 180)));
   assert.ok(near(ship.y, 400 + 100 * Math.sin((210 * Math.PI) / 180)));
-  assert.equal(ship.heading, 30);
+  assert.equal(ship.heading, 210);
+  // The travel angle is wrapped to 0..360 like a forward move's.
+  assert.equal(applyMove(at(400, 400, 300), { distance: 10, angle: 480, backward: true }).ships[0].heading, 120);
 });
 
 test('only the ship whose turn it is moves; every other field is carried over', () => {

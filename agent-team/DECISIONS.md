@@ -98,5 +98,8 @@ Context: answers "Go-ahead for tonight's night-shift build: which 3 READY briefs
 Decided by human in session, 2026-11-10: "approve T-013 spec change"
 Context: approves the exact diff on branch task/T-013-backward-heading-spec, as shown to the human: expected/movement.json, case "backward move keeps the heading", "ships.0.heading": 0 to 180 (x 100 and y 480 unchanged). Clears the Approval gate; T-009 may now be built from this branch. Merge T-013 then T-009 back to back.
 
+Decided by human in session, 2026-11-10: "start work on T-009"
+Context: the human ran /run-task with "start work on T-009" after approving the exact T-013 diff (ccf20b7). Go-ahead to build T-009 on branch task/T-009-backward-turn, created from ccf20b7. Not a merge or push approval.
+
 Decided by human in session, 2026-11-10: "Fix branch, you merge (Recommended)"
 Context: answers "Master has committed conflict markers in tests/game.test.js, FEATURE_MAP.md and REPEATS.md, and its tests don't run. How should I fix it before T-009 is reviewed?" The coordinator resolves them on branch fix/master-conflict-markers (keeping both sides) and the human merges it; then master is merged into task/T-009-backward-turn before T-009 review.
