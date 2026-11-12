@@ -36,7 +36,7 @@ export function drawMap(ctx) {
   ctx.strokeRect(1, 1, config.worldWidth - 2, config.worldHeight - 2);
 }
 
-const SHIP_COLORS = COLORS.ships;
+const shipColor = (i) => COLORS.ships[i % COLORS.ships.length];
 
 export function protectionAlpha(clockMs) {
   const period = config.protectionBlinkMs;
@@ -47,7 +47,6 @@ export function protectionAlpha(clockMs) {
 export function drawShips(ctx, state) {
   state.ships.forEach((ship, i) => {
     if (!ship.alive) return;
-    const blinking = isSpawnProtected(state, i);
     const [tip, left, right] = shipPoints(ship, config.shipSize, config.shipWidth);
     ctx.beginPath();
     ctx.moveTo(tip.x, tip.y);
@@ -56,8 +55,8 @@ export function drawShips(ctx, state) {
     ctx.closePath();
     ctx.lineJoin = 'round';
     ctx.lineWidth = config.shipLineWidth;
-    ctx.strokeStyle = SHIP_COLORS[i % SHIP_COLORS.length];
-    ctx.globalAlpha = blinking ? protectionAlpha(state.clock ?? 0) : 1;
+    ctx.strokeStyle = shipColor(i);
+    ctx.globalAlpha = isSpawnProtected(state, i) ? protectionAlpha(state.clock ?? 0) : 1;
     ctx.stroke();
     ctx.globalAlpha = 1;
   });
@@ -99,42 +98,47 @@ export function gaugeLayout(state) {
   return { bar, dial };
 }
 
-const GAUGE_DIM = COLORS.dim;
-
-export function drawPowerBar(ctx, state) {
+function powerBar(ctx, state, bar) {
   const { phase, power } = state.gauge;
-  const { bar } = gaugeLayout(state);
-  const color = SHIP_COLORS[state.turn % SHIP_COLORS.length];
+  const color = phase === 'power' ? shipColor(state.turn) : COLORS.dim;
   ctx.lineWidth = config.gaugeLineWidth;
-  ctx.strokeStyle = phase === 'power' ? color : GAUGE_DIM;
+  ctx.strokeStyle = color;
   ctx.strokeRect(bar.x, bar.y, bar.w, bar.h);
-  ctx.fillStyle = phase === 'power' ? color : GAUGE_DIM;
-  ctx.fillRect(bar.x, bar.y, bar.w * Math.min(Math.max(power, 0), 1), bar.h);
+  ctx.fillStyle = color;
+  ctx.fillRect(bar.x, bar.y, bar.w * clamp(power, 0, 1), bar.h);
 }
 
-export function drawDirectionDial(ctx, state) {
+function directionDial(ctx, state, dial) {
   const { needle } = state.gauge;
-  const { dial } = gaugeLayout(state);
   const max = rad(config.gaugeNeedleMax);
   ctx.lineWidth = config.gaugeLineWidth;
-  ctx.strokeStyle = GAUGE_DIM;
+  ctx.strokeStyle = COLORS.dim;
   ctx.beginPath();
   ctx.arc(dial.x, dial.y, dial.r, dial.facing - max, dial.facing + max);
   ctx.closePath();
   ctx.stroke();
   const a = dial.facing + rad(needle);
-  ctx.strokeStyle = SHIP_COLORS[state.turn % SHIP_COLORS.length];
+  ctx.strokeStyle = shipColor(state.turn);
   ctx.beginPath();
   ctx.moveTo(dial.x, dial.y);
   ctx.lineTo(dial.x + Math.cos(a) * dial.r, dial.y + Math.sin(a) * dial.r);
   ctx.stroke();
 }
 
+export function drawPowerBar(ctx, state) {
+  powerBar(ctx, state, gaugeLayout(state).bar);
+}
+
+export function drawDirectionDial(ctx, state) {
+  directionDial(ctx, state, gaugeLayout(state).dial);
+}
+
 export function drawGauge(ctx, state) {
   const { phase } = state.gauge;
   if (phase !== 'power' && phase !== 'direction') return;
-  drawPowerBar(ctx, state);
-  if (phase === 'direction') drawDirectionDial(ctx, state);
+  const { bar, dial } = gaugeLayout(state);
+  powerBar(ctx, state, bar);
+  if (phase === 'direction') directionDial(ctx, state, dial);
 }
 
 export function explosionPieces(explosion, elapsedMs) {
@@ -170,7 +174,7 @@ export function drawExplosions(ctx, state) {
       ctx.lineTo(to.x, to.y);
     }
     ctx.lineWidth = config.shipLineWidth;
-    ctx.strokeStyle = SHIP_COLORS[e.ship % SHIP_COLORS.length];
+    ctx.strokeStyle = shipColor(e.ship);
     ctx.stroke();
   }
 }
@@ -182,7 +186,7 @@ export function drawScores(ctx, state) {
   currentScores(state).forEach((score, i) => {
     const right = i % 2 === 1;
     ctx.textAlign = right ? 'right' : 'left';
-    ctx.fillStyle = SHIP_COLORS[i % SHIP_COLORS.length];
+    ctx.fillStyle = shipColor(i);
     ctx.fillText(String(score), right ? config.worldWidth - m : m, m);
   });
 }

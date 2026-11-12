@@ -61,6 +61,8 @@ const withShip = (state, ship) => ({
   ships: state.ships.map((s, j) => (j === state.turn ? ship : s)),
 });
 
+const toPowerPhase = ({ anim: _anim, ...rest }) => ({ ...rest, gauge: createInitialState().gauge });
+
 export function startMove(state, end) {
   const ship = state.ships[state.turn];
   const to = end.ships[state.turn];
@@ -71,15 +73,11 @@ export function startMove(state, end) {
 export function stepMove(state, ms) {
   const a = state.anim;
   if (state.gauge.phase !== 'moving' || !(ms > 0)) return state;
-  if (!a) {
-    const { anim: _none, ...rest } = state;
-    return { ...rest, gauge: createInitialState().gauge };
-  }
+  if (!a) return toPowerPhase(state);
   const elapsed = a.elapsed + ms;
   if (elapsed >= config.moveAnimMs) {
-    const { anim: _done, ...rest } = withShip(state, a.to);
-    const ships = a.ships ?? rest.ships;
-    return { ...rest, ships, gauge: createInitialState().gauge };
+    const arrived = withShip(state, a.to);
+    return toPowerPhase({ ...arrived, ships: a.ships ?? arrived.ships });
   }
   const ship = state.ships[state.turn];
   const p = pointAlong(a.from, a.to, elapsed / config.moveAnimMs);

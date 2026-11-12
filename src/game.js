@@ -21,8 +21,8 @@ function press(key) {
   if (launching && state.gauge.phase === 'moving') {
     const end = resolveMove(state, moveFromGauge(state));
     const scores = scoreMove(state, end);
-    state = startMove(state, end);
-    state = { ...state, anim: { ...state.anim, scores } };
+    const moving = startMove(state, end);
+    state = { ...moving, anim: { ...moving.anim, scores } };
   }
 }
 

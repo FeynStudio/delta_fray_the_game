@@ -84,12 +84,22 @@ function polygonsOverlap(a, b) {
   for (const poly of [a, b]) {
     for (let i = 0; i < poly.length; i += 1) {
       const p = poly[i], q = poly[(i + 1) % poly.length];
-      const len = Math.hypot(q.x - p.x, q.y - p.y);
+      const dx = q.x - p.x, dy = q.y - p.y;
+      const len = Math.hypot(dx, dy);
       if (len === 0) continue;
-      const nx = -(q.y - p.y) / len, ny = (q.x - p.x) / len;
-      const project = (poly2) => poly2.map((v) => v.x * nx + v.y * ny);
-      const pa = project(a), pb = project(b);
-      if (Math.max(...pa) < Math.min(...pb) - TOUCH || Math.max(...pb) < Math.min(...pa) - TOUCH) return false;
+      const nx = -dy / len, ny = dx / len;
+      let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
+      for (const v of a) {
+        const d = v.x * nx + v.y * ny;
+        minA = Math.min(minA, d);
+        maxA = Math.max(maxA, d);
+      }
+      for (const v of b) {
+        const d = v.x * nx + v.y * ny;
+        minB = Math.min(minB, d);
+        maxB = Math.max(maxB, d);
+      }
+      if (maxA < minB - TOUCH || maxB < minA - TOUCH) return false;
     }
   }
   return true;
