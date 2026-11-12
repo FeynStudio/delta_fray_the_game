@@ -1,0 +1,4 @@
+== ./scripts/guards.sh
+exit: 0
+== node scripts/no-comments.mjs
+exit: 0

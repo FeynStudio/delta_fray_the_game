@@ -1,0 +1,6 @@
+== grep -nE '//|/\*|\*/|<!--' scripts/no-comments.mjs tests/no-comments.test.js
+grep exit: 1 (1 = no match)
+== grep -nE '(^|[[:space:]])#' scripts/no-comments.mjs tests/no-comments.test.js
+grep exit: 1 (1 = no match)
+== grep -nE 'child_process|eval\(|new Function|new RegExp|fetch\(|https?:' scripts/no-comments.mjs tests/no-comments.test.js
+grep exit: 1 (1 = no match)
