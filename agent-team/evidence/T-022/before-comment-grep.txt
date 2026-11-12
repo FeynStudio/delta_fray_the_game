@@ -1,0 +1,158 @@
+tests/config.test.js:41:  const m = config.shipLineWidth / 2; // round-joined stroke reaches this far past each corner
+tests/game.test.js:1:// Loads the real src/game.js in Node with a minimal stubbed DOM and ?debug=1, then drives the move
+tests/game.test.js:2:// through window.__game (pattern: tests/rules.test.js; values come from config). T-005: the end of
+tests/game.test.js:3:// every move comes from rules.resolveMove, and the step that finishes it calls rules.endTurn once.
+tests/game.test.js:18:  const ctx = new Proxy({}, { get: () => () => {} }); // every canvas call is a no-op
+tests/game.test.js:25:  globalThis.requestAnimationFrame = () => 0; // the loop is driven by step() in these tests
+tests/game.test.js:28:  loaded = game.getState(); // the state game.js starts with, before any test's setState (T-010)
+tests/game.test.js:36:// From the spawn state: lock power, lock the needle (optionally backward), press the second Space.
+tests/game.test.js:60:// T-009: a backward move turns the ship to the travel angle at launch, flies tip first, keeps the heading.
+tests/game.test.js:95:  launch(0.3, 0); // ship 1 makes any move
+tests/game.test.js:149:// Loads ships and turn, then locks power, a forward needle and launches (same as launch()).
+tests/game.test.js:202:  launch(0.4, 0); // ship 1 faces heading 180, so a forward move goes toward -x
+tests/game.test.js:237:  // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
+tests/game.test.js:238:  // so the ship whose turn it is is always alive when it launches.
+tests/game.test.js:242:// ---- explosions (T-007): decoration only, play does not wait (human, 2026-11-09) ----
+tests/game.test.js:320:  launch(0.4, 0); // player 2, explosion still playing
+tests/game.test.js:329:// ---- score (T-012): scores change in the step where the move animation ends, never before ----
+tests/game.test.js:356:  // P1 kills P2 (+1), P2 plain move, P1 dies at the wall (-2), P2 kills P1 (+1).
+tests/game.test.js:373:  launch(1, 0); // ship 1 faces 180, a full forward move sweeps ship 0
+tests/game.test.js:391:// T-014: a moving phase with no anim (debug setState only) recovers on the next step: gauge back to
+tests/game.test.js:392:// the power phase for the same player, ships unmoved, no endTurn (human decision 2026-11-09).
+tests/game.test.js:417:  const locked = { ...launched, ships }; // the ships as they were before startMove turned the mover
+tests/game.test.js:428:// ---- game clock and spawn protection blink (T-010) ----
+tests/game.test.js:444:  launch(0.5, 0); // moving phase
+tests/game.test.js:451:  game.setState(createInitialState()); // a state without clock counts from 0
+tests/hits.test.js:1:// Hit detection and edges (FEATURE_MAP section 5): rules.resolveMove(state, move).
+tests/hits.test.js:2:// Follows the tests/rules.test.js pattern: sizes come from config, config is restored after each test,
+tests/hits.test.js:3:// and every input is deep-frozen so a mutation throws.
+tests/hits.test.js:23:// Tip-to-back length of the ship triangle, read from config at call time.
+tests/hits.test.js:36:  // Mover heading 0 sweeps a band y = 480 +- shipWidth/2. An enemy (heading 0) shipWidth lower has its
+tests/hits.test.js:37:  // back corner exactly on the band's edge; moved 0.01 further down it no longer touches.
+tests/hits.test.js:45:  // End position's tip and the enemy's tip (facing back at it) meet exactly at one point.
+tests/hits.test.js:58:  // Sanity: the enemy is clear of both the start and the end triangle along x.
+tests/hits.test.js:97:  // Tip ends exactly on the right edge (centre is tip units inside).
+tests/hits.test.js:101:  // Tip ends past the edge with the centre still inside.
+tests/hits.test.js:105:  // Whole swept triangle stays inside: survives.
+tests/hits.test.js:112:  // Heading 0 at y = shipWidth/2: the back corner sits exactly on y = 0.
+tests/hits.test.js:122:  // Heading 180 moving at 0 (backward): the ship turns to heading 0, so the tip leads to the right wall.
+tests/hits.test.js:137:      const angle = (heading + 180 + needle) % 360; // as input.moveFromGauge builds a backward move
+tests/hits.test.js:140:        // Open space, enemy far away: no hit.
+tests/hits.test.js:142:        // Enemy on the path: destroyed.
+tests/hits.test.js:144:        // Path ends at a wall: mover destroyed.
+tests/hits.test.js:155:  // The brief's angled example: heading 30, angle 240; the enemy on the path is destroyed either way.
+tests/hits.test.js:201:  // Mover heading 0 turns to 90 and moves down (input.startMove turns it before it moves). The enemy's
+tests/hits.test.js:202:  // back edge sits 1 unit behind the old (heading 0) tip, so it overlaps the old start triangle, but the
+tests/hits.test.js:203:  // new swept area only reaches shipWidth/2 to the right of the centre: the enemy survives.
+tests/input.test.js:1:// Gauge and control tests (pattern: tests/rules.test.js). Values come from config; config is restored
+tests/input.test.js:2:// after each test; inputs are deep-frozen, as scripts/run-scenario.mjs does, to catch mutation.
+tests/input.test.js:33:  // Small steps across a full back-and-forth: no reading leaves 0..1 and no step jumps.
+tests/input.test.js:47:  // Turns back instead of wrapping: past the top it comes down.
+tests/input.test.js:50:  // A long step still lands inside 0..1.
+tests/input.test.js:151:// A locked gauge (second Space pressed) on ship 0 with the given heading.
+tests/input.test.js:212:// T-014: a moving phase with no anim (only reachable through the debug setState) is put back to the
+tests/input.test.js:213:// power phase on the next step(ms) > 0, ship unmoved, turn unchanged (human decision 2026-11-09).
+tests/movement.test.js:1:// rules.applyMove tests (pattern: tests/rules.test.js). Values come from config; config is restored
+tests/movement.test.js:2:// after each test; inputs are deep-frozen, as scripts/run-scenario.mjs does, to catch mutation.
+tests/movement.test.js:52:  // The travel angle is wrapped to 0..360 like a forward move's.
+tests/render.test.js:68:// ---- gauges on the active ship (human decision of 2026-11-08) ----
+tests/render.test.js:88:// Farthest any gauge part may reach from the active ship's centre.
+tests/render.test.js:127:  // Deliberately pinned, not derived: these two values are the human's decisions of 2026-11-08
+tests/render.test.js:128:  // (agent-team/DECISIONS.md): power gauge 50%, then 60% of that (0.5 x 0.6); direction gauge 70%,
+tests/render.test.js:129:  // then 80% of that (0.7 x 0.8). Change them only with a new human decision.
+tests/render.test.js:213:      // Sample the whole bar: no point may fall inside the dial's half-disc.
+tests/render.test.js:225:// ---- explosions (T-007, human answer of 2026-11-09) ----
+tests/render.test.js:284:// ---- score corners (T-012) ----
+tests/render.test.js:321:// ---- spawn protection blink (T-010, human answers 2026-11-09: 400 ms, fade to invisible, snap back) ----
+tests/render.test.js:328:  // repeats exactly every period
+tests/render.test.js:359:// Records globalAlpha at every stroke, and the value left on the context at the end.
+tests/render.test.js:372:  const base = createInitialState(); // both ships protected at game start (T-006)
+tests/render.test.js:404:// Respawn turn (T-010 review round 1): ship 1 was just destroyed, its explosion is running in the same
+tests/render.test.js:405:// colour, and the respawned ship 1 sits on its spawn, protected, blinking. Only that ship's outline is
+tests/render.test.js:406:// drawn below full opacity; the explosion pieces, the other ship, the scores, the map and the gauge are not.
+tests/render.test.js:411:    { x: 1020, y: 480, heading: 0, alive: true, unmovedSinceSpawn: false }, // the mover, not protected
+tests/render.test.js:412:    { ...config.spawns[1], alive: true, unmovedSinceSpawn: true }, // respawned by endTurn
+tests/render.test.js:420:    // drawShips alone: 2 ship strokes, alpha only on ship 1.
+tests/render.test.js:428:    // The whole frame: every draw call other than ship 1's outline happens at globalAlpha 1.
+tests/render.test.js:440:    // Order in drawFrame: map border, explosion pieces (ship 1 colour, alpha 1), ship 0, ship 1 (faded), gauge.
+tests/render.test.js:450:// ---- title decal (T-011) ----
+tests/render.test.js:451:// A stub ctx that records every method call with the drawing settings in force at that moment, and keeps
+tests/render.test.js:452:// a real save/restore stack, so the test can see what drawTitle leaves behind for later draw calls.
+tests/render.test.js:471:// Frames with every state field present so far: clock (T-010 blink), scores (T-012), explosions (T-007),
+tests/render.test.js:472:// unmovedSinceSpawn (T-006), and both gauge phases.
+tests/render.test.js:527:    // Only the scores are other text, and they come before the title.
+tests/rules.test.js:1:// Pattern for rules tests: import config and rules, read expected values from config,
+tests/rules.test.js:2:// restore any config change after the test, and check that inputs are not mutated.
+tests/score.test.js:1:// T-012 score rules (pattern: tests/rules.test.js). Points come from config; inputs are deep-frozen,
+tests/score.test.js:2:// so any mutation of before/after throws.
+tests/score.test.js:16:// Builds a frozen state, resolves the move with the real rules and returns { before, after, scores }.
+tests/score.test.js:89:  // Same sweep against an unprotected enemy is a kill, so the move does reach it.
+tests/spawn.test.js:1:// Spawn protection (FEATURE_MAP sections 5, 6 and 9; human decision 2026-11-09, A2): a ship that has not
+tests/spawn.test.js:2:// moved since it spawned cannot be destroyed by an enemy's swept area. rules.isSpawnProtected(state, i),
+tests/spawn.test.js:3:// the unmovedSinceSpawn field and its use in resolveMove.
+tests/spawn.test.js:4:// Follows the tests/rules.test.js pattern: positions come from config, config is restored after each test,
+tests/spawn.test.js:5:// and every input is deep-frozen so a mutation throws.
+tests/spawn.test.js:24:// Player 2's ship on its spawn point, with the given unmovedSinceSpawn (undefined = no field).
+tests/spawn.test.js:30:// Player 1's ship 110 units left of player 2's spawn, facing it: a max move sweeps over that spawn.
+tests/spawn.test.js:61:  // Player 2 has just destroyed player 1 and sits 110 units right of player 1's spawn, facing it.
+tests/spawn.test.js:68:  // While still unmoved, an enemy sweep over it leaves it alive.
+tests/spawn.test.js:71:  // Its own move ends protection, even a zero-length one that leaves it on the spawn point.
+tests/spawn.test.js:89:  // The default spawn point is no longer protected.
+tests/spawn.test.js:110:  // Same move with the enemy unprotected: both die (FEATURE_MAP 5 hit-then-wall is unchanged).
+tests/turns.test.js:1:// Respawn and turns (FEATURE_MAP sections 6 and 9): rules.endTurn(state).
+tests/turns.test.js:2:// Follows the tests/rules.test.js pattern: values come from config, config is restored after each test,
+tests/turns.test.js:3:// and every input is deep-frozen so a mutation throws.
+sim/balance.mjs:1:// sim/balance.mjs — plays scripted games with the real rules; exits 1 if a balance target is missed.
+sim/balance.mjs:2:// Usage: node sim/balance.mjs --games 2000 --out agent-team/evidence/T-001/balance.json
+sim/balance.mjs:5:// ===== Hooks: connect your game here =====
+sim/balance.mjs:10:// Scripted player: aims roughly at the enemy within what the gauge allows (needle ±90°, or backward).
+sim/balance.mjs:14:  let rel = ((toFoe - me.heading + 540) % 360) - 180;   // -180..180 from the ship's heading
+sim/balance.mjs:16:  if (backward) rel = ((rel + 360) % 360) - 180;        // measured from the tail instead
+sim/balance.mjs:19:  return moveFromGauge({ ...state, gauge });            // the same move the real controls produce
+sim/balance.mjs:39:  // One number per metric for this game; names must match balance-targets.json.
+sim/balance.mjs:43:    movesToFirstEncounter: firstHit ? Math.ceil(firstHit.turn / 2) : null, // turns alternate, so moves per player
+sim/balance.mjs:47:// ===== End hooks =====
+sim/balance.mjs:54:// Seeded random numbers, so the same code always gives the same result (no flaky CI).
+scripts/run-scenario.mjs:2:// Runs a rules scenario against src/rules.js and writes the picked values as JSON.
+scripts/run-scenario.mjs:3:// Usage: node scripts/run-scenario.mjs scenarios/<name>.json --out <file.json>
+scripts/run-scenario.mjs:4://
+scripts/run-scenario.mjs:5:// Scenario format (see FEATURE_MAP.md, "Test harness contract"):
+scripts/run-scenario.mjs:6://   { "overrides": {config keys}, "cases": [ { "name", "state", "steps": [{ "call", "move"? }], "pick": ["ships.0.x", ...] } ] }
+scripts/run-scenario.mjs:7:// Each step calls rules[call](state, move) or rules[call](state) and must return the new state.
+scripts/run-scenario.mjs:8:// Inputs are deep-frozen, so a rules function that mutates its input fails here.
+scripts/run-scenario.mjs:9:// Numbers are rounded to 3 decimals. Exit code 1 if anything could not run.
+scripts/run-scenario.mjs:54:      // Reset config, then apply the scenario's and the case's overrides.
+scripts/run-scenario.mjs:55:      // Overrides come from scenario files checked into the repo, not from user input.
+scripts/run-scenario.mjs:57:      Object.assign(config, structuredClone(original), scenario.overrides ?? {}, c.overrides ?? {}); // nosemgrep: javascript.lang.security.insecure-object-assign.insecure-object-assign
+scripts/serve.mjs:2:// Static file server for the game (no build step).
+scripts/serve.mjs:3:// `npm run dev` serves the project at http://localhost:5173/index.html (set PORT to change).
+scripts/serve.mjs:4:// scripts/smoke.mjs imports startServer() to serve the game to the headless browser.
+scripts/serve.mjs:26:      path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+scripts/serve.mjs:32:    // Never serve dotfiles (.env, .git) or secrets/, and never leave the project folder.
+scripts/serve.mjs:54:        url: `http://${host}:${server.address().port}`,
+scripts/serve.mjs:66:  process.stdout.write(`Serving ${root} at http://localhost:${port}/index.html (Ctrl+C to stop)\n`);
+scripts/smoke.mjs:2:// Browser smoke check: serves the game, opens index.html?debug=1 in headless Chrome or Edge,
+scripts/smoke.mjs:3:// drives window.__game and writes named PASS/FAIL booleans as JSON (compared to expected/<feature>-smoke.json).
+scripts/smoke.mjs:4:// Also saves a screenshot next to --out (<out>.png) as evidence. The input feature also saves one screenshot
+scripts/smoke.mjs:5:// per gauge phase (<out>-power.png, <out>-direction.png, <out>-direction-backward.png), each taken in its own
+scripts/smoke.mjs:6:// page and checked against getState().gauge at capture time; a wrong phase fails the run.
+scripts/smoke.mjs:7:// Usage: node scripts/smoke.mjs --feature render|input|turns --out <file.json>
+scripts/smoke.mjs:8:// No npm dependencies: talks to the browser over the DevTools protocol with Node's built-in WebSocket.
+scripts/smoke.mjs:9:// Set CHROME_PATH to pick a browser; otherwise Chrome, then Edge, is used.
+scripts/smoke.mjs:23:// ---------- browser plumbing ----------
+scripts/smoke.mjs:65:  // Chrome prints "DevTools listening on <websocket url>" to stderr when it has a console. Started from a shell
+scripts/smoke.mjs:66:  // without one (e.g. an agent's shell on Windows), chrome.exe hands off to a detached browser and exits 0
+scripts/smoke.mjs:67:  // without printing it, so also read the DevToolsActivePort file the browser writes into the profile.
+scripts/smoke.mjs:80:      // Local DevTools on 127.0.0.1 only speaks plain ws (no wss); nothing leaves the machine.
+scripts/smoke.mjs:81:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+scripts/smoke.mjs:121:      // Wait until the game page has loaded and exposed its debug API.
+scripts/smoke.mjs:134:      // Ask the browser itself to quit: proc may be only the launcher, which a detached browser outlives.
+scripts/smoke.mjs:140:      // The browser removes its profile lockfile as it exits; wait for that so the profile can be deleted.
+scripts/smoke.mjs:151:// ---------- in-page probes (run inside the browser, not in Node) ----------
+scripts/smoke.mjs:214:// Puts a fresh page into one gauge phase for a screenshot: keys is the list of presses to make.
+scripts/smoke.mjs:219:// Waits for two animation frames so the canvas shows the current state, then returns the gauge.
+scripts/smoke.mjs:261:// ---------- features ----------
+scripts/smoke.mjs:265:// Opens its own page, presses keys, then screenshots it. The gauge is read just before and just after
+scripts/smoke.mjs:266:// the capture; if either reading is not the wanted phase/backward, throws an error naming the file.
+scripts/smoke.mjs:316:    // Per-phase screenshots, each in its own page opened after the checked pages a, b and c are done.
+scripts/smoke.mjs:348:// ---------- main ----------

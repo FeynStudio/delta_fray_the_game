@@ -1,6 +1,3 @@
-// Respawn and turns (FEATURE_MAP sections 6 and 9): rules.endTurn(state).
-// Follows the tests/rules.test.js pattern: values come from config, config is restored after each test,
-// and every input is deep-frozen so a mutation throws.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';

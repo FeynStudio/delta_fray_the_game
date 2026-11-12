@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-// Runs a rules scenario against src/rules.js and writes the picked values as JSON.
-// Usage: node scripts/run-scenario.mjs scenarios/<name>.json --out <file.json>
-//
-// Scenario format (see FEATURE_MAP.md, "Test harness contract"):
-//   { "overrides": {config keys}, "cases": [ { "name", "state", "steps": [{ "call", "move"? }], "pick": ["ships.0.x", ...] } ] }
-// Each step calls rules[call](state, move) or rules[call](state) and must return the new state.
-// Inputs are deep-frozen, so a rules function that mutates its input fails here.
-// Numbers are rounded to 3 decimals. Exit code 1 if anything could not run.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -51,8 +43,6 @@ try {
 
   for (const c of scenario.cases) {
     try {
-      // Reset config, then apply the scenario's and the case's overrides.
-      // Overrides come from scenario files checked into the repo, not from user input.
       for (const key of Object.keys(config)) if (!(key in original)) delete config[key];
       Object.assign(config, structuredClone(original), scenario.overrides ?? {}, c.overrides ?? {}); // nosemgrep: javascript.lang.security.insecure-object-assign.insecure-object-assign
 

@@ -1,5 +1,3 @@
-// rules.applyMove tests (pattern: tests/rules.test.js). Values come from config; config is restored
-// after each test; inputs are deep-frozen, as scripts/run-scenario.mjs does, to catch mutation.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -49,7 +47,6 @@ test('a backward move travels along the angle and turns the heading to the trave
   assert.ok(near(ship.x, 400 + 100 * Math.cos((210 * Math.PI) / 180)));
   assert.ok(near(ship.y, 400 + 100 * Math.sin((210 * Math.PI) / 180)));
   assert.equal(ship.heading, 210);
-  // The travel angle is wrapped to 0..360 like a forward move's.
   assert.equal(applyMove(at(400, 400, 300), { distance: 10, angle: 480, backward: true }).ships[0].heading, 120);
 });
 

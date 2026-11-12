@@ -1,0 +1,28 @@
+After: commit 5cb13e4. Each block is the command, its output, and the grep exit code (1 = no match).
+$ grep -nE '//|/\*|\*/' tests/*.js sim/*.mjs scripts/*.mjs src/*.js
+scripts/run-scenario.mjs:47:      Object.assign(config, structuredClone(original), scenario.overrides ?? {}, c.overrides ?? {}); // nosemgrep: javascript.lang.security.insecure-object-assign.insecure-object-assign
+scripts/serve.mjs:23:      path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+scripts/serve.mjs:50:        url: `http://${host}:${server.address().port}`,
+scripts/serve.mjs:62:  process.stdout.write(`Serving ${root} at http://localhost:${port}/index.html (Ctrl+C to stop)\n`);
+scripts/smoke.mjs:68:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+exit 0
+
+$ grep -nE '(^|[[:space:]])#' scripts/*.sh
+scripts/guards.sh:1:#!/usr/bin/env bash
+scripts/verify.sh:1:#!/usr/bin/env bash
+exit 0
+
+$ grep -nE '<!--|/\*|//' index.html
+exit 1
+
+$ git ls-files '*.css'
+exit 0 (no output = no .css file)
+
+$ node agent-team/evidence/T-022/strip-comments.mjs list   (tokeniser view of the committed files)
+scripts/run-scenario.mjs:47: [DIRECTIVE (kept)] // nosemgrep: javascript.lang.security.insecure-object-assign.insecure-object-assign
+scripts/serve.mjs:23: [NOT A COMMENT, inside a string] path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+scripts/serve.mjs:50: [NOT A COMMENT, inside a template] url: `http://${host}:${server.address().port}`,
+scripts/serve.mjs:62: [NOT A COMMENT, inside a template] process.stdout.write(`Serving ${root} at http://localhost:${port}/index.html (Ctrl+C to stop)\n`);
+scripts/smoke.mjs:68: [DIRECTIVE (kept)] // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+scripts/smoke.mjs:68: [NOT A COMMENT, inside a template] if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+TOTAL: 0 whole-line + 0 trailing = 0 comments to remove; 2 directive comments kept; 4 non-comment line(s)

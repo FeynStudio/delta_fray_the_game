@@ -1,0 +1,64 @@
+$ node agent-team/evidence/T-022/strip-comments.mjs prove 0155ba3 5cb13e4
+BASE 0155ba3b883270c2a08b770e8a815335dbafd576
+HEAD 5cb13e459d6193ad1baf2384ec2dff93bb57ff93
+Changed files under tests/ sim/ scripts/: 14
+
+OK   scripts/run-scenario.mjs: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 10; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 8 -> 8; line count delta 10
+OK   scripts/serve.mjs: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 4; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 4 -> 4; line count delta 4
+OK   scripts/smoke.mjs: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 24; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 28 -> 28; line count delta 24
+OK   sim/balance.mjs: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 7; lines changed in place (trailing comment cut): 4; added lines: 0; blank lines 8 -> 8; line count delta 7
+OK   tests/config.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 0; lines changed in place (trailing comment cut): 1; added lines: 0; blank lines 8 -> 8; line count delta 0
+OK   tests/game.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 14; lines changed in place (trailing comment cut): 10; added lines: 0; blank lines 36 -> 36; line count delta 14
+OK   tests/hits.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 20; lines changed in place (trailing comment cut): 1; added lines: 0; blank lines 25 -> 25; line count delta 20
+OK   tests/input.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 8; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 24 -> 24; line count delta 8
+OK   tests/movement.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 3; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 11 -> 11; line count delta 3
+OK   tests/render.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 23; lines changed in place (trailing comment cut): 3; added lines: 0; blank lines 41 -> 41; line count delta 23
+OK   tests/rules.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 2; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 5 -> 5; line count delta 2
+OK   tests/score.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 4; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 18 -> 18; line count delta 4
+OK   tests/spawn.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 12; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 14 -> 14; line count delta 12
+OK   tests/turns.test.js: strip(BASE) byte-identical to HEAD: true; deleted whole-line comment lines: 3; lines changed in place (trailing comment cut): 0; added lines: 0; blank lines 12 -> 12; line count delta 3
+
+TOTAL: 134 lines deleted, 19 lines changed in place, 153 comments removed, 0 file(s) failing
+RESULT: COMMENT-ONLY
+exit 0
+
+$ git diff --numstat 0155ba3 5cb13e4 -- tests/ sim/ scripts/
+0	10	scripts/run-scenario.mjs
+0	4	scripts/serve.mjs
+0	24	scripts/smoke.mjs
+4	11	sim/balance.mjs
+1	1	tests/config.test.js
+10	24	tests/game.test.js
+1	21	tests/hits.test.js
+0	8	tests/input.test.js
+0	3	tests/movement.test.js
+3	26	tests/render.test.js
+0	2	tests/rules.test.js
+0	4	tests/score.test.js
+0	12	tests/spawn.test.js
+0	3	tests/turns.test.js
+added 19, deleted 153, sum 172
+
+$ git diff 0155ba3 5cb13e4 -- tests/ sim/ scripts/ | grep -cE '^[-+][[:space:]]*$'   (blank lines added or removed)
+0
+
+$ node --check on every changed file
+scripts/run-scenario.mjs exit 0
+scripts/serve.mjs exit 0
+scripts/smoke.mjs exit 0
+sim/balance.mjs exit 0
+tests/config.test.js exit 0
+tests/game.test.js exit 0
+tests/hits.test.js exit 0
+tests/input.test.js exit 0
+tests/movement.test.js exit 0
+tests/render.test.js exit 0
+tests/rules.test.js exit 0
+tests/score.test.js exit 0
+tests/spawn.test.js exit 0
+tests/turns.test.js exit 0
+
+$ head -1 scripts/*.mjs   (shebangs kept)
+#!/usr/bin/env node
+#!/usr/bin/env node
+#!/usr/bin/env node

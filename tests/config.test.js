@@ -38,7 +38,7 @@ test('the ship triangle is narrower than equilateral', () => {
 });
 
 test('each spawned narrow ship, outline included, lies fully inside the map without touching an edge', () => {
-  const m = config.shipLineWidth / 2; // round-joined stroke reaches this far past each corner
+  const m = config.shipLineWidth / 2;
   for (const s of config.spawns) {
     for (const p of shipPoints(s, config.shipSize, config.shipWidth)) {
       assert.ok(p.x - m > 0 && p.x + m < config.worldWidth, `corner x ${p.x} is not inside the map`);

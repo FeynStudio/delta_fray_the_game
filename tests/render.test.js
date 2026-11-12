@@ -65,7 +65,6 @@ test('fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks
   }
 });
 
-// ---- gauges on the active ship (human decision of 2026-11-08) ----
 const deepFreeze = (o) => {
   if (o && typeof o === 'object') { Object.values(o).forEach(deepFreeze); Object.freeze(o); }
   return o;
@@ -85,7 +84,6 @@ const gaugeState = (turn, gauge, ships) => {
   return deepFreeze({ ...base, turn, ships: ships ?? base.ships, gauge: { ...base.gauge, ...gauge } });
 };
 const dialR = () => config.gaugeDialRadius * config.gaugeDialScale;
-// Farthest any gauge part may reach from the active ship's centre.
 const reach = () => config.shipSize + config.gaugeDialGap + config.gaugeLineWidth + 2 * dialR()
   + config.gaugePowerGap
   + Math.hypot((config.gaugeBarWidth * config.gaugePowerScale) / 2, config.gaugeBarHeight * config.gaugePowerScale);
@@ -124,9 +122,6 @@ test('gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of 
   assert.ok(Math.abs(bar.w - config.gaugeBarWidth * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(bar.h - config.gaugeBarHeight * config.gaugePowerScale) < 1e-9);
   assert.ok(Math.abs(dial.r - config.gaugeDialRadius * config.gaugeDialScale) < 1e-9);
-  // Deliberately pinned, not derived: these two values are the human's decisions of 2026-11-08
-  // (agent-team/DECISIONS.md): power gauge 50%, then 60% of that (0.5 x 0.6); direction gauge 70%,
-  // then 80% of that (0.7 x 0.8). Change them only with a new human decision.
   assert.ok(Math.abs(config.gaugePowerScale - 0.5 * 0.6) < 1e-9);
   assert.ok(Math.abs(config.gaugeDialScale - 0.7 * 0.8) < 1e-9);
 });
@@ -210,7 +205,6 @@ test('the power bar does not overlap the direction dial', () => {
   for (let heading = 0; heading < 360; heading += 15) {
     for (const backward of [false, true]) {
       const { bar, dial } = gaugeLayout(gaugeState(0, { phase: 'direction', backward }, testShips(640, 400, heading)));
-      // Sample the whole bar: no point may fall inside the dial's half-disc.
       for (let i = 0; i <= 40; i++) {
         for (let j = 0; j <= 4; j++) {
           const dx = bar.x + (bar.w * i) / 40 - dial.x, dy = bar.y + (bar.h * j) / 4 - dial.y;
@@ -222,7 +216,6 @@ test('the power bar does not overlap the direction dial', () => {
   }
 });
 
-// ---- explosions (T-007, human answer of 2026-11-09) ----
 const boom = { ship: 1, x: 400, y: 300, heading: 237, elapsed: 0 };
 const len = (s) => Math.hypot(s.to.x - s.from.x, s.to.y - s.from.y);
 const mid = (s) => ({ x: (s.from.x + s.to.x) / 2, y: (s.from.y + s.to.y) / 2 });
@@ -281,7 +274,6 @@ test('drawExplosions: nothing without explosions; strokes in the ship colour wit
   assert.ok(!calls.some(([k]) => /fill/i.test(String(k))), 'outline only');
 });
 
-// ---- score corners (T-012) ----
 test('drawScores: player 1 top-left, player 2 top-right, each in its ship colour, minus sign kept', () => {
   const texts = [];
   const ctx = new Proxy({}, {
@@ -318,14 +310,12 @@ test('drawScores: a state without scores draws 0 for both; margins come from con
   ]);
 });
 
-// ---- spawn protection blink (T-010, human answers 2026-11-09: 400 ms, fade to invisible, snap back) ----
 test('protectionAlpha: 1, 0.75, 0.5, 0.25 at 0, 1/4, 1/2, 3/4 of the period and 1 again at one period', () => {
   const P = config.protectionBlinkMs;
   assert.equal(P, 400);
   assert.equal(config.protectionMinAlpha, 0);
   const want = [[0, 1], [P / 4, 0.75], [P / 2, 0.5], [(3 * P) / 4, 0.25], [P, 1]];
   for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms) - a) < 1e-9, `${ms} ms: ${protectionAlpha(ms)}`);
-  // repeats exactly every period
   for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms + 3 * P) - a) < 1e-9, `${ms + 3 * P} ms`);
 });
 
@@ -356,7 +346,6 @@ test('protectionAlpha reads period and minimum from config at call time', () => 
   }
 });
 
-// Records globalAlpha at every stroke, and the value left on the context at the end.
 const alphaCtx = () => {
   const strokes = [];
   const t = { globalAlpha: 1 };
@@ -369,7 +358,7 @@ const alphaCtx = () => {
 
 test('drawShips: only a spawn-protected ship is drawn below full opacity; globalAlpha back at 1; state unchanged', () => {
   const P = config.protectionBlinkMs;
-  const base = createInitialState(); // both ships protected at game start (T-006)
+  const base = createInitialState();
   const moved = { ...base.ships[0], x: 400, unmovedSinceSpawn: false };
   const cases = [
     { ships: base.ships, clock: P / 4, want: [0.75, 0.75] },
@@ -401,15 +390,12 @@ test('drawShips: a state without clock draws a protected ship at full opacity (c
   assert.equal(t.globalAlpha, 1);
 });
 
-// Respawn turn (T-010 review round 1): ship 1 was just destroyed, its explosion is running in the same
-// colour, and the respawned ship 1 sits on its spawn, protected, blinking. Only that ship's outline is
-// drawn below full opacity; the explosion pieces, the other ship, the scores, the map and the gauge are not.
 test('respawn turn with an explosion running: only the respawned protected ship blinks', () => {
   const P = config.protectionBlinkMs;
   const base = createInitialState();
   const ships = [
-    { x: 1020, y: 480, heading: 0, alive: true, unmovedSinceSpawn: false }, // the mover, not protected
-    { ...config.spawns[1], alive: true, unmovedSinceSpawn: true }, // respawned by endTurn
+    { x: 1020, y: 480, heading: 0, alive: true, unmovedSinceSpawn: false },
+    { ...config.spawns[1], alive: true, unmovedSinceSpawn: true },
   ];
   const explosions = [{ ship: 1, x: 1000, y: 480, heading: 180, elapsed: 100 }];
   for (const [clock, want] of [[P * 5 + P / 4, 0.75], [P * 5 + (3 * P) / 4, 0.25], [P * 5 + P - 10, 0.025]]) {
@@ -417,7 +403,6 @@ test('respawn turn with an explosion running: only the respawned protected ship 
     const copy = structuredClone(state);
     assert.equal(isSpawnProtected(state, 1), true);
 
-    // drawShips alone: 2 ship strokes, alpha only on ship 1.
     const one = alphaCtx();
     drawShips(one.ctx, state);
     assert.deepEqual(one.strokes.map((s) => s.color), COLORS.ships);
@@ -425,7 +410,6 @@ test('respawn turn with an explosion running: only the respawned protected ship 
     assert.ok(Math.abs(one.strokes[1].alpha - want) < 1e-9, `clock ${clock}: ${one.strokes[1].alpha}`);
     assert.equal(one.t.globalAlpha, 1);
 
-    // The whole frame: every draw call other than ship 1's outline happens at globalAlpha 1.
     const calls = [];
     const t = { globalAlpha: 1 };
     const ctx = new Proxy(t, {
@@ -437,7 +421,6 @@ test('respawn turn with an explosion running: only the respawned protected ship 
     const faded = calls.filter((c) => /^(stroke|strokeRect|fill|fillRect|fillText)$/.test(c.k) && c.alpha !== 1);
     assert.equal(faded.length, 1, `exactly one faded draw call: ${JSON.stringify(faded)}`);
     assert.ok(Math.abs(faded[0].alpha - want) < 1e-9);
-    // Order in drawFrame: map border, explosion pieces (ship 1 colour, alpha 1), ship 0, ship 1 (faded), gauge.
     assert.equal(strokes[1].color, COLORS.ships[1], 'explosion stroke in ship 1 colour');
     assert.equal(strokes[1].alpha, 1, 'explosion pieces at full opacity');
     assert.equal(strokes[3], faded[0], 'the faded call is ship 1 outline, after the explosion and ship 0');
@@ -447,9 +430,6 @@ test('respawn turn with an explosion running: only the respawned protected ship 
   }
 });
 
-// ---- title decal (T-011) ----
-// A stub ctx that records every method call with the drawing settings in force at that moment, and keeps
-// a real save/restore stack, so the test can see what drawTitle leaves behind for later draw calls.
 const PROPS = ['font', 'letterSpacing', 'textAlign', 'textBaseline', 'strokeStyle', 'fillStyle', 'lineWidth', 'globalAlpha'];
 const settingsCtx = () => {
   const calls = [];
@@ -468,8 +448,6 @@ const settingsCtx = () => {
 };
 const DRAW = /^(stroke|fill|strokeRect|fillRect|strokeText|fillText|clearRect|drawImage)$/;
 
-// Frames with every state field present so far: clock (T-010 blink), scores (T-012), explosions (T-007),
-// unmovedSinceSpawn (T-006), and both gauge phases.
 const titleFrames = () => {
   const base = createInitialState();
   const P = config.protectionBlinkMs;
@@ -524,7 +502,6 @@ test('drawFrame draws the title last: strokeText "DELTA FRAY", centred at worldW
     assert.equal(last.strokeStyle, COLORS.dim);
     assert.equal(last.globalAlpha, 1, `${name}: the title never blinks with a protected ship`);
     assert.ok(!draws.some((c) => /^fill/.test(c.k) && c.args?.[0] === 'DELTA FRAY'), `${name}: no filled title`);
-    // Only the scores are other text, and they come before the title.
     assert.equal(texts.filter((c) => c.k === 'strokeText').length, 1, `${name}: one title`);
     assert.deepEqual(state, copy, `${name}: state unchanged`);
   }
