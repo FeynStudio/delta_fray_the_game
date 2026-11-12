@@ -5,7 +5,7 @@
 - Design doc: agent-team/design/DESIGN.md (pillars, rules, money; read before writing briefs).
 - Architecture: docs/ARCHITECTURE.md (tech and architecture rules, build order).
 - Task briefs: agent-team/tasks/T-###.md, copied from agent-team/tasks/_TEMPLATE.md.
-- Stack: TypeScript 5, React, Vite; npm; Vitest for tests; Supabase for data; app code in src/, tests in tests/.
+- Stack: TypeScript 5, React, Vite; npm; Vitest for tests; Supabase for data; app code in src/, tests in tests/. This is the planned stack for the live game. The Phase 1 prototype is deliberately plain JavaScript in the browser with `node --test` and no framework (human decision of 2026-11-07), so the difference is intended; do not report it as a mismatch or migrate the code without a brief.
 - Run locally: npm ci, then cp .env.example .env, then npm run dev (opens at http://localhost:5173). Never edit .env values.
 - Verify: `./scripts/verify.sh T-###`; run npm ci first. Must pass before any task is called done.
 - Guards: `./scripts/guards.sh`; must pass; Bans TODO/HACK markers, debug prints, silent catch blocks, and UI importing the data layer. Fix the code, never edit the guards.
