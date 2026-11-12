@@ -1,0 +1,25 @@
+Before: afd564b (brief only on top of BASE 0155ba3; tests/, sim/, scripts/ identical to BASE). After: commit 5cb13e4.
+Each line is the command and its exit code; diff output, if any, follows the line (none = identical).
+$ diff agent-team/evidence/T-022/before-movement.json agent-team/evidence/T-022/after-movement.json
+exit 0
+$ diff agent-team/evidence/T-022/before-hits.json agent-team/evidence/T-022/after-hits.json
+exit 0
+$ diff agent-team/evidence/T-022/before-turns.json agent-team/evidence/T-022/after-turns.json
+exit 0
+$ diff agent-team/evidence/T-022/before-config.json agent-team/evidence/T-022/after-config.json
+exit 0
+$ diff agent-team/evidence/T-022/before-render-smoke.json agent-team/evidence/T-022/after-render-smoke.json
+exit 0
+$ diff agent-team/evidence/T-022/before-input-smoke.json agent-team/evidence/T-022/after-input-smoke.json
+exit 0
+$ diff agent-team/evidence/T-022/before-turns-smoke.json agent-team/evidence/T-022/after-turns-smoke.json
+exit 0
+$ diff agent-team/evidence/T-022/before-balance.json agent-team/evidence/T-022/after-balance.json
+exit 0
+$ diff agent-team/evidence/T-022/before-test-names.txt agent-team/evidence/T-022/after-test-names.txt
+exit 0
+$ tail -1 agent-team/evidence/T-022/before-test-names.txt
+TOTAL tests: 145  pass: 145  fail: 0
+$ tail -1 agent-team/evidence/T-022/after-test-names.txt
+TOTAL tests: 145  pass: 145  fail: 0
+Screenshots are not compared (Done-when 8; REPEATS row from T-021).
