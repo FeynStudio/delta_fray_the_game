@@ -1,0 +1,12 @@
+
+export default config;
+// scratch gap comment
+diff --git a/src/config.js b/src/config.js
+index 5044ddd..b84407c 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -41,3 +41,4 @@ const config = {
+ };
+ 
+ export default config;
++// scratch gap comment
