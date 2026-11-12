@@ -1,22 +1,18 @@
-// sim/balance.mjs — plays scripted games with the real rules; exits 1 if a balance target is missed.
-// Usage: node sim/balance.mjs --games 2000 --out agent-team/evidence/T-001/balance.json
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// ===== Hooks: connect your game here =====
 import config from '../src/config.js';
 import { createInitialState, resolveMove, endTurn } from '../src/rules.js';
 import { moveFromGauge } from '../src/input.js';
 
-// Scripted player: aims roughly at the enemy within what the gauge allows (needle ±90°, or backward).
 function scriptedMove(state, rng) {
   const me = state.ships[state.turn], foe = state.ships[1 - state.turn];
   const toFoe = (Math.atan2(foe.y - me.y, foe.x - me.x) * 180) / Math.PI;
-  let rel = ((toFoe - me.heading + 540) % 360) - 180;   // -180..180 from the ship's heading
+  let rel = ((toFoe - me.heading + 540) % 360) - 180;
   const backward = Math.abs(rel) > 90;
-  if (backward) rel = ((rel + 360) % 360) - 180;        // measured from the tail instead
+  if (backward) rel = ((rel + 360) % 360) - 180;
   const needle = Math.max(-config.gaugeNeedleMax, Math.min(config.gaugeNeedleMax, rel + (rng() * 2 - 1) * 30));
   const gauge = { distance: (0.5 + rng() * 0.5) * config.maxMove, needle, backward };
-  return moveFromGauge({ ...state, gauge });            // the same move the real controls produce
+  return moveFromGauge({ ...state, gauge });
 }
 
 function playOne(rng, maxTurns = 300) {
@@ -36,22 +32,19 @@ function playOne(rng, maxTurns = 300) {
 }
 
 function measure(events) {
-  // One number per metric for this game; names must match balance-targets.json.
   const firstHit = events.find(e => e.type === 'destroyed' && e.cause === 'ship');
   const deaths = events.filter(e => e.type === 'destroyed');
   return {
-    movesToFirstEncounter: firstHit ? Math.ceil(firstHit.turn / 2) : null, // turns alternate, so moves per player
+    movesToFirstEncounter: firstHit ? Math.ceil(firstHit.turn / 2) : null,
     edgeDeathRate: deaths.length ? deaths.filter(e => e.cause === 'edge').length / deaths.length : 0,
   };
 }
-// ===== End hooks =====
 
 const args = {};
 process.argv.slice(2).forEach((v, i, all) => { if (v.startsWith('--')) args[v.slice(2)] = all[i + 1]; });
 const games = Number(args.games ?? 2000);
 const targets = JSON.parse(readFileSync('agent-team/design/balance-targets.json', 'utf8'));
 
-// Seeded random numbers, so the same code always gives the same result (no flaky CI).
 function seeded(a) {
   return () => {
     a |= 0; a = (a + 0x6D2B79F5) | 0;

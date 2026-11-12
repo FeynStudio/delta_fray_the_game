@@ -1,5 +1,3 @@
-// Pattern for rules tests: import config and rules, read expected values from config,
-// restore any config change after the test, and check that inputs are not mutated.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';

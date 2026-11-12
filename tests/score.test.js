@@ -1,5 +1,3 @@
-// T-012 score rules (pattern: tests/rules.test.js). Points come from config; inputs are deep-frozen,
-// so any mutation of before/after throws.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -13,7 +11,6 @@ const deepFreeze = (o) => {
   return o;
 };
 
-// Builds a frozen state, resolves the move with the real rules and returns { before, after, scores }.
 function play(turn, ships, move, scores) {
   const before = deepFreeze({ turn, ships, ...(scores ? { scores } : {}) });
   const after = deepFreeze(resolveMove(before, move));
@@ -86,7 +83,6 @@ test('sweeping a spawn-protected enemy scores nothing (T-006)', () => {
   assert.equal(protectedRun.after.ships[1].alive, true, 'protected enemy survives');
   assert.equal(protectedRun.after.ships[0].alive, true, 'mover stays inside the map');
   assert.deepEqual(protectedRun.scores, [0, 0]);
-  // Same sweep against an unprotected enemy is a kill, so the move does reach it.
   const open = play(0, [mover, { ...enemy, unmovedSinceSpawn: false }], move, [0, 0]);
   assert.deepEqual(open.scores, [1, 0]);
 });

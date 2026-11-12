@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// Static file server for the game (no build step).
-// `npm run dev` serves the project at http://localhost:5173/index.html (set PORT to change).
-// scripts/smoke.mjs imports startServer() to serve the game to the headless browser.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { dirname, extname, resolve, sep } from 'node:path';
@@ -29,7 +26,6 @@ export function startServer(root, port = 0, host = '127.0.0.1') {
       return;
     }
     if (path.endsWith('/')) path += 'index.html';
-    // Never serve dotfiles (.env, .git) or secrets/, and never leave the project folder.
     const parts = path.split('/').filter(Boolean);
     const file = resolve(base, ...parts);
     if (parts.some((p) => p.startsWith('.') || p === 'secrets') || !file.startsWith(base + sep)) {

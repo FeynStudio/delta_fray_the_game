@@ -1,8 +1,3 @@
-// Spawn protection (FEATURE_MAP sections 5, 6 and 9; human decision 2026-11-09, A2): a ship that has not
-// moved since it spawned cannot be destroyed by an enemy's swept area. rules.isSpawnProtected(state, i),
-// the unmovedSinceSpawn field and its use in resolveMove.
-// Follows the tests/rules.test.js pattern: positions come from config, config is restored after each test,
-// and every input is deep-frozen so a mutation throws.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -21,13 +16,11 @@ function deepFreeze(value) {
 
 const move = (distance, angle, backward = false) => deepFreeze({ distance, angle, backward });
 const alive = (s) => s.ships.map((sh) => sh.alive);
-// Player 2's ship on its spawn point, with the given unmovedSinceSpawn (undefined = no field).
 const onSpawn1 = (unmoved) => {
   const sp = config.spawns[1];
   const sh = { x: sp.x, y: sp.y, heading: sp.heading, alive: true };
   return unmoved === undefined ? sh : { ...sh, unmovedSinceSpawn: unmoved };
 };
-// Player 1's ship 110 units left of player 2's spawn, facing it: a max move sweeps over that spawn.
 const attacker = () => ({ x: config.spawns[1].x - 110, y: config.spawns[1].y, heading: 0, alive: true });
 
 test('(1) at game start, player 1 sweeping over player 2 on its spawn point leaves player 2 alive', () => {
@@ -58,17 +51,14 @@ test('(3) unmovedSinceSpawn: true but 1 unit off the spawn point is not protecte
 
 test('(4) a ship respawned by endTurn is protected until its own next move (also distance 0), then not', () => {
   const sp = config.spawns[0];
-  // Player 2 has just destroyed player 1 and sits 110 units right of player 1's spawn, facing it.
   const hunter = { x: sp.x + 110, y: sp.y, heading: 180, alive: true };
   const s0 = deepFreeze({ turn: 1, ships: [{ x: 500, y: 300, heading: 0, alive: false }, hunter] });
   const respawned = deepFreeze(endTurn(s0));
   assert.equal(respawned.turn, 0);
   assert.deepEqual(respawned.ships[0], { ...sp, alive: true, unmovedSinceSpawn: true });
   assert.equal(isSpawnProtected(respawned, 0), true);
-  // While still unmoved, an enemy sweep over it leaves it alive.
   const sweptEarly = resolveMove(deepFreeze({ ...respawned, turn: 1 }), move(config.maxMove, 180));
   assert.deepEqual(alive(sweptEarly), [true, true]);
-  // Its own move ends protection, even a zero-length one that leaves it on the spawn point.
   const ownMove = deepFreeze(resolveMove(respawned, move(0, 0)));
   assert.equal(ownMove.ships[0].x, sp.x);
   assert.equal(ownMove.ships[0].y, sp.y);
@@ -86,7 +76,6 @@ test('(5) a config.spawns override moves the protected point', () => {
   const s = deepFreeze({ ...init, ships: [{ ...init.ships[0], x: 490 }, init.ships[1]] });
   assert.equal(isSpawnProtected(s, 1), true);
   assert.deepEqual(alive(resolveMove(s, move(config.maxMove, 0))), [true, true]);
-  // The default spawn point is no longer protected.
   const oldSpot = { x: original.spawns[1].x, y: original.spawns[1].y, heading: 180, alive: true, unmovedSinceSpawn: true };
   const t = deepFreeze({ turn: 0, ships: [{ x: oldSpot.x - 110, y: oldSpot.y, heading: 0, alive: true }, oldSpot] });
   assert.equal(isSpawnProtected(t, 1), false);
@@ -107,7 +96,6 @@ test('(7) hit then wall where the swept enemy is protected destroys only the mov
   const s = deepFreeze({ ...init, ships: [{ ...init.ships[0], x: 1150, y: 480 }, init.ships[1]] });
   assert.equal(isSpawnProtected(s, 1), true);
   assert.deepEqual(alive(resolveMove(s, move(config.maxMove, 0))), [false, true]);
-  // Same move with the enemy unprotected: both die (FEATURE_MAP 5 hit-then-wall is unchanged).
   const u = deepFreeze({ ...s, ships: [s.ships[0], { ...s.ships[1], unmovedSinceSpawn: false }] });
   assert.deepEqual(alive(resolveMove(u, move(config.maxMove, 0))), [false, false]);
 });

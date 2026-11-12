@@ -1,6 +1,3 @@
-// Hit detection and edges (FEATURE_MAP section 5): rules.resolveMove(state, move).
-// Follows the tests/rules.test.js pattern: sizes come from config, config is restored after each test,
-// and every input is deep-frozen so a mutation throws.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -20,7 +17,6 @@ function deepFreeze(value) {
 const ship = (x, y, heading) => ({ x, y, heading, alive: true });
 const state = (turn, a, b) => deepFreeze({ turn, ships: [a, b] });
 const move = (distance, angle, backward = false) => deepFreeze({ distance, angle, backward });
-// Tip-to-back length of the ship triangle, read from config at call time.
 const shipLength = () => Math.sqrt(config.shipSize ** 2 - (config.shipWidth / 2) ** 2);
 const alive = (s) => s.ships.map((sh) => sh.alive);
 
@@ -33,8 +29,6 @@ test('FEATURE_MAP 5 example: the swept path destroys the enemy, the attacker sur
 });
 
 test('grazing contact counts: touching the swept area destroys, a little further away survives', () => {
-  // Mover heading 0 sweeps a band y = 480 +- shipWidth/2. An enemy (heading 0) shipWidth lower has its
-  // back corner exactly on the band's edge; moved 0.01 further down it no longer touches.
   const touching = state(0, ship(200, 480, 0), ship(300, 480 + config.shipWidth, 0));
   assert.deepEqual(alive(resolveMove(touching, move(config.maxMove, 0))), [true, false]);
   const apart = state(0, ship(200, 480, 0), ship(300, 480 + config.shipWidth + 0.01, 0));
@@ -42,7 +36,6 @@ test('grazing contact counts: touching the swept area destroys, a little further
 });
 
 test('grazing contact counts tip to tip along the path', () => {
-  // End position's tip and the enemy's tip (facing back at it) meet exactly at one point.
   const tip = (2 * shipLength()) / 3;
   const endX = 200 + config.maxMove;
   const touching = state(0, ship(200, 480, 0), ship(endX + 2 * tip, 480, 180));
@@ -55,7 +48,6 @@ test('no tunneling: an enemy fully between the start and end of a max-distance m
   const L = shipLength();
   const mid = 200 + config.maxMove / 2;
   const enemy = ship(mid, 480, 0);
-  // Sanity: the enemy is clear of both the start and the end triangle along x.
   assert.ok(mid - L / 3 > 200 + (2 * L) / 3, 'enemy starts past the start tip');
   assert.ok(mid + (2 * L) / 3 < 200 + config.maxMove - L / 3, 'enemy ends before the end back edge');
   const out = resolveMove(state(0, ship(200, 480, 0), enemy), move(config.maxMove, 0));
@@ -94,22 +86,18 @@ test('the wall on each of the four edges destroys the mover, forward and backwar
 test('any part counts at the wall: the centre stays inside but the tip touches or crosses the edge', () => {
   const W = config.worldWidth, tip = (2 * shipLength()) / 3, d = config.maxMove / 2;
   const enemy = ship(200, 200, 0);
-  // Tip ends exactly on the right edge (centre is tip units inside).
   const touch = resolveMove(state(0, ship(W - tip - d, 480, 0), enemy), move(d, 0));
   assert.ok(touch.ships[0].x < W);
   assert.deepEqual(alive(touch), [false, true], 'tip touching the edge');
-  // Tip ends past the edge with the centre still inside.
   const cross = resolveMove(state(0, ship(W - tip / 2 - d, 480, 0), enemy), move(d, 0));
   assert.ok(cross.ships[0].x < W);
   assert.deepEqual(alive(cross), [false, true], 'tip crossing the edge');
-  // Whole swept triangle stays inside: survives.
   const inside = resolveMove(state(0, ship(W - tip - d - 1, 480, 0), enemy), move(d, 0));
   assert.deepEqual(alive(inside), [true, true], 'tip 1 unit short of the edge');
 });
 
 test('any part counts at the wall: a back corner grazing the top edge while moving along it', () => {
   const half = config.shipWidth / 2, enemy = ship(600, 480, 0);
-  // Heading 0 at y = shipWidth/2: the back corner sits exactly on y = 0.
   const graze = resolveMove(state(0, ship(200, half, 0), enemy), move(config.maxMove, 0));
   assert.deepEqual(alive(graze), [false, true]);
   const clear = resolveMove(state(0, ship(200, half + 0.5, 0), enemy), move(config.maxMove, 0));
@@ -119,7 +107,6 @@ test('any part counts at the wall: a back corner grazing the top edge while movi
 test('a backward move: the ship turns to the travel angle and its tip leads into the wall', () => {
   const W = config.worldWidth, tip = (2 * shipLength()) / 3, d = config.maxMove;
   const enemy = ship(200, 200, 0);
-  // Heading 180 moving at 0 (backward): the ship turns to heading 0, so the tip leads to the right wall.
   const hit = resolveMove(state(0, ship(W - tip - d + 1, 480, 180), enemy), move(d, 0, true));
   assert.ok(hit.ships[0].x < W);
   assert.deepEqual(alive(hit), [false, true], 'tip 1 unit past the edge');
@@ -134,14 +121,11 @@ test('a backward move resolves exactly like the forward move with the same angle
   const pick = (s) => s.ships.map(({ x, y, heading, alive: a }) => ({ x, y, heading, alive: a }));
   for (const heading of [0, 30, 90, 200, 315]) {
     for (const needle of [0, 30, -45, 60]) {
-      const angle = (heading + 180 + needle) % 360; // as input.moveFromGauge builds a backward move
+      const angle = (heading + 180 + needle) % 360;
       const a = (angle * Math.PI) / 180;
       const starts = [
-        // Open space, enemy far away: no hit.
         [ship(W / 2, H / 2, heading), ship(100, 100, 0)],
-        // Enemy on the path: destroyed.
         [ship(W / 2, H / 2, heading), ship(W / 2 + Math.cos(a) * d / 2, H / 2 + Math.sin(a) * d / 2, 90)],
-        // Path ends at a wall: mover destroyed.
         [ship(W / 2 + Math.cos(a) * (W / 2 - d / 2), H / 2 + Math.sin(a) * (H / 2 - d / 2), heading),
           ship(100, 100, 0)],
       ];
@@ -152,7 +136,6 @@ test('a backward move resolves exactly like the forward move with the same angle
       }
     }
   }
-  // The brief's angled example: heading 30, angle 240; the enemy on the path is destroyed either way.
   const s = state(0, ship(640, 480, 30), ship(640 + Math.cos(4 * Math.PI / 3) * 60, 480 + Math.sin(4 * Math.PI / 3) * 60, 0));
   const back = resolveMove(s, move(d, 240, true));
   assert.deepEqual(pick(back), pick(resolveMove(s, move(d, 240, false))));
@@ -198,9 +181,6 @@ test('an already destroyed enemy stays as it is', () => {
 });
 
 test('the swept triangle uses the heading the ship turns to as the move starts', () => {
-  // Mover heading 0 turns to 90 and moves down (input.startMove turns it before it moves). The enemy's
-  // back edge sits 1 unit behind the old (heading 0) tip, so it overlaps the old start triangle, but the
-  // new swept area only reaches shipWidth/2 to the right of the centre: the enemy survives.
   const tip = (2 * shipLength()) / 3;
   const s = state(0, ship(200, 480, 0), ship(200 + tip + shipLength() / 3 - 1, 480, 0));
   assert.deepEqual(alive(resolveMove(s, move(config.maxMove, 90))), [true, true]);

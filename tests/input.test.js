@@ -1,5 +1,3 @@
-// Gauge and control tests (pattern: tests/rules.test.js). Values come from config; config is restored
-// after each test; inputs are deep-frozen, as scripts/run-scenario.mjs does, to catch mutation.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -30,7 +28,6 @@ test('power sweeps with elapsed time, stays within 0..1 and turns back at both e
   let s = fresh({ power: 0 });
   s = stepGauge(s, T / 4);
   assert.ok(near(s.gauge.power, 0.25), `quarter sweep gives ${s.gauge.power}`);
-  // Small steps across a full back-and-forth: no reading leaves 0..1 and no step jumps.
   let prev = s.gauge.power;
   const dt = T / 50;
   let sawTop = false, sawBottom = false;
@@ -44,10 +41,8 @@ test('power sweeps with elapsed time, stays within 0..1 and turns back at both e
     prev = p;
   }
   assert.ok(sawTop && sawBottom, 'reaches both ends');
-  // Turns back instead of wrapping: past the top it comes down.
   assert.ok(near(stepGauge(fresh({ power: 0.9, sweep: 1 }), T * 0.2).gauge.power, 0.9));
   assert.ok(near(stepGauge(fresh({ power: 0.1, sweep: -1 }), T * 0.2).gauge.power, 0.1));
-  // A long step still lands inside 0..1.
   const long = stepGauge(fresh({ power: 0.3 }), T * 7.3).gauge.power;
   assert.ok(long >= 0 && long <= 1);
 });
@@ -148,7 +143,6 @@ test('keyFromEvent maps Space and both Shift keys and ignores key repeat', () =>
   assert.equal(keyFromEvent({ code: 'KeyA', repeat: false }), null);
 });
 
-// A locked gauge (second Space pressed) on ship 0 with the given heading.
 const locked = (heading, gauge) => {
   const s = createInitialState();
   s.ships[0] = { ...s.ships[0], heading };
@@ -209,8 +203,6 @@ test('startMove/stepMove: constant speed along the segment, ends exactly at the 
   assert.deepEqual(stepMove(deepFreeze(m), T), m, 'nothing to animate after the move');
 });
 
-// T-014: a moving phase with no anim (only reachable through the debug setState) is put back to the
-// power phase on the next step(ms) > 0, ship unmoved, turn unchanged (human decision 2026-11-09).
 const stuck = (turn, extra = {}) => {
   const s = createInitialState();
   const ships = [

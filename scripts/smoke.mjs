@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-// Browser smoke check: serves the game, opens index.html?debug=1 in headless Chrome or Edge,
-// drives window.__game and writes named PASS/FAIL booleans as JSON (compared to expected/<feature>-smoke.json).
-// Also saves a screenshot next to --out (<out>.png) as evidence. The input feature also saves one screenshot
-// per gauge phase (<out>-power.png, <out>-direction.png, <out>-direction-backward.png), each taken in its own
-// page and checked against getState().gauge at capture time; a wrong phase fails the run.
-// Usage: node scripts/smoke.mjs --feature render|input|turns --out <file.json>
-// No npm dependencies: talks to the browser over the DevTools protocol with Node's built-in WebSocket.
-// Set CHROME_PATH to pick a browser; otherwise Chrome, then Edge, is used.
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -20,7 +12,6 @@ const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1
 const feature = opt('--feature');
 const out = opt('--out');
 
-// ---------- browser plumbing ----------
 
 function findBrowser() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
@@ -62,9 +53,6 @@ async function launchBrowser(exe, profile) {
     '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
   const exited = new Promise((done) => proc.once('exit', done));
-  // Chrome prints "DevTools listening on <websocket url>" to stderr when it has a console. Started from a shell
-  // without one (e.g. an agent's shell on Windows), chrome.exe hands off to a detached browser and exits 0
-  // without printing it, so also read the DevToolsActivePort file the browser writes into the profile.
   const portFile = join(profile, 'DevToolsActivePort');
   const wsUrl = await new Promise((ok, fail) => {
     let buf = '';
@@ -77,7 +65,6 @@ async function launchBrowser(exe, profile) {
     const poll = setInterval(() => {
       if (!existsSync(portFile)) return;
       const [port, path] = readFileSync(portFile, 'utf8').split(/\r?\n/);
-      // Local DevTools on 127.0.0.1 only speaks plain ws (no wss); nothing leaves the machine.
       if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
     }, 100);
     proc.stderr.on('data', (d) => {
@@ -118,7 +105,6 @@ async function launchBrowser(exe, profile) {
         },
       };
 
-      // Wait until the game page has loaded and exposed its debug API.
       const deadline = Date.now() + 15000;
       for (;;) {
         const ready = await page.eval(
@@ -131,13 +117,11 @@ async function launchBrowser(exe, profile) {
       }
     },
     async close() {
-      // Ask the browser itself to quit: proc may be only the launcher, which a detached browser outlives.
       const closing = cdp.send('Browser.close').then(() => null, (err) => err);
       const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
       if (closeErr) process.stderr.write(`Browser.close failed: ${closeErr.message}\n`);
       cdp.close();
       proc.kill();
-      // The browser removes its profile lockfile as it exits; wait for that so the profile can be deleted.
       const lockfile = join(profile, 'lockfile');
       for (const deadline = Date.now() + 10000; existsSync(lockfile) && Date.now() < deadline;) {
         await new Promise((r) => setTimeout(r, 100));
@@ -148,7 +132,6 @@ async function launchBrowser(exe, profile) {
   };
 }
 
-// ---------- in-page probes (run inside the browser, not in Node) ----------
 
 async function renderProbe() {
   const cfg = (await import('/src/config.js')).default;
@@ -211,12 +194,10 @@ function phaseProbe() {
   return window.__game.getState().gauge.phase;
 }
 
-// Puts a fresh page into one gauge phase for a screenshot: keys is the list of presses to make.
 function phaseSetupProbe(keys) {
   for (const k of keys) window.__game.press(k);
 }
 
-// Waits for two animation frames so the canvas shows the current state, then returns the gauge.
 function gaugeAfterFrameProbe() {
   return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
     () => done(window.__game.getState().gauge))));
@@ -258,12 +239,9 @@ async function turnsProbe() {
   return r;
 }
 
-// ---------- features ----------
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
 
-// Opens its own page, presses keys, then screenshots it. The gauge is read just before and just after
-// the capture; if either reading is not the wanted phase/backward, throws an error naming the file.
 async function phaseShot(browser, url, shots, suffix, keys, want) {
   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
   const p = await browser.open(url, FULL_HD);
@@ -313,7 +291,6 @@ const FEATURES = {
     await c.key('keyDown', { autoRepeat: true });
     const afterRepeat = await c.eval(phaseProbe);
     await c.key('keyUp');
-    // Per-phase screenshots, each in its own page opened after the checked pages a, b and c are done.
     await phaseShot(browser, url, shots, '-power', [], { phase: 'power', backward: false });
     await phaseShot(browser, url, shots, '-direction', ['Space'], { phase: 'direction', backward: false });
     await phaseShot(browser, url, shots, '-direction-backward', ['Space', 'Shift'], { phase: 'direction', backward: true });
@@ -345,7 +322,6 @@ const FEATURES = {
   },
 };
 
-// ---------- main ----------
 
 if (!FEATURES[feature] || !out) {
   process.stderr.write(`Usage: node scripts/smoke.mjs --feature ${Object.keys(FEATURES).join('|')} --out <file.json>\n`);

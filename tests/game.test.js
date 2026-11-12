@@ -1,6 +1,3 @@
-// Loads the real src/game.js in Node with a minimal stubbed DOM and ?debug=1, then drives the move
-// through window.__game (pattern: tests/rules.test.js; values come from config). T-005: the end of
-// every move comes from rules.resolveMove, and the step that finishes it calls rules.endTurn once.
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import config from '../src/config.js';
@@ -15,17 +12,17 @@ let game;
 let loaded;
 
 before(async () => {
-  const ctx = new Proxy({}, { get: () => () => {} }); // every canvas call is a no-op
+  const ctx = new Proxy({}, { get: () => () => {} });
   globalThis.document = { getElementById: () => ({ style: {}, getContext: () => ctx }) };
   globalThis.window = {
     innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1,
     addEventListener: (type, fn) => { listeners[type] = fn; },
   };
   globalThis.location = { search: '?debug=1' };
-  globalThis.requestAnimationFrame = () => 0; // the loop is driven by step() in these tests
+  globalThis.requestAnimationFrame = () => 0;
   await import('../src/game.js');
   game = window.__game;
-  loaded = game.getState(); // the state game.js starts with, before any test's setState (T-010)
+  loaded = game.getState();
 });
 
 beforeEach(() => game.setState(createInitialState()));
@@ -33,7 +30,6 @@ beforeEach(() => game.setState(createInitialState()));
 const T = () => config.moveAnimMs;
 const near = (a, b) => Math.abs(a - b) < 1e-3;
 
-// From the spawn state: lock power, lock the needle (optionally backward), press the second Space.
 function launch(power, needle, backward = false) {
   const s = game.getState();
   game.setState({ ...s, gauge: { ...s.gauge, power } });
@@ -57,7 +53,6 @@ test('second Space flies ship 0 to the rules end point; gauge back to power, tur
   assert.equal(s.gauge.phase, 'power');
 });
 
-// T-009: a backward move turns the ship to the travel angle at launch, flies tip first, keeps the heading.
 const tipAhead = (ship, angle) => {
   const tip = shipPoints(ship, config.shipSize, config.shipWidth)[0];
   const a = (angle * Math.PI) / 180;
@@ -92,7 +87,7 @@ test('after a backward move, on its next turn the dial sits at the new nose and 
   launch(0.5, -40, true);
   const angle = wrapDegrees(30 + 180 - 40);
   game.step(T());
-  launch(0.3, 0); // ship 1 makes any move
+  launch(0.3, 0);
   game.step(T());
   const mine = game.getState();
   assert.equal(mine.turn, 0);
@@ -146,7 +141,6 @@ test('a real Space keydown launches the move like press(); key repeat is ignored
   assert.equal(game.getState().gauge.phase, 'power');
 });
 
-// Loads ships and turn, then locks power, a forward needle and launches (same as launch()).
 function launchFrom(turn, ships, power, needle) {
   const s = createInitialState();
   game.setState({ ...s, turn, ships });
@@ -199,7 +193,7 @@ test('a plain move passes the turn, and the next Space, Space moves the other sh
   assert.equal(after0.turn, 1);
   assert.ok(near(after0.ships[0].x, start.ships[0].x + 0.5 * config.maxMove));
   assert.deepEqual(after0.ships[1], start.ships[1]);
-  launch(0.4, 0); // ship 1 faces heading 180, so a forward move goes toward -x
+  launch(0.4, 0);
   game.step(T());
   const after1 = game.getState();
   assert.equal(after1.turn, 0);
@@ -234,12 +228,9 @@ test('double kill through the game: both respawn, the turn passes once, and the 
     { ...config.spawns[1], alive: true, unmovedSinceSpawn: true },
   ]);
   assert.equal(s.turn, 1);
-  // resolveMove does not check that the mover is alive (T-004 review); endTurn leaves no ship destroyed,
-  // so the ship whose turn it is is always alive when it launches.
   assert.equal(s.ships[s.turn].alive, true);
 });
 
-// ---- explosions (T-007): decoration only, play does not wait (human, 2026-11-09) ----
 const inMap = (e) => shipPoints(e, config.shipSize, config.shipWidth)
   .every((p) => p.x >= 0 && p.x <= config.worldWidth && p.y >= 0 && p.y <= config.worldHeight);
 
@@ -317,7 +308,7 @@ test('an explosion is present at explosionMs - 1 and gone at explosionMs; turn, 
 test('the next player can press Space while an explosion plays, and its move ends on time', () => {
   launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
   game.step(T());
-  launch(0.4, 0); // player 2, explosion still playing
+  launch(0.4, 0);
   assert.equal(game.getState().gauge.phase, 'moving');
   assert.equal(game.getState().explosions.length, 1);
   game.step(T());
@@ -326,7 +317,6 @@ test('the next player can press Space while an explosion plays, and its move end
   assert.equal(s.explosions.length, config.explosionMs > T() ? 1 : 0);
 });
 
-// ---- score (T-012): scores change in the step where the move animation ends, never before ----
 test('score after a hit: unchanged during the animation, +1 for the mover in the step it ends', () => {
   launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
   assert.deepEqual(game.getState().scores, [0, 0]);
@@ -353,7 +343,6 @@ test('score after a wall death: unchanged during the animation, -2 for the mover
 });
 
 test('scores add up over several turns; turn and gauge behave as before', () => {
-  // P1 kills P2 (+1), P2 plain move, P1 dies at the wall (-2), P2 kills P1 (+1).
   launchFrom(0, [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }], 1, 0);
   game.step(T());
   assert.deepEqual(game.getState().scores, [1, 0]);
@@ -370,7 +359,7 @@ test('scores add up over several turns; turn and gauge behave as before', () => 
   assert.deepEqual(s.scores, [-1, 0]);
   assert.equal(s.turn, 1);
   game.setState({ ...s, ships: [{ x: 200, y: 480, heading: 0, alive: true }, { x: 300, y: 490, heading: 180, alive: true }] });
-  launch(1, 0); // ship 1 faces 180, a full forward move sweeps ship 0
+  launch(1, 0);
   game.step(T());
   s = game.getState();
   assert.deepEqual(s.scores, [-1, 1]);
@@ -388,8 +377,6 @@ test('a state loaded without scores starts from [0, 0] when a move ends', () => 
   assert.deepEqual(game.getState().scores, [config.scoreWall, 0]);
 });
 
-// T-014: a moving phase with no anim (debug setState only) recovers on the next step: gauge back to
-// the power phase for the same player, ships unmoved, no endTurn (human decision 2026-11-09).
 test('moving phase with no anim: step goes back to power, same player, ships unmoved; then plays on', () => {
   const s = createInitialState();
   const ships = [
@@ -414,7 +401,7 @@ test('moving phase with no anim: step goes back to power, same player, ships unm
   const launched = game.getState();
   assert.equal(launched.gauge.phase, 'moving');
   assert.ok(launched.anim, 'Space, Space starts a normal move animation');
-  const locked = { ...launched, ships }; // the ships as they were before startMove turned the mover
+  const locked = { ...launched, ships };
   const end = resolveMove(locked, moveFromGauge(locked)).ships[1];
   game.step(T());
   const after = game.getState();
@@ -425,7 +412,6 @@ test('moving phase with no anim: step goes back to power, same player, ships unm
   assert.equal(after.gauge.phase, 'power');
 });
 
-// ---- game clock and spawn protection blink (T-010) ----
 
 test('the game starts with clock 0 and both ships spawn protected', () => {
   assert.equal(loaded.clock, 0);
@@ -441,14 +427,14 @@ test('step(ms) grows the clock by exactly ms, in every phase and across the end 
     want += ms;
     assert.equal(game.getState().clock, want, `after step(${ms})`);
   }
-  launch(0.5, 0); // moving phase
+  launch(0.5, 0);
   for (const ms of [T() / 2, T() / 2 + 1, 16]) {
     game.step(ms);
     want += ms;
     assert.equal(game.getState().clock, want, `moving / after the move, step(${ms})`);
   }
   assert.equal(game.getState().turn, 1, 'the move ended and the turn passed');
-  game.setState(createInitialState()); // a state without clock counts from 0
+  game.setState(createInitialState());
   game.step(40);
   assert.equal(game.getState().clock, 40);
 });
