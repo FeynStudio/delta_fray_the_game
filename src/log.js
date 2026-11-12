@@ -1,4 +1,3 @@
-// Project logger: silent unless the page URL has ?debug=1.
 const enabled = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
 
 const emit = (method) => (...args) => {
