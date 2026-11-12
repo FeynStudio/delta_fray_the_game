@@ -1,0 +1,12 @@
+== before (src at 426a82f, run on commit 06b2701) ==
+config.js: default
+log.js: default,log
+input.js: bounce,insideMap,keyFromEvent,moveFromGauge,pointAlong,pressKey,startExplosions,startMove,stepExplosions,stepGauge,stepMove
+render.js: COLORS,drawDirectionDial,drawExplosions,drawFrame,drawGauge,drawMap,drawPowerBar,drawScores,drawShips,drawTitle,explosionPieces,fitCanvas,fitScale,gaugeLayout,protectionAlpha,shipPoints
+rules.js: applyMove,createInitialState,currentScores,endTurn,isSpawnProtected,resolveMove,scoreMove,shipPoints,wrapDegrees
+== after (commit 9a11cae) ==
+config.js: default
+log.js: default,log
+input.js: bounce,insideMap,keyFromEvent,moveFromGauge,pointAlong,pressKey,startExplosions,startMove,stepExplosions,stepGauge,stepMove
+render.js: COLORS,drawDirectionDial,drawExplosions,drawFrame,drawGauge,drawMap,drawPowerBar,drawScores,drawShips,drawTitle,explosionPieces,fitCanvas,fitScale,gaugeLayout,protectionAlpha,shipPoints
+rules.js: applyMove,createInitialState,currentScores,endTurn,isSpawnProtected,resolveMove,scoreMove,shipPoints,wrapDegrees

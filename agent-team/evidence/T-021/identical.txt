@@ -1,0 +1,52 @@
+Before: src at 426a82f (verify run on 06b2701). After: commit 9a11cae. Each line is the command and its exit code; diff/cmp output, if any, follows the line (none = identical).
+$ diff agent-team/evidence/T-021/before-movement.json agent-team/evidence/T-021/after-movement.json
+exit 0
+$ diff agent-team/evidence/T-021/before-hits.json agent-team/evidence/T-021/after-hits.json
+exit 0
+$ diff agent-team/evidence/T-021/before-turns.json agent-team/evidence/T-021/after-turns.json
+exit 0
+$ diff agent-team/evidence/T-021/before-config.json agent-team/evidence/T-021/after-config.json
+exit 0
+$ diff agent-team/evidence/T-021/before-render-smoke.json agent-team/evidence/T-021/after-render-smoke.json
+exit 0
+$ diff agent-team/evidence/T-021/before-input-smoke.json agent-team/evidence/T-021/after-input-smoke.json
+exit 0
+$ diff agent-team/evidence/T-021/before-turns-smoke.json agent-team/evidence/T-021/after-turns-smoke.json
+exit 0
+$ diff agent-team/evidence/T-021/before-balance.json agent-team/evidence/T-021/after-balance.json
+exit 0
+$ diff agent-team/evidence/T-021/before-config-values.json agent-team/evidence/T-021/after-config-values.json
+exit 0
+$ diff agent-team/evidence/T-021/before-trace.sha256 agent-team/evidence/T-021/after-trace.sha256   (owner's extra trace, see inventory.md)
+exit 0
+
+Exports (exports.txt), before block vs after block without the header line:
+exit 0
+
+Screenshots, byte comparison (cmp):
+agent-team/evidence/T-021/before-render-smoke.png agent-team/evidence/T-021/after-render-smoke.png differ: char 49, line 3
+cmp render-smoke.png exit 1
+agent-team/evidence/T-021/before-input-smoke.png agent-team/evidence/T-021/after-input-smoke.png differ: char 48, line 3
+cmp input-smoke.png exit 1
+agent-team/evidence/T-021/before-input-smoke-power.png agent-team/evidence/T-021/after-input-smoke-power.png differ: char 47, line 3
+cmp input-smoke-power.png exit 1
+agent-team/evidence/T-021/before-input-smoke-direction.png agent-team/evidence/T-021/after-input-smoke-direction.png differ: char 45, line 3
+cmp input-smoke-direction.png exit 1
+agent-team/evidence/T-021/before-input-smoke-direction-backward.png agent-team/evidence/T-021/after-input-smoke-direction-backward.png differ: char 46, line 3
+cmp input-smoke-direction-backward.png exit 1
+agent-team/evidence/T-021/before-turns-smoke.png agent-team/evidence/T-021/after-turns-smoke.png differ: char 46, line 3
+cmp turns-smoke.png exit 1
+
+$ git diff --stat 426a82f -- tests/ scenarios/ expected/ scripts/ sim/ docs/ agent-team/design/ index.html package.json package-lock.json AGENTS.md .claude/
+exit 0 (no output = nothing changed)
+
+$ git diff --numstat 426a82f -- src/
+27	42	src/config.js
+3	15	src/game.js
+5	48	src/input.js
+0	1	src/log.js
+30	63	src/render.js
+18	49	src/rules.js
+added 83, deleted 218, total 301
+
+Note on the screenshots: the PNG files are not byte-identical, and they are not byte-identical between two runs of the same commit either (the page animates on real time while the screenshot is taken: protection blink and gauge sweep). See screenshots-pixel-diff.txt. The Done-when asks for byte-identical JSON (all identical above) and an eye check of the screenshots.
