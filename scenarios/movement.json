@@ -1,5 +1,5 @@
 {
-  "description": "rules.applyMove(state, move): moves the ship whose turn it is. move.angle is the world travel direction in degrees, 0 = right (+x), 90 = down (+y). Forward moves turn the heading to the travel direction; backward moves keep it.",
+  "description": "rules.applyMove(state, move): moves the ship whose turn it is. move.angle is the world travel direction in degrees, 0 = right (+x), 90 = down (+y). Forward moves turn the heading to the travel direction; backward moves turns backwards and heading to the backward travel direction.",
   "overrides": {
     "maxMove": 150,
     "worldWidth": 1280,
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "name": "backward move keeps the heading",
+      "name": "backward move turns the ship around 180 degrees and turns the ship toward heading direction",
       "state": {
         "turn": 0,
         "ships": [

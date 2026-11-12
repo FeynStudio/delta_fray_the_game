@@ -26,6 +26,7 @@
 - Keep each change small and revertible; split work that grows past ~400 changed lines (playbook default).
 - Follow the existing paved road for each job (see FEATURE_MAP). Do not invent a second way.
 - Stop and write BLOCKED in the brief when you need credentials, approvals, or a human choice.
+- No comments in code. This covers every code file agents write or edit (src/, tests/, sim/, scripts/, index.html). Put the reason for a change in the brief, the handoff or FEATURE_MAP, not in the code. Only three things are allowed: shebang lines, scanner directives that CI needs (the two `// nosemgrep` lines in scripts/run-scenario.mjs and scripts/smoke.mjs), and comments in protected files agents cannot edit (.github/**). Evidence scripts from tasks merged before 2026-11-12 keep their comments; new ones have none.
 
 ## Handoff format (end of every task)
 - Status: DONE | BLOCKED | PARTIAL

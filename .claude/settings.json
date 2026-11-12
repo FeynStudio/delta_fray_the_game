@@ -13,7 +13,8 @@
       "Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)",
       "Edit(./scripts/guards.sh)", "Edit(./scripts/verify.sh)", "Edit(./.github/**)",
       "Edit(./agent-team/evals/cases/**)", "Edit(./agent-team/evals/*-rubric.md)",
-      "Edit(./.claude/settings.json)", "Edit(./agent-team/design/DESIGN.md)", "Edit(./agent-team/design/balance-targets.json)"
+      "Edit(./.claude/settings.json)", "Edit(./agent-team/design/DESIGN.md)", 
+      "Edit(./agent-team/design/balance-targets.json)", "Edit(./docs/ROADMAP.md)"
     ]
   }
 }

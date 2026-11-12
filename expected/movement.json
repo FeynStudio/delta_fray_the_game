@@ -11,7 +11,7 @@
     "ships.0.y": 580,
     "ships.0.heading": 90
   },
-  "backward move keeps the heading": {
+  "backward move turns the ship around 180 degrees and turns the ship toward heading direction": {
     "ships.0.x": 100,
     "ships.0.y": 480,
     "ships.0.heading": 180
