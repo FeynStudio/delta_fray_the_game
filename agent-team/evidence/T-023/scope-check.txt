@@ -1,0 +1,13 @@
+== git diff --stat master -- (protected and out-of-scope paths; must be empty)
+== git diff --name-status master -- scripts/ tests/
+A	scripts/no-comments.mjs
+A	tests/no-comments.test.js
+== git ls-files .gitignore (must be empty)
+== ls .gitignore in worktree
+ls: cannot access '.gitignore': No such file or directory
+== git diff --numstat master -- scripts/ tests/ agent-team/FEATURE_MAP.md
+1	0	agent-team/FEATURE_MAP.md
+234	0	scripts/no-comments.mjs
+148	0	tests/no-comments.test.js
+total changed lines: 383
+== git status --short (tracked changes; must be empty apart from new evidence)

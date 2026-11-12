@@ -1,0 +1,40 @@
+before: 145 tests; after: 182 tests
+== names in before but not in after (must be empty)
+== names in after but not in before: 37
+✔ checkTree accepts each scanner directive only in its own file with its exact text
+✔ checkTree reports a comment in every checked place with file and line
+✔ checkTree skips old evidence, unchecked files and node_modules
+✔ findComments does not flag a block comment mark in an attribute value (html)
+✔ findComments does not flag a colour inside style (html)
+✔ findComments does not flag a hash inside single and double quotes (sh)
+✔ findComments does not flag a path with a glob (sh)
+✔ findComments does not flag a regular expression after ( , = and return (js)
+✔ findComments does not flag a shebang on line 1 (js)
+✔ findComments does not flag a shebang on line 1 (sh)
+✔ findComments does not flag an escaped quote before comment marks (js)
+✔ findComments does not flag comment marks in a character class (js)
+✔ findComments does not flag comment marks in a double-quoted string (js)
+✔ findComments does not flag comment marks in a regular expression (js)
+✔ findComments does not flag comment marks in a single-quoted string (js)
+✔ findComments does not flag comment marks in a template string (js)
+✔ findComments does not flag division (js)
+✔ findComments does not flag the argument count and an array length (sh)
+✔ findComments does not flag the doctype (html)
+✔ findComments flags a block comment in the middle of a line (js)
+✔ findComments flags a block comment inside style (html)
+✔ findComments flags a block comment over several lines (js)
+✔ findComments flags a comment across lines (html)
+✔ findComments flags a comment inside an inline script (html)
+✔ findComments flags a comment inside the code part of a template literal (js)
+✔ findComments flags a comment on line 2 under a shebang (js)
+✔ findComments flags a one-line block comment (js)
+✔ findComments flags a one-line comment (html)
+✔ findComments flags a shebang that is not on line 1 (js)
+✔ findComments flags a trailing comment after a command (sh)
+✔ findComments flags a trailing comment after a division (js)
+✔ findComments flags a trailing comment after code (js)
+✔ findComments flags a whole-line comment (js)
+✔ findComments flags a whole-line comment (sh)
+✔ findComments returns the comment text and rejects an unknown kind
+✔ no code file in this repo holds a comment
+✔ the two real scanner directives are seen by the tokenizer

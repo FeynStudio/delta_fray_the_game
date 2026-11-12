@@ -1,0 +1,42 @@
+== scratch change: one line-comment appended to src/config.js as line 44
+ M src/config.js
+?? agent-team/evidence/T-023/negative-1-src-config.txt
+== node --test tests/no-comments.test.js
+✖ no code file in this repo holds a comment (14.1428ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 36
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 155.0983
+
+✖ failing tests:
+
+test at tests\no-comments.test.js:145:1
+✖ no code file in this repo holds a comment (14.1428ms)
+  AssertionError [ERR_ASSERTION]: Remove the comment; put the reason in the brief, the handoff or FEATURE_MAP
+  src/config.js:44: // scratch negative control
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-023/tests/no-comments.test.js:147:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exit: 1
+== node scripts/no-comments.mjs
+GUARD FAIL [no-comments]: Remove the comment; put the reason in the brief, the handoff or FEATURE_MAP
+src/config.js:44: // scratch negative control
+exit: 1
