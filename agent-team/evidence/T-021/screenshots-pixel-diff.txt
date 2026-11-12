@@ -1,0 +1,22 @@
+Screenshot pixel comparison (pngdiff.mjs decodes both PNGs and counts pixels that differ).
+
+A. before (src at 426a82f) against after (9a11cae):
+agent-team/evidence/T-021/before-render-smoke.png vs agent-team/evidence/T-021/after-render-smoke.png: 1920x1080, differing pixels 210, max channel delta 7, bounding box x 417..1476, y 530..607
+agent-team/evidence/T-021/before-input-smoke.png vs agent-team/evidence/T-021/after-input-smoke.png: 1920x1080, differing pixels 576, max channel delta 240, bounding box x 446..1478, y 530..557
+agent-team/evidence/T-021/before-input-smoke-power.png vs agent-team/evidence/T-021/after-input-smoke-power.png: 1920x1080, differing pixels 462, max channel delta 28, bounding box x 421..1478, y 530..606
+agent-team/evidence/T-021/before-input-smoke-direction.png vs agent-team/evidence/T-021/after-input-smoke-direction.png: 1920x1080, differing pixels 572, max channel delta 93, bounding box x 416..1478, y 530..607
+agent-team/evidence/T-021/before-input-smoke-direction-backward.png vs agent-team/evidence/T-021/after-input-smoke-direction-backward.png: 1920x1080, differing pixels 372, max channel delta 112, bounding box x 407..1477, y 530..606
+agent-team/evidence/T-021/before-turns-smoke.png vs agent-team/evidence/T-021/after-turns-smoke.png: 1920x1080, differing pixels 180, max channel delta 166, bounding box x 1427..1477, y 530..606
+
+B. Same code twice: after (9a11cae, first run) against rerun/ (9a11cae, second run):
+agent-team/evidence/T-021/after-render-smoke.png vs agent-team/evidence/T-021/rerun/render-smoke.png: 1920x1080, differing pixels 233, max channel delta 1, bounding box x 417..1477, y 530..607
+agent-team/evidence/T-021/after-input-smoke.png vs agent-team/evidence/T-021/rerun/input-smoke.png: 1920x1080, differing pixels 583, max channel delta 240, bounding box x 446..1478, y 530..557
+agent-team/evidence/T-021/after-input-smoke-power.png vs agent-team/evidence/T-021/rerun/input-smoke-power.png: 1920x1080, differing pixels 344, max channel delta 8, bounding box x 421..1477, y 530..607
+agent-team/evidence/T-021/after-input-smoke-direction.png vs agent-team/evidence/T-021/rerun/input-smoke-direction.png: 1920x1080, differing pixels 585, max channel delta 117, bounding box x 416..1478, y 530..607
+agent-team/evidence/T-021/after-input-smoke-direction-backward.png vs agent-team/evidence/T-021/rerun/input-smoke-direction-backward.png: 1920x1080, differing pixels 430, max channel delta 122, bounding box x 407..1477, y 530..606
+agent-team/evidence/T-021/after-turns-smoke.png vs agent-team/evidence/T-021/rerun/turns-smoke.png: 1920x1080, differing pixels 260, max channel delta 93, bounding box x 1428..1478, y 530..606
+
+C. rerun JSON against expected/:
+diff render-smoke.json exit 0
+diff input-smoke.json exit 0
+diff turns-smoke.json exit 0
