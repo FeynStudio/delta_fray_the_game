@@ -16,3 +16,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 2 | T-014, T-009 |
 | owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 1 | T-013 |
 | handoff claims more test coverage than the tests have (e.g. "states include explosions" with empty explosions arrays) | 1 | T-010 |
+| smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte | 1 | T-021 |
