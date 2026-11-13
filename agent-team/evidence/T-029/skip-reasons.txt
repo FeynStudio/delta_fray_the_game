@@ -1,0 +1,23 @@
+skip( calls and reasons in scripts/handoff-check.mjs (Done-when 7)
+before, on bf8eaaa:
+72:  if (id === null) return skip('no task: not on a task branch');
+74:  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+76:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+78:  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+81:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+84:    if (commit === null) return skip('no commit touches a path outside agent-team/');
+90:    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+after, on fab8750:
+84:  if (id === null) return skip('no task: not on a task branch');
+86:  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+88:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+90:  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+93:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+96:    if (commit === null) return skip('no commit touches a path outside agent-team/');
+102:    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+same calls and reasons, line numbers apart:
+identical
+the report test, before and after:
+identical
+report() in the module, before and after:
+identical

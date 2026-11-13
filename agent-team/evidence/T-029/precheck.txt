@@ -1,0 +1,6 @@
+T-029 precheck (Done-when 1), on BASE bf8eaaa, branch task/T-029-handoff-check-fixes
+$ git ls-files scripts/handoff-check.mjs tests/handoff-check.test.js
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ grep -n "handoff-check" .claude/settings.json
+(exit 1; nothing printed: the two files are not on the deny list)

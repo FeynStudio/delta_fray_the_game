@@ -1,0 +1,9 @@
+controls.mjs before
+scratch copy of the worktree in the OS temp dir, nothing changed: exit 0, tests 25, pass 24, fail 0, skipped 1 [as expected: yes]
+with the REPO_ENV filter removed: exit 0, tests 25, pass 24, fail 0, skipped 1 [as expected: yes]
+with the SKIP branch 'not the top folder of a git repo' removed: exit 0, tests 25, pass 24, fail 0, skipped 1 [as expected: yes]
+with the SKIP branch 'no commit touches a path outside agent-team/' removed: exit 0, tests 25, pass 24, fail 0, skipped 1 [as expected: yes]
+with the SKIP branch 'git history cannot be read' removed (the stage line): exit 0, tests 25, pass 24, fail 0, skipped 1 [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all controls as expected for before: yes

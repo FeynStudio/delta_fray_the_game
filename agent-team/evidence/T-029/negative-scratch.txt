@@ -1,0 +1,14 @@
+controls.mjs after
+scratch copy of the worktree in the OS temp dir, nothing changed: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with the REPO_ENV filter removed: exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "checkHandoff and currentBranch answer for the repo at root when GIT_DIR and GIT_WORK_TREE point at another repo" [as expected: yes]
+with the SKIP branch 'not the top folder of a git repo' removed: exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "skips a subfolder of a git repo" [as expected: yes]
+with the SKIP branch 'no commit touches a path outside agent-team/' removed: exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "skips a repo whose commits touch agent-team/ only" [as expected: yes]
+with the SKIP branch 'git history cannot be read' removed (the stage line): exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "skips a repo that has no commit yet" [as expected: yes]
+with the cleaning of Fix E removed: exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "removes control characters from the subject and the reason" [as expected: yes]
+with the SKIP reason 'git cannot be run' removed: exit 1, tests 31, pass 29, fail 1, skipped 1, failed: "skips when git cannot be run" [as expected: yes]
+with Fix A removed (one unpaged rev-list call), gaps.mjs after a: exit 1; a. long history: 14000 first-parent commits (the newest 450 touch agent-team/ only), fixture built in 923 ms, latest code commit d724ca2 (Code commit 13550); Handoff names 0000000 -> SKIP (git history cannot be read); Handoff names d724ca2 -> SKIP (git history cannot be read) [as expected for after: no] [as expected: yes]
+temp dir (TEMP, TMP and TMPDIR for the one run) pointed at a folder inside a throw-away git repo, the committed test file: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+temp dir (TEMP, TMP and TMPDIR for the one run) pointed at a folder inside a throw-away git repo, the test file as it is on BASE bf8eaaa: exit 1, tests 25, pass 23, fail 1, skipped 1, failed: "skips a folder that is not a git repo" [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all controls as expected for after: yes

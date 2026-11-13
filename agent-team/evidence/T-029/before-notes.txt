@@ -1,0 +1,15 @@
+T-029 before, on BASE bf8eaaa (no change of this task)
+verify.sh T-029 --feature config --label before: RESULT: PASS; unit tests in before-config.log: tests 208 pass 207 fail 0 skipped 1 
+node --test tests/handoff-check.test.js, three runs on this machine (duration_ms as node reports it):
+tests 25 pass 24 fail 0 skipped 1 duration_ms 4402.5459 
+tests 25 pass 24 fail 0 skipped 1 duration_ms 4334.7991 
+tests 25 pass 24 fail 0 skipped 1 duration_ms 4564.1135 
+
+skip( calls and reasons in scripts/handoff-check.mjs on BASE (grep -n "skip("):
+72:  if (id === null) return skip('no task: not on a task branch');
+74:  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+76:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+78:  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+81:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+84:    if (commit === null) return skip('no commit touches a path outside agent-team/');
+90:    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
