@@ -18,6 +18,11 @@ const CLOSED = 'DONE';
 const PLACEHOLDER = '(owner fills in)';
 const TITLE = 'handoff names the latest code commit';
 const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+const SAFE = ['-c', 'core.fsmonitor=false'];
+const PAGE = 200;
+const LAST_C0 = 0x1f;
+const FIRST_C1 = 0x7f;
+const LAST_C1 = 0x9f;
 
 function taskId(text) {
   if (typeof text !== 'string' || !text.startsWith(TASK_PREFIX)) return null;
@@ -35,7 +40,12 @@ export function taskFromBranch(name) {
 
 function git(root, args) {
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !REPO_ENV.includes(key)));
-  return execFileSync('git', args, { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+  return execFileSync('git', [...SAFE, ...args], { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+}
+
+function clean(text) {
+  const keep = (code) => code > LAST_C0 && (code < FIRST_C1 || code > LAST_C1);
+  return Array.from(text).filter((ch) => keep(ch.codePointAt(0))).join('');
 }
 
 function briefStatus(lines) {
@@ -55,14 +65,16 @@ function handoffSection(lines) {
 }
 
 function latestCodeCommit(root) {
-  const rows = git(root, ['rev-list', '--first-parent', '--parents', 'HEAD']).split(NEWLINE).filter(Boolean);
-  for (const row of rows) {
-    const [commit, parent] = row.trim().split(' ');
-    const range = parent ? [parent, commit] : ['--root', commit];
-    const names = git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', ...range]).split('\0').filter(Boolean);
-    if (names.some((name) => !name.startsWith(NOT_CODE))) return commit;
+  for (let done = 0; ; done += PAGE) {
+    const rows = git(root, ['rev-list', '--first-parent', '--parents', '-n', String(PAGE), '--skip=' + done, 'HEAD']).split(NEWLINE).filter(Boolean);
+    for (const row of rows) {
+      const [commit, parent] = row.trim().split(' ');
+      const range = parent ? [parent, commit] : ['--root', commit];
+      const names = git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', ...range]).split('\0').filter(Boolean);
+      if (names.some((name) => !name.startsWith(NOT_CODE))) return commit;
+    }
+    if (rows.length < PAGE) return null;
   }
-  return null;
 }
 
 const skip = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
@@ -82,7 +94,7 @@ export function checkHandoff(root, task) {
     stage = 'git history cannot be read';
     const commit = latestCodeCommit(root);
     if (commit === null) return skip('no commit touches a path outside agent-team/');
-    const subject = git(root, ['log', '-1', '--format=%s', commit]).trim();
+    const subject = clean(git(root, ['log', '-1', '--no-show-signature', '--format=%s', commit])).trim();
     const short = commit.slice(0, SHORT);
     if (handoff.toLowerCase().includes(short)) return { result: 'PASS', reason: 'Handoff names ' + short, commit, subject };
     return { result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (' + subject + ')', commit, subject };
@@ -97,7 +109,7 @@ export function report(outcome) {
   return { lines: ['FAIL ' + TITLE, outcome.reason], code: 1 };
 }
 
-function currentBranch(root) {
+export function currentBranch(root) {
   try {
     return git(root, ['branch', '--show-current']).trim();
   } catch {

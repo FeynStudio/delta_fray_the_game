@@ -1,11 +1,11 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFile, execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execFile } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkHandoff, report, taskFromBranch } from '../scripts/handoff-check.mjs';
+import { checkHandoff, currentBranch, report, taskFromBranch } from '../scripts/handoff-check.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WHO = ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', '-c', 'core.autocrlf=false'];
@@ -52,6 +52,9 @@ async function inRepo(run) {
 
 const names = (hash) => '- Latest code commit: ' + hash.slice(0, 7) + '.';
 const check = (repo) => checkHandoff(repo.root, 'T-900');
+const skipped = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+const insideRepo = (dir) => existsSync(join(dir, '.git')) || (dirname(dir) !== dir && insideRepo(dirname(dir)));
+const CONTROLS = [27, 7, 133].map((code) => String.fromCharCode(code));
 
 function withCode(run) {
   return inRepo(async (repo) => {
@@ -112,7 +115,7 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
     try {
       mkdirSync(join(base, dirname(BRIEF)), { recursive: true });
       writeFileSync(join(base, BRIEF), brief({ handoff: STALE }));
-      assert.deepEqual(checkHandoff(base, 'T-900'), { result: 'SKIP', reason: 'not a git repo', commit: null, subject: null });
+      assert.deepEqual(checkHandoff(base, 'T-900'), skipped(insideRepo(base) ? 'not the top folder of a git repo' : 'not a git repo'));
     } finally {
       rmSync(base, { recursive: true, force: true, maxRetries: 5 });
     }
@@ -195,6 +198,58 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       assert.equal(check(repo).commit, code);
     });
   });
+
+  test('skips a subfolder of a git repo', async () => {
+    await withCode(async (repo) => {
+      repo.write('sub/' + BRIEF, brief({ handoff: STALE }));
+      assert.deepEqual(checkHandoff(join(repo.root, 'sub'), 'T-900'), skipped('not the top folder of a git repo'));
+    });
+  });
+
+  test('skips a repo whose commits touch agent-team/ only', async () => {
+    await inRepo(async (repo) => {
+      await repo.commit('Brief only', { [BRIEF]: brief({ handoff: STALE }) });
+      assert.deepEqual(check(repo), skipped('no commit touches a path outside agent-team/'));
+    });
+  });
+
+  test('skips a repo that has no commit yet', async () => {
+    await inRepo(async (repo) => {
+      repo.write(BRIEF, brief({ handoff: STALE }));
+      assert.deepEqual(check(repo), skipped('git history cannot be read'));
+    });
+  });
+
+  test('removes control characters from the subject and the reason', async () => {
+    await inRepo(async (repo) => {
+      const [escape, bell, nextLine] = CONTROLS;
+      const code = await repo.commit(escape + '[31mFix' + bell + ' the ' + nextLine + 'wall', { 'src/game.js': 'export const a = 1;\n', [BRIEF]: brief({ handoff: STALE }) });
+      const short = code.slice(0, 7);
+      assert.deepEqual(check(repo), {
+        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' ([31mFix the wall)', commit: code, subject: '[31mFix the wall',
+      });
+    });
+  });
+});
+
+test('checkHandoff and currentBranch answer for the repo at root when GIT_DIR and GIT_WORK_TREE point at another repo', async () => {
+  await withCode((repo, code) => inRepo(async (other) => {
+    repo.write(BRIEF, brief({ handoff: STALE }));
+    await other.git('symbolic-ref', 'HEAD', 'refs/heads/task/T-901-other');
+    await other.commit('Other work', { 'src/other.js': 'export const b = 1;\n' });
+    const saved = { GIT_DIR: process.env.GIT_DIR, GIT_WORK_TREE: process.env.GIT_WORK_TREE };
+    try {
+      process.env.GIT_DIR = join(other.root, '.git');
+      process.env.GIT_WORK_TREE = other.root;
+      assert.equal(currentBranch(repo.root), BRANCH);
+      assert.equal(check(repo).commit, code);
+    } finally {
+      for (const [key, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+  }));
 });
 
 test('report gives the result lines and the exit code', () => {
@@ -205,13 +260,7 @@ test('report gives the result lines and the exit code', () => {
 });
 
 test('the Handoff of the brief for the current task branch names the latest code commit in this repo', (t) => {
-  let branch = '';
-  try {
-    branch = execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true }).trim();
-  } catch (error) {
-    t.diagnostic('git branch --show-current failed: ' + error.message);
-  }
-  const outcome = checkHandoff(ROOT, taskFromBranch(branch));
+  const outcome = checkHandoff(ROOT, taskFromBranch(currentBranch(ROOT)));
   if (outcome.result === 'SKIP') {
     t.skip(outcome.reason);
     return;
