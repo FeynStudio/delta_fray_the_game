@@ -312,9 +312,9 @@ test('drawScores: a state without scores draws 0 for both; margins come from con
 
 test('protectionAlpha: 1, 0.75, 0.5, 0.25 at 0, 1/4, 1/2, 3/4 of the period and 1 again at one period', () => {
   const P = config.protectionBlinkMs;
-  assert.equal(P, 400);
+  assert.equal(P, 600);
   assert.equal(config.protectionMinAlpha, 0);
-  const want = [[0, 1], [P / 4, 0.75], [P / 2, 0.5], [(3 * P) / 4, 0.25], [P, 1]];
+  const want = [[0, 1], [150, 0.75], [300, 0.5], [450, 0.25], [600, 1]];
   for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms) - a) < 1e-9, `${ms} ms: ${protectionAlpha(ms)}`);
   for (const [ms, a] of want) assert.ok(Math.abs(protectionAlpha(ms + 3 * P) - a) < 1e-9, `${ms + 3 * P} ms`);
 });
@@ -398,7 +398,7 @@ test('respawn turn with an explosion running: only the respawned protected ship 
     { ...config.spawns[1], alive: true, unmovedSinceSpawn: true },
   ];
   const explosions = [{ ship: 1, x: 1000, y: 480, heading: 180, elapsed: 100 }];
-  for (const [clock, want] of [[P * 5 + P / 4, 0.75], [P * 5 + (3 * P) / 4, 0.25], [P * 5 + P - 10, 0.025]]) {
+  for (const [clock, want] of [[P * 5 + P / 4, 0.75], [P * 5 + (3 * P) / 4, 0.25], [P * 5 + P - 10, 10 / P]]) {
     const state = deepFreeze(structuredClone({ ...base, turn: 1, ships, explosions, scores: [1, 0], clock }));
     const copy = structuredClone(state);
     assert.equal(isSpawnProtected(state, 1), true);
@@ -479,6 +479,24 @@ const titleFrames = () => {
 
 test('config holds the title text exactly as the human typed it', () => {
   assert.equal(config.titleText, 'Delta Fray');
+});
+
+test('the title is drawn at 72px monospace, letter spacing 12px, line width 2.25, y 16, each equal to its config value', () => {
+  assert.equal(config.titleFontSize, 72);
+  assert.equal(config.titleLetterSpacing, 12);
+  assert.equal(config.titleLineWidth, 2.25);
+  assert.equal(config.titleTop, 16);
+  const { ctx, calls } = settingsCtx();
+  drawFrame(ctx, createInitialState());
+  const title = calls.filter((c) => c.k === 'strokeText').at(-1);
+  assert.equal(title.font, '72px monospace');
+  assert.equal(title.font, `${config.titleFontSize}px monospace`);
+  assert.equal(title.letterSpacing, '12px');
+  assert.equal(title.letterSpacing, `${config.titleLetterSpacing}px`);
+  assert.equal(title.lineWidth, 2.25);
+  assert.equal(title.lineWidth, config.titleLineWidth);
+  assert.equal(title.args[2], 16);
+  assert.equal(title.args[2], config.titleTop);
 });
 
 test('drawFrame draws the title last: strokeText "DELTA FRAY", centred at worldWidth / 2 in the top half, outline only', () => {
