@@ -1,0 +1,7 @@
+On 16faa71 with the Handoff filled in (saved, not yet committed):
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit 0
+$ node scripts/handoff-check.mjs T-016-review
+PASS handoff names the latest code commit
+exit 0

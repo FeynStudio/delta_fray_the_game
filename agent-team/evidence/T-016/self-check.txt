@@ -1,0 +1,50 @@
+Self-check on 24db046 (code commit 24db046)
+$ node scripts/no-comments.mjs
+exit 0
+$ grep -nE '//|/\*|\*/|<!--' scripts/handoff-check.mjs tests/handoff-check.test.js
+exit 1 (1 = no match)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' scripts/handoff-check.mjs tests/handoff-check.test.js
+exit 1 (1 = no match)
+$ ./scripts/guards.sh
+exit 0
+
+Every git call in the two new files (grep -n "git(\|'git'\|execFile"):
+scripts/handoff-check.mjs:4:import { execFileSync } from 'node:child_process';
+scripts/handoff-check.mjs:36:function git(root, args) {
+scripts/handoff-check.mjs:38:  return execFileSync('git', args, { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+scripts/handoff-check.mjs:58:  const rows = git(root, ['rev-list', '--first-parent', '--parents', 'HEAD']).split(NEWLINE).filter(Boolean);
+scripts/handoff-check.mjs:62:    const names = git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', ...range]).split('\0').filter(Boolean);
+scripts/handoff-check.mjs:81:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+scripts/handoff-check.mjs:85:    const subject = git(root, ['log', '-1', '--format=%s', commit]).trim();
+scripts/handoff-check.mjs:102:    return git(root, ['branch', '--show-current']).trim();
+tests/handoff-check.test.js:3:import { execFile, execFileSync } from 'node:child_process';
+tests/handoff-check.test.js:30:    execFile('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true }, (error, out) => (error ? failed(error) : done(out.trim())));
+tests/handoff-check.test.js:38:    await git('add', '-A');
+tests/handoff-check.test.js:39:    await git(...WHO, 'commit', '-q', '-m', subject);
+tests/handoff-check.test.js:40:    return git('rev-parse', 'HEAD');
+tests/handoff-check.test.js:45:    await git('init', '-q');
+tests/handoff-check.test.js:46:    await git('symbolic-ref', 'HEAD', 'refs/heads/' + BRANCH);
+tests/handoff-check.test.js:102:      const branch = await repo.git('branch', '--show-current');
+tests/handoff-check.test.js:105:      await repo.git('checkout', '-q', '--detach');
+tests/handoff-check.test.js:106:      assert.deepEqual(checkHandoff(repo.root, taskFromBranch(await repo.git('branch', '--show-current'))), NO_TASK);
+tests/handoff-check.test.js:152:      await repo.git('checkout', '-q', '-b', 'side');
+tests/handoff-check.test.js:154:      await repo.git('checkout', '-q', BRANCH);
+tests/handoff-check.test.js:156:      await repo.git(...WHO, 'merge', '-q', '--no-ff', '-m', 'Merge side into the task', 'side');
+tests/handoff-check.test.js:157:      const merge = await repo.git('rev-parse', 'HEAD');
+tests/handoff-check.test.js:158:      const parents = await repo.git('rev-list', '--parents', '-n', '1', 'HEAD');
+tests/handoff-check.test.js:186:      assert.equal(await repo.git('rev-parse', 'HEAD'), later);
+tests/handoff-check.test.js:210:    branch = execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true }).trim();
+
+Imports:
+scripts/handoff-check.mjs:1:import { existsSync, readFileSync } from 'node:fs';
+scripts/handoff-check.mjs:2:import { dirname, join, resolve } from 'node:path';
+scripts/handoff-check.mjs:3:import { fileURLToPath, pathToFileURL } from 'node:url';
+scripts/handoff-check.mjs:4:import { execFileSync } from 'node:child_process';
+tests/handoff-check.test.js:1:import { describe, test } from 'node:test';
+tests/handoff-check.test.js:2:import assert from 'node:assert/strict';
+tests/handoff-check.test.js:3:import { execFile, execFileSync } from 'node:child_process';
+tests/handoff-check.test.js:4:import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+tests/handoff-check.test.js:5:import { tmpdir } from 'node:os';
+tests/handoff-check.test.js:6:import { dirname, join, resolve } from 'node:path';
+tests/handoff-check.test.js:7:import { fileURLToPath } from 'node:url';
+tests/handoff-check.test.js:8:import { checkHandoff, report, taskFromBranch } from '../scripts/handoff-check.mjs';

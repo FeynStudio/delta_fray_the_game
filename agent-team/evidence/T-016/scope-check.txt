@@ -1,0 +1,36 @@
+Scope check, BASE c0fa4d3, HEAD 24db046 plus uncommitted evidence
+$ git diff --stat c0fa4d3 -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md
+(end, nothing printed = no change)
+$ git diff --name-status c0fa4d3 -- scripts/ tests/
+A	scripts/handoff-check.mjs
+A	tests/handoff-check.test.js
+$ git status --short -- scripts/ tests/ src/ (untracked or modified, nothing expected)
+(end)
+$ git ls-files .gitignore
+(end)
+$ ls -a | grep gitignore (worktree)
+(end)
+$ git diff --name-status c0fa4d3 (all tracked changes outside agent-team/evidence/T-016/)
+M	agent-team/FEATURE_MAP.md
+A	scripts/handoff-check.mjs
+A	tests/handoff-check.test.js
+$ git diff --numstat c0fa4d3 -- scripts/ tests/ agent-team/FEATURE_MAP.md
+1	0	agent-team/FEATURE_MAP.md
+115	0	scripts/handoff-check.mjs
+220	0	tests/handoff-check.test.js
+$ git log --oneline c0fa4d3..HEAD
+24db046 T-016: stale-handoff check (scripts/handoff-check.mjs, tests/handoff-check.test.js, FEATURE_MAP section 9)
+68e946a T-016: before evidence on BASE c0fa4d3 (verify config PASS; scratch stale handoff still PASS)
+
+git configuration before and after one run of the new tests:
+node --test tests/handoff-check.test.js exit 0
+$ git config --list --show-origin: 32 entries before, 32 after
+$ diff before after
+exit 0 (0 = identical)
+fixture folders left in the OS temp dir (name starts with handoff-): before 0, after 0
+$ git status --short (after the test run; only new evidence expected)
+(end)
+$ git stash list; git branch --list
++ master
++ task/T-015-blink-title-tuning
+* task/T-016-stale-handoff-check

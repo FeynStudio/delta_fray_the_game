@@ -1,0 +1,26 @@
+Scratch change on BASE c0fa4d3 (never committed, reverted after the run): the Handoff placeholder is replaced by one line naming 0000000.
+$ git diff -- agent-team/tasks/T-016.md
+warning: in the working copy of 'agent-team/tasks/T-016.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/agent-team/tasks/T-016.md b/agent-team/tasks/T-016.md
+index f603192..1da183c 100644
+--- a/agent-team/tasks/T-016.md
++++ b/agent-team/tasks/T-016.md
+@@ -117,7 +117,7 @@ Human answer of 2026-11-12 (item 4 is the instruction to rewrite this brief), pa
+   Context: answers the session orchestrator's eight-item loose-ends list. Item 5 is the build go-ahead for this brief (coordinator's reading: for T-015, T-016 and T-017 only; it supersedes item 1 of the 2026-11-11 answer for these three). It is not a merge or push approval and does not lift the deny list. The stack order and bases are a process choice by the session orchestrator, not a human decision.
+ 
+ ## Handoff
+-(owner fills in)
++- Scratch gap check: the latest code commit is 0000000.
+ 
+ ## Review
+ (reviewer fills in)
+$ ./scripts/verify.sh T-016 --feature config --label before-gap
+commit: c0fa4d3  branch: task/T-016-stale-handoff-check  2026-11-13T14:12:06Z
+PASS guards
+PASS lint
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
+exit 0
