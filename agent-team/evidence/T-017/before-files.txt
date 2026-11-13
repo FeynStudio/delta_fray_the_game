@@ -1,0 +1,6 @@
+On BASE 1564176 (before any change) scripts/smoke.mjs --feature turns writes only these files:
+before-files.txt
+before-turns-smoke.json
+before-turns-smoke.png
+before-turns.json
+before-turns.log

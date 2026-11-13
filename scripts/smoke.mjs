@@ -239,8 +239,126 @@ async function turnsProbe() {
   return r;
 }
 
+function freezeLoopProbe() {
+  return new Promise((done) => {
+    window.requestAnimationFrame = (loop) => {
+      window.requestAnimationFrame = () => 0;
+      const now = performance.now();
+      window.__redraw = () => loop(now);
+      window.__redraw();
+      done(true);
+      return 0;
+    };
+  });
+}
+
+function drawnStateProbe() {
+  window.__redraw();
+  return window.__game.getState();
+}
+
+function stateProbe() {
+  return window.__game.getState();
+}
+
+async function backwardLaunchProbe(flight) {
+  const cfg = (await import('/src/config.js')).default;
+  const { applyMove } = await import('/src/rules.js');
+  const g = window.__game;
+  const needle = 30;
+  const s = g.getState();
+  s.turn = 0;
+  s.clock = 0;
+  s.ships[0] = { ...s.ships[0], x: cfg.worldWidth / 2, y: cfg.worldHeight / 2, heading: 0, alive: true };
+  s.gauge = { ...s.gauge, phase: 'power', power: 1, backward: false };
+  g.setState(s);
+  g.press('Space');
+  g.press('Shift');
+  const d = g.getState();
+  d.gauge = { ...d.gauge, needle };
+  g.setState(d);
+  const from = d.ships[0];
+  const angle = (((from.heading + 180 + needle) % 360) + 360) % 360;
+  const to = applyMove(d, { distance: d.gauge.distance, angle }).ships[0];
+  g.press('Space');
+  g.step(cfg.moveAnimMs * flight);
+  return { from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y }, angle };
+}
+
+async function explosionProbe() {
+  const cfg = (await import('/src/config.js')).default;
+  const g = window.__game;
+  const s = g.getState();
+  s.turn = 0;
+  s.clock = 0;
+  s.ships = [
+    { ...s.ships[0], x: 200, y: 480, heading: 0, alive: true },
+    { ...s.ships[1], x: 300, y: 490, heading: 180, alive: true },
+  ];
+  s.gauge = { ...s.gauge, phase: 'power', power: 1, backward: false };
+  g.setState(s);
+  g.press('Space');
+  const d = g.getState();
+  d.gauge = { ...d.gauge, needle: 0 };
+  g.setState(d);
+  g.press('Space');
+  g.step(cfg.moveAnimMs);
+  g.step(cfg.explosionMs / 2);
+  return { explosionMs: cfg.explosionMs, spawn: cfg.spawns[1] };
+}
+
+const headingOff = (s, want) => Math.abs((((s.ships[0].heading - want.angle) % 360) + 540) % 360 - 180) > 1e-6;
+
+function backwardMidWrong(s, want) {
+  const { from, to } = want;
+  const ship = s.ships[0];
+  const dx = to.x - from.x, dy = to.y - from.y;
+  const t = ((ship.x - from.x) * dx + (ship.y - from.y) * dy) / (dx * dx + dy * dy);
+  const off = Math.hypot(ship.x - (from.x + dx * t), ship.y - (from.y + dy * t));
+  if (s.gauge.phase !== 'moving') return `wanted gauge phase 'moving', got '${s.gauge.phase}'`;
+  if (!(t > 0 && t < 1 && off <= 0.001)) return `mover at (${ship.x}, ${ship.y}) is not strictly between its start and end points`;
+  if (headingOff(s, want)) return `wanted heading ${want.angle} (heading before launch + 180 + needle), got ${ship.heading}`;
+  return null;
+}
+
+function backwardEndWrong(s, want) {
+  const ship = s.ships[0];
+  if (s.gauge.phase !== 'power' || s.turn !== 1) return `wanted the move ended (phase 'power', turn 1), got phase '${s.gauge.phase}' turn ${s.turn}`;
+  if (Math.abs(ship.x - want.to.x) > 0.001 || Math.abs(ship.y - want.to.y) > 0.001) {
+    return `wanted the mover on the rules end point (${want.to.x}, ${want.to.y}), got (${ship.x}, ${ship.y})`;
+  }
+  if (headingOff(s, want)) return `wanted heading ${want.angle} (heading before launch + 180 + needle), got ${ship.heading}`;
+  return null;
+}
+
+function explosionWrong(s, want) {
+  const e = (s.explosions ?? []).find((x) => x.ship === 1);
+  const ship = s.ships[1];
+  if (!e) return 'wanted a running explosion for ship 1, got none';
+  if (!(e.elapsed > 0 && e.elapsed < want.explosionMs)) return `wanted explosion elapsed between 0 and ${want.explosionMs}, got ${e.elapsed}`;
+  if (ship.alive !== true || Math.abs(ship.x - want.spawn.x) > 0.001 || Math.abs(ship.y - want.spawn.y) > 0.001) {
+    return `wanted the destroyed ship respawned at (${want.spawn.x}, ${want.spawn.y}), got alive ${ship.alive} at (${ship.x}, ${ship.y})`;
+  }
+  return null;
+}
+
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
+
+async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
+  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
+  const p = await browser.open(url, FULL_HD);
+  await p.eval(freezeLoopProbe);
+  const want = await p.eval(setup, ...setupArgs);
+  const before = await p.eval(drawnStateProbe);
+  const png = await p.screenshot();
+  const after = await p.eval(stateProbe);
+  for (const [when, s] of [['before', before], ['after', after]]) {
+    const problem = wrong(s, want);
+    if (problem) throw new Error(`${file}: ${problem} ${when} the capture`);
+  }
+  shots.push({ suffix, png });
+}
 
 async function phaseShot(browser, url, shots, suffix, keys, want) {
   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
@@ -312,6 +430,9 @@ const FEATURES = {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(turnsProbe);
     shots.push({ suffix: '', png: await a.screenshot() });
+    await stateShot(browser, url, shots, '-backward-mid', backwardLaunchProbe, [0.5], backwardMidWrong);
+    await stateShot(browser, url, shots, '-backward-end', backwardLaunchProbe, [1], backwardEndWrong);
+    await stateShot(browser, url, shots, '-explosion', explosionProbe, [], explosionWrong);
     return {
       'destroyed enemy respawns at its spawn point': r.enemyRespawnedAtSpawn === true,
       'attacker survives at the end of its move': r.attackerSurvivedAtEnd === true,

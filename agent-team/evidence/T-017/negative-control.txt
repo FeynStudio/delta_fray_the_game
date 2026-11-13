@@ -1,0 +1,67 @@
+T-017 negative control: a wrong state at capture time fails the run with an error naming the file.
+Each scratch change below was made to the working copy of scripts/smoke.mjs on top of code commit c550366, run once, and removed with git restore. None was committed.
+Because the scratch change was uncommitted, the header of negative-wrongangle-turns.log names c550366 although the code that ran was c550366 plus scratch change A.
+
+=== A. wrong expected angle (run through ./scripts/verify.sh T-017 --feature turns --label negative-wrongangle; full log: negative-wrongangle-turns.log; result file: negative-wrongangle-turns-smoke.json) ===
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..cefa2d7 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -282,7 +282,7 @@ async function backwardLaunchProbe(flight) {
+   const to = applyMove(d, { distance: d.gauge.distance, angle }).ships[0];
+   g.press('Space');
+   g.step(cfg.moveAnimMs * flight);
+-  return { from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y }, angle };
++  return { from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y }, angle: angle + 1 };
+ }
+ 
+ async function explosionProbe() {
+--- result: RESULT: FAIL, exit 1; FAIL turns browser runs; FAIL turns browser output; error line:
+smoke turns: turns-smoke-backward-mid.png: wanted heading 211 (heading before launch + 180 + needle), got 210 before the capture
+
+=== B. backward-end page stepped only 0.9 of the move (node scripts/smoke.mjs --feature turns, output to a scratch folder) ===
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..d312596 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -431,7 +431,7 @@ const FEATURES = {
+     const r = await a.eval(turnsProbe);
+     shots.push({ suffix: '', png: await a.screenshot() });
+     await stateShot(browser, url, shots, '-backward-mid', backwardLaunchProbe, [0.5], backwardMidWrong);
+-    await stateShot(browser, url, shots, '-backward-end', backwardLaunchProbe, [1], backwardEndWrong);
++    await stateShot(browser, url, shots, '-backward-end', backwardLaunchProbe, [0.9], backwardEndWrong);
+     await stateShot(browser, url, shots, '-explosion', explosionProbe, [], explosionWrong);
+     return {
+       'destroyed enemy respawns at its spawn point': r.enemyRespawnedAtSpawn === true,
+--- output:
+smoke turns: turns-smoke-backward-end.png: wanted the move ended (phase 'power', turn 1), got phase 'moving' turn 0 before the capture
+exit=1
+--- files written (no turns-smoke-backward-end.png, no turns-smoke-explosion.png):
+turns-smoke-backward-mid.png
+turns-smoke.json
+turns-smoke.png
+
+=== C. explosion page stepped the whole of config.explosionMs, so the explosion is over (node scripts/smoke.mjs --feature turns, output to a scratch folder) ===
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..9a8bbb4 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -303,7 +303,7 @@ async function explosionProbe() {
+   g.setState(d);
+   g.press('Space');
+   g.step(cfg.moveAnimMs);
+-  g.step(cfg.explosionMs / 2);
++  g.step(cfg.explosionMs);
+   return { explosionMs: cfg.explosionMs, spawn: cfg.spawns[1] };
+ }
+ 
+--- output:
+smoke turns: turns-smoke-explosion.png: wanted a running explosion for ship 1, got none before the capture
+exit=1
+--- files written (no turns-smoke-explosion.png):
+turns-smoke-backward-end.png
+turns-smoke-backward-mid.png
+turns-smoke.json
+turns-smoke.png
+
+After the three runs: git status --short scripts/ printed nothing (working copy equals c550366).

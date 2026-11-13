@@ -1,0 +1,36 @@
+T-017 scope and self checks, run on code commit c550366 (working copy clean in scripts/), BASE 1564176
+
+$ git diff --stat 1564176 -- expected/ scenarios/ src/   (empty = unchanged)
+exit=0
+
+$ git diff --stat 1564176 c550366 -- . ':!agent-team/evidence'
+ agent-team/FEATURE_MAP.md |   1 +
+ scripts/smoke.mjs         | 121 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 122 insertions(+)
+
+$ git diff --name-only 1564176 c550366 -- . ':!agent-team'   (paths outside agent-team/)
+scripts/smoke.mjs
+
+$ node scripts/no-comments.mjs
+exit=0
+
+$ ./scripts/guards.sh
+exit=0
+
+$ grep -n nosemgrep scripts/smoke.mjs
+68:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+
+$ git diff 1564176 c550366 -- scripts/smoke.mjs | grep -c nosemgrep   (0 = the directive line is not in the diff)
+0
+
+$ git diff 1564176 c550366 -- scripts/smoke.mjs | grep -E '^-[^-]'   (removed lines; none = additions only)
+exit=1 (1 = none)
+
+$ git diff 1564176 c550366 -- scripts/smoke.mjs | grep -E '^\+.*(import .* from|spawn\(|WebSocket|startServer|127\.0\.0\.1|https?:)'   (new imports, launch, websocket, server or address lines)
+exit=1 (1 = none)
+
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit=0
+
+PNG hashes: two trial runs before the commit, the after-turns run and the after-all run gave the same sha256 for the three new files (after-turns-png-sha256.txt, after-all-png-sha256.txt). turns-smoke.png differs between runs as before (real-time loop in that page, REPEATS row from T-021; not changed by this task).
