@@ -1,0 +1,324 @@
+{
+  "before": {
+    "commit": "adf3c07",
+    "srcOrTestsDirty": false,
+    "url": "/index.html?debug=1",
+    "config": {
+      "protectionBlinkMs": 400,
+      "protectionMinAlpha": 0,
+      "titleText": "Delta Fray",
+      "titleFontSize": 48,
+      "titleTop": 16,
+      "titleLetterSpacing": 8,
+      "titleLineWidth": 1.5,
+      "worldWidth": 1280,
+      "worldHeight": 960
+    },
+    "method": "game loop frozen, scores set to [-12, -12], ink boxes read back from canvas pixels in the top band, world units; metrics box is measureText plus half the line width",
+    "frames": [
+      {
+        "file": "before-title-1920x1080-dpr1.png",
+        "viewport": "1920x1080 dpr 1",
+        "scores": [
+          -12,
+          -12
+        ],
+        "clock": 0,
+        "canvasPixels": {
+          "width": 1440,
+          "height": 1080
+        },
+        "devicePixelRatio": 1,
+        "pixelsPerWorldUnit": 1.13,
+        "scannedBandWorld": {
+          "x": [
+            3,
+            1277
+          ],
+          "y": [
+            3,
+            240
+          ]
+        },
+        "titleInkWorld": {
+          "left": 469.33,
+          "right": 805.33,
+          "top": 19.56,
+          "bottom": 52.44,
+          "width": 336,
+          "height": 32.89,
+          "pixels": 4304
+        },
+        "titleInkCentreX": 637.33,
+        "titleMetricsBoxWorld": {
+          "left": 469.3,
+          "right": 805.31,
+          "top": 19.91,
+          "bottom": 52.41
+        },
+        "score0InkWorld": {
+          "left": 18.67,
+          "right": 61.33,
+          "top": 18.67,
+          "bottom": 36.44,
+          "width": 42.67,
+          "height": 17.78,
+          "pixels": 314
+        },
+        "score1InkWorld": {
+          "left": 1220.44,
+          "right": 1263.11,
+          "top": 18.67,
+          "bottom": 36.44,
+          "width": 42.67,
+          "height": 17.78,
+          "pixels": 308
+        },
+        "gapLeftWorld": 408,
+        "gapRightWorld": 415.11,
+        "bothGapsPositive": true,
+        "titleInkInsideMap": true,
+        "titleMetricsBoxInsideMap": true,
+        "titleBand": {
+          "top": 19.56,
+          "bottom": 52.44,
+          "height": 32.89,
+          "percentOfMapHeight": 3.43,
+          "bottomAsPercentOfMapHeight": 5.46
+        }
+      },
+      {
+        "file": "before-title-1000x1000-dpr2.png",
+        "viewport": "1000x1000 dpr 2",
+        "scores": [
+          -12,
+          -12
+        ],
+        "clock": 0,
+        "canvasPixels": {
+          "width": 2000,
+          "height": 1500
+        },
+        "devicePixelRatio": 2,
+        "pixelsPerWorldUnit": 1.56,
+        "scannedBandWorld": {
+          "x": [
+            3,
+            1277
+          ],
+          "y": [
+            3,
+            240
+          ]
+        },
+        "titleInkWorld": {
+          "left": 469.12,
+          "right": 805.12,
+          "top": 20.48,
+          "bottom": 53.12,
+          "width": 336,
+          "height": 32.64,
+          "pixels": 7095
+        },
+        "titleInkCentreX": 637.12,
+        "titleMetricsBoxWorld": {
+          "left": 469.3,
+          "right": 805.31,
+          "top": 19.91,
+          "bottom": 52.41
+        },
+        "score0InkWorld": {
+          "left": 19.2,
+          "right": 60.8,
+          "top": 18.56,
+          "bottom": 36.48,
+          "width": 41.6,
+          "height": 17.92,
+          "pixels": 571
+        },
+        "score1InkWorld": {
+          "left": 1221.12,
+          "right": 1262.72,
+          "top": 18.56,
+          "bottom": 36.48,
+          "width": 41.6,
+          "height": 17.92,
+          "pixels": 567
+        },
+        "gapLeftWorld": 408.32,
+        "gapRightWorld": 416,
+        "bothGapsPositive": true,
+        "titleInkInsideMap": true,
+        "titleMetricsBoxInsideMap": true,
+        "titleBand": {
+          "top": 20.48,
+          "bottom": 53.12,
+          "height": 32.64,
+          "percentOfMapHeight": 3.4,
+          "bottomAsPercentOfMapHeight": 5.53
+        }
+      }
+    ]
+  },
+  "after": {
+    "commit": "76e498d",
+    "srcOrTestsDirty": false,
+    "url": "/index.html?debug=1",
+    "config": {
+      "protectionBlinkMs": 600,
+      "protectionMinAlpha": 0,
+      "titleText": "Delta Fray",
+      "titleFontSize": 72,
+      "titleTop": 16,
+      "titleLetterSpacing": 12,
+      "titleLineWidth": 2.25,
+      "worldWidth": 1280,
+      "worldHeight": 960
+    },
+    "method": "game loop frozen, scores set to [-12, -12], ink boxes read back from canvas pixels in the top band, world units; metrics box is measureText plus half the line width",
+    "frames": [
+      {
+        "file": "after-title-1920x1080-dpr1.png",
+        "viewport": "1920x1080 dpr 1",
+        "scores": [
+          -12,
+          -12
+        ],
+        "clock": 0,
+        "canvasPixels": {
+          "width": 1440,
+          "height": 1080
+        },
+        "devicePixelRatio": 1,
+        "pixelsPerWorldUnit": 1.13,
+        "scannedBandWorld": {
+          "x": [
+            3,
+            1277
+          ],
+          "y": [
+            3,
+            240
+          ]
+        },
+        "titleInkWorld": {
+          "left": 384,
+          "right": 888,
+          "top": 22.22,
+          "bottom": 71.11,
+          "width": 504,
+          "height": 48.89,
+          "pixels": 7859
+        },
+        "titleInkCentreX": 636,
+        "titleMetricsBoxWorld": {
+          "left": 383.95,
+          "right": 887.47,
+          "top": 22.34,
+          "bottom": 70.59
+        },
+        "score0InkWorld": {
+          "left": 18.67,
+          "right": 61.33,
+          "top": 18.67,
+          "bottom": 36.44,
+          "width": 42.67,
+          "height": 17.78,
+          "pixels": 314
+        },
+        "score1InkWorld": {
+          "left": 1220.44,
+          "right": 1263.11,
+          "top": 18.67,
+          "bottom": 36.44,
+          "width": 42.67,
+          "height": 17.78,
+          "pixels": 308
+        },
+        "gapLeftWorld": 322.67,
+        "gapRightWorld": 332.44,
+        "bothGapsPositive": true,
+        "titleInkInsideMap": true,
+        "titleMetricsBoxInsideMap": true,
+        "titleBand": {
+          "top": 22.22,
+          "bottom": 71.11,
+          "height": 48.89,
+          "percentOfMapHeight": 5.09,
+          "bottomAsPercentOfMapHeight": 7.41
+        }
+      },
+      {
+        "file": "after-title-1000x1000-dpr2.png",
+        "viewport": "1000x1000 dpr 2",
+        "scores": [
+          -12,
+          -12
+        ],
+        "clock": 0,
+        "canvasPixels": {
+          "width": 2000,
+          "height": 1500
+        },
+        "devicePixelRatio": 2,
+        "pixelsPerWorldUnit": 1.56,
+        "scannedBandWorld": {
+          "x": [
+            3,
+            1277
+          ],
+          "y": [
+            3,
+            240
+          ]
+        },
+        "titleInkWorld": {
+          "left": 384,
+          "right": 887.68,
+          "top": 22.4,
+          "bottom": 71.04,
+          "width": 503.68,
+          "height": 48.64,
+          "pixels": 13848
+        },
+        "titleInkCentreX": 635.84,
+        "titleMetricsBoxWorld": {
+          "left": 383.95,
+          "right": 887.47,
+          "top": 22.34,
+          "bottom": 70.59
+        },
+        "score0InkWorld": {
+          "left": 19.2,
+          "right": 60.8,
+          "top": 18.56,
+          "bottom": 36.48,
+          "width": 41.6,
+          "height": 17.92,
+          "pixels": 571
+        },
+        "score1InkWorld": {
+          "left": 1221.12,
+          "right": 1262.72,
+          "top": 18.56,
+          "bottom": 36.48,
+          "width": 41.6,
+          "height": 17.92,
+          "pixels": 567
+        },
+        "gapLeftWorld": 323.2,
+        "gapRightWorld": 333.44,
+        "bothGapsPositive": true,
+        "titleInkInsideMap": true,
+        "titleMetricsBoxInsideMap": true,
+        "titleBand": {
+          "top": 22.4,
+          "bottom": 71.04,
+          "height": 48.64,
+          "percentOfMapHeight": 5.07,
+          "bottomAsPercentOfMapHeight": 7.4
+        }
+      }
+    ]
+  }
+}
