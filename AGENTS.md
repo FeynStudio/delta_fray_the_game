@@ -8,7 +8,7 @@
 - Stack: TypeScript 5, React, Vite; npm; Vitest for tests; Supabase for data; app code in src/, tests in tests/. This is the planned stack for the live game. The Phase 1 prototype is deliberately plain JavaScript in the browser with `node --test` and no framework (human decision of 2026-11-07), so the difference is intended; do not report it as a mismatch or migrate the code without a brief.
 - Run locally: npm ci, then cp .env.example .env, then npm run dev (opens at http://localhost:5173). Never edit .env values.
 - Verify: `./scripts/verify.sh T-###`; run npm ci first. Must pass before any task is called done.
-- Guards: `./scripts/guards.sh`; must pass; Bans TODO/HACK markers, debug prints, silent catch blocks, and UI importing the data layer. Fix the code, never edit the guards.
+- Guards: `./scripts/guards.sh`; must pass; Bans TODO/HACK markers, comments, debug prints, silent catch blocks, and UI importing the data layer. Fix the code, never edit the guards.
 
 ## How work flows
 1. Every task has a brief in agent-team/tasks/T-###.md. No brief, no work.
