@@ -16,7 +16,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           if git diff --name-only "origin/$BASE_REF"...HEAD \
-            | grep -E '^(scripts/(guards|verify)\.sh|\.github/|\.claude/settings\.json|agent-team/evals/(cases/|[^/]*-rubric\.md)|agent-team/design/(DESIGN\.md|balance-targets\.json))'; then
+            | grep -E '^(scripts/(guards|verify)\.sh|scripts/no-comments\.mjs|tests/no-comments\.test\.js|\.github/|\.claude/settings\.json|agent-team/evals/(cases/|[^/]*-rubric\.md)|agent-team/design/(DESIGN\.md|balance-targets\.json))'; then
             echo "This PR changes the checks. Add the checks-change label if you made this change."; exit 1
           fi
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0

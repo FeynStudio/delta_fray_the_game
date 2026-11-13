@@ -36,5 +36,5 @@ guard "render-no-state-change" '(^|[^[:alnum:]_$])state\.[A-Za-z_.]+[[:space:]]*
   src/render.js "render.js reads state only; change state in rules.js or game.js"
 guard "no-magic-numbers" '(^|[^[:alnum:]_$])(1280|960|150|900)([^[:alnum:]_$]|$)' \
   src "Read tunable values from src/config.js" "config.js"
- 
+node scripts/no-comments.mjs || FAIL=1
 exit $FAIL
