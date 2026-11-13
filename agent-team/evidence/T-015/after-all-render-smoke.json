@@ -1,0 +1,12 @@
+{
+  "one canvas": true,
+  "fits the 1920x1080 window": true,
+  "aspect ratio kept at 1920x1080": true,
+  "no scrollbars at 1920x1080": true,
+  "aspect ratio kept at 1000x1000": true,
+  "no scrollbars at 1000x1000": true,
+  "sharp on a 2x screen": true,
+  "two ships": true,
+  "ships at their spawn points": true,
+  "ships face each other": true
+}

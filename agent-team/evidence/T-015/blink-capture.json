@@ -118,5 +118,125 @@
         ]
       }
     ]
+  },
+  "after": {
+    "commit": "76e498d",
+    "srcOrTestsDirty": false,
+    "url": "/index.html?debug=1",
+    "config": {
+      "protectionBlinkMs": 600,
+      "protectionMinAlpha": 0,
+      "titleText": "Delta Fray",
+      "titleFontSize": 72,
+      "titleTop": 16,
+      "titleLetterSpacing": 12,
+      "titleLineWidth": 2.25,
+      "worldWidth": 1280,
+      "worldHeight": 960
+    },
+    "viewport": "1920x1080 dpr 1",
+    "method": "game loop frozen (requestAnimationFrame replaced), clock moved only by __game.step, alpha read back from canvas pixels around each ship",
+    "frames": [
+      {
+        "file": "after-blink-0ms.png",
+        "ms": 0,
+        "clock": 0,
+        "phase": "power",
+        "ships": [
+          {
+            "ship": 0,
+            "protected": true,
+            "expectedAlpha": 1,
+            "alphaFromPixels": 1
+          },
+          {
+            "ship": 1,
+            "protected": true,
+            "expectedAlpha": 1,
+            "alphaFromPixels": 1
+          }
+        ]
+      },
+      {
+        "file": "after-blink-150ms.png",
+        "ms": 150,
+        "clock": 150,
+        "phase": "power",
+        "ships": [
+          {
+            "ship": 0,
+            "protected": true,
+            "expectedAlpha": 0.75,
+            "alphaFromPixels": 0.746
+          },
+          {
+            "ship": 1,
+            "protected": true,
+            "expectedAlpha": 0.75,
+            "alphaFromPixels": 0.748
+          }
+        ]
+      },
+      {
+        "file": "after-blink-300ms.png",
+        "ms": 300,
+        "clock": 300,
+        "phase": "power",
+        "ships": [
+          {
+            "ship": 0,
+            "protected": true,
+            "expectedAlpha": 0.5,
+            "alphaFromPixels": 0.5
+          },
+          {
+            "ship": 1,
+            "protected": true,
+            "expectedAlpha": 0.5,
+            "alphaFromPixels": 0.5
+          }
+        ]
+      },
+      {
+        "file": "after-blink-450ms.png",
+        "ms": 450,
+        "clock": 450,
+        "phase": "power",
+        "ships": [
+          {
+            "ship": 0,
+            "protected": true,
+            "expectedAlpha": 0.25,
+            "alphaFromPixels": 0.25
+          },
+          {
+            "ship": 1,
+            "protected": true,
+            "expectedAlpha": 0.25,
+            "alphaFromPixels": 0.248
+          }
+        ]
+      },
+      {
+        "file": "after-blink-600ms.png",
+        "ms": 600,
+        "clock": 600,
+        "phase": "power",
+        "ships": [
+          {
+            "ship": 0,
+            "protected": true,
+            "expectedAlpha": 1,
+            "alphaFromPixels": 1
+          },
+          {
+            "ship": 1,
+            "protected": true,
+            "expectedAlpha": 1,
+            "alphaFromPixels": 1
+          }
+        ]
+      }
+    ]
   }
 }
