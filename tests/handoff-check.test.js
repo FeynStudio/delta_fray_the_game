@@ -252,6 +252,20 @@ test('checkHandoff and currentBranch answer for the repo at root when GIT_DIR an
   }));
 });
 
+test('skips when git cannot be run', () => {
+  const base = mkdtempSync(join(tmpdir(), 'handoff-check-'));
+  const saved = process.env.PATH;
+  try {
+    mkdirSync(join(base, dirname(BRIEF)), { recursive: true });
+    writeFileSync(join(base, BRIEF), brief({ handoff: STALE }));
+    process.env.PATH = '';
+    assert.deepEqual(checkHandoff(base, 'T-900'), skipped('git cannot be run'));
+  } finally {
+    process.env.PATH = saved;
+    rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+  }
+});
+
 test('report gives the result lines and the exit code', () => {
   assert.deepEqual(report({ result: 'PASS', reason: 'Handoff names abc1234' }), { lines: ['PASS ' + TITLE], code: 0 });
   assert.deepEqual(report({ result: 'SKIP', reason: 'handoff not filled in' }), { lines: ['SKIP handoff check (handoff not filled in)'], code: 0 });
