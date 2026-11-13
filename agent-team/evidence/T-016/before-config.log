@@ -1,0 +1,228 @@
+commit: c0fa4d3  branch: task/T-016-stale-handoff-check  2026-11-13T14:11:54Z
+PASS guards
+PASS lint
+✔ config holds the Prototype 1 starting values (1.9578ms)
+✔ config is a plain, mutable object (0.1918ms)
+✔ spawns are on opposite sides of the map, 850 to 950 units apart (0.2691ms)
+✔ the ship triangle is narrower than equilateral (0.1717ms)
+✔ each spawned narrow ship, outline included, lies fully inside the map without touching an edge (0.3664ms)
+✔ each spawn heading points at the other spawn (within 1 degree) (0.2227ms)
+[game] game started {
+  turn: 0,
+  ships: [
+    {
+      x: 190,
+      y: 480,
+      heading: 0,
+      alive: true,
+      unmovedSinceSpawn: true
+    },
+    {
+      x: 1090,
+      y: 480,
+      heading: 180,
+      alive: true,
+      unmovedSinceSpawn: true
+    }
+  ],
+  gauge: {
+    phase: 'power',
+    power: 0,
+    needle: 0,
+    backward: false,
+    distance: 0,
+    sweep: 1
+  },
+  scores: [ 0, 0 ],
+  clock: 0
+}
+✔ second Space flies ship 0 to the rules end point; gauge back to power, turn passes to 1 (6.1975ms)
+✔ with Shift the ship turns to the travel angle at launch, flies there and keeps that heading (1.3605ms)
+✔ after a backward move, on its next turn the dial sits at the new nose and a forward move follows it (1.0217ms)
+✔ halfway: still moving, Space and Shift change nothing, ship not yet at its end point (0.7828ms)
+✔ a large step never takes the ship past the applyMove end point (0.5673ms)
+✔ a real Space keydown launches the move like press(); key repeat is ignored (0.4662ms)
+✔ turns smoke scenario: enemy destroyed on the path respawns, attacker stays, turn 1 on power (0.4695ms)
+✔ the end point is the resolveMove result: the enemy stays drawn alive until the move ends (0.3754ms)
+✔ a move into the wall: the mover is back at its spawn point, alive, and the turn has passed (0.4721ms)
+✔ a plain move passes the turn, and the next Space, Space moves the other ship (0.4817ms)
+✔ later steps never change the turn again: no turn timer and no second endTurn (0.59ms)
+✔ double kill through the game: both respawn, the turn passes once, and the next mover is alive (0.3953ms)
+✔ explosion after a hit: one entry at the enemy where it was hit; turn and gauge as before T-007 (0.3898ms)
+✔ explosion after a wall death: centre moved so the whole triangle is inside the map (0.4114ms)
+✔ explosions after a double kill: two entries, enemy where hit, mover inside the map (0.3649ms)
+✔ no explosion after a plain move (0.3026ms)
+✔ an explosion is present at explosionMs - 1 and gone at explosionMs; turn, ships, gauge untouched (0.4914ms)
+✔ the next player can press Space while an explosion plays, and its move ends on time (0.3706ms)
+✔ score after a hit: unchanged during the animation, +1 for the mover in the step it ends (0.3747ms)
+✔ score after a wall death: unchanged during the animation, -2 for the mover when it ends (0.3582ms)
+✔ scores add up over several turns; turn and gauge behave as before (0.9902ms)
+✔ a state loaded without scores starts from [0, 0] when a move ends (0.4759ms)
+✔ moving phase with no anim: step goes back to power, same player, ships unmoved; then plays on (1.6506ms)
+✔ the game starts with clock 0 and both ships spawn protected (0.1676ms)
+✔ step(ms) grows the clock by exactly ms, in every phase and across the end of a move (0.5683ms)
+✔ after player 1's first move only player 2's ship is still protected (blinks) (0.2951ms)
+✔ FEATURE_MAP 5 example: the swept path destroys the enemy, the attacker survives at the end (3.8773ms)
+✔ grazing contact counts: touching the swept area destroys, a little further away survives (0.5158ms)
+✔ grazing contact counts tip to tip along the path (0.5209ms)
+✔ no tunneling: an enemy fully between the start and end of a max-distance move is destroyed (0.4085ms)
+✔ an enemy behind the start survives, as does one well beside the path (0.4167ms)
+✔ stopping short of the enemy misses (1.3992ms)
+✔ the wall on each of the four edges destroys the mover, forward and backward (0.5679ms)
+✔ any part counts at the wall: the centre stays inside but the tip touches or crosses the edge (0.2942ms)
+✔ any part counts at the wall: a back corner grazing the top edge while moving along it (0.3806ms)
+✔ a backward move: the ship turns to the travel angle and its tip leads into the wall (0.4515ms)
+✔ a backward move resolves exactly like the forward move with the same angle (3.0177ms)
+✔ hit then wall destroys both (0.2561ms)
+✔ turn 1 can destroy the turn 0 ship (0.4019ms)
+✔ a move longer than maxMove is refused: state unchanged, nobody destroyed (0.1464ms)
+✔ no respawn and no turn change: dead ships keep x, y and heading; other fields carry over (0.2224ms)
+✔ an already destroyed enemy stays as it is (0.1114ms)
+✔ the swept triangle uses the heading the ship turns to as the move starts (0.1183ms)
+✔ shipWidth is read at call time: a near miss becomes a hit with wider ships (0.1916ms)
+✔ shipSize is read at call time: a near miss tip to tip becomes a hit with longer ships (0.2621ms)
+✔ world size is read at call time for the wall (0.188ms)
+✔ hits use the same triangle that render.js draws (1.6767ms)
+✔ the starting gauge is in the power phase (1.8094ms)
+✔ power sweeps with elapsed time, stays within 0..1 and turns back at both ends (1.8161ms)
+✔ first Space locks distance = power x maxMove (1.3557ms)
+✔ first Space reads maxMove at call time (override to 200) (0.2915ms)
+✔ sweep speeds are read from config at call time (0.3547ms)
+✔ direction phase: needle sweeps with time within -max..max, backward starts false (1.2053ms)
+✔ Shift flips backward in the direction phase only (0.8219ms)
+✔ second Space launches and keeps the needle, backward and distance it had (0.2467ms)
+✔ Space, Shift and time change nothing in the moving phase (0.226ms)
+✔ no function mutates the state passed in (1.0275ms)
+✔ keyFromEvent maps Space and both Shift keys and ignores key repeat (0.2031ms)
+✔ moveFromGauge: 60% power, needle 30, forward, heading 0 gives 0.6 x maxMove at 30 (FEATURE_MAP 3) (0.3119ms)
+✔ moveFromGauge: forward = heading + needle, backward = heading + 180 + needle, within 0..360 (0.2301ms)
+✔ moveFromGauge uses the ship whose turn it is (0.1245ms)
+✔ pointAlong: start, middle and end of the segment, never past either end (0.1736ms)
+✔ startMove/stepMove: constant speed along the segment, ends exactly at the applyMove result (0.5366ms)
+✔ stepMove: moving phase with no anim goes back to the power phase, ships and turn unchanged (0.3085ms)
+✔ stepMove: moving phase with no anim and ms 0 changes nothing (0.1641ms)
+✔ stepMove recovery carries every other state field over unchanged (0.2061ms)
+✔ forward moves at 0, 90, 180 and 270 go right, down, left and up and turn the heading (2.7367ms)
+✔ 45 degrees uses degrees, not radians (0.4393ms)
+✔ forward heading is kept within 0 to 360 (0.3761ms)
+✔ a backward move travels along the angle and turns the heading to the travel angle (0.405ms)
+✔ only the ship whose turn it is moves; every other field is carried over (0.809ms)
+✔ works without a gauge field (scenario states have none) (0.3594ms)
+✔ a move longer than maxMove is refused; exactly maxMove is made (human decision 2026-11-08) (0.9438ms)
+✔ distance comes from the move and the limit from config at call time (maxMove 200) (0.3726ms)
+✔ findComments flags a whole-line comment (js) (2.516ms)
+✔ findComments flags a trailing comment after code (js) (0.3087ms)
+✔ findComments flags a trailing comment after a division (js) (0.1734ms)
+✔ findComments flags a one-line block comment (js) (0.1843ms)
+✔ findComments flags a block comment over several lines (js) (0.162ms)
+✔ findComments flags a block comment in the middle of a line (js) (0.1677ms)
+✔ findComments flags a comment inside the code part of a template literal (js) (0.2489ms)
+✔ findComments flags a comment on line 2 under a shebang (js) (1.542ms)
+✔ findComments flags a shebang that is not on line 1 (js) (0.2309ms)
+✔ findComments flags a whole-line comment (sh) (0.4172ms)
+✔ findComments flags a trailing comment after a command (sh) (0.1282ms)
+✔ findComments flags a one-line comment (html) (0.3576ms)
+✔ findComments flags a comment across lines (html) (0.1328ms)
+✔ findComments flags a block comment inside style (html) (0.1425ms)
+✔ findComments flags a comment inside an inline script (html) (0.1132ms)
+✔ findComments does not flag comment marks in a single-quoted string (js) (0.1237ms)
+✔ findComments does not flag comment marks in a double-quoted string (js) (0.0663ms)
+✔ findComments does not flag comment marks in a template string (js) (0.0679ms)
+✔ findComments does not flag an escaped quote before comment marks (js) (0.0635ms)
+✔ findComments does not flag comment marks in a regular expression (js) (0.1285ms)
+✔ findComments does not flag comment marks in a character class (js) (0.068ms)
+✔ findComments does not flag a regular expression after ( , = and return (js) (0.0676ms)
+✔ findComments does not flag division (js) (0.0696ms)
+✔ findComments does not flag a shebang on line 1 (js) (0.0537ms)
+✔ findComments does not flag a shebang on line 1 (sh) (0.0631ms)
+✔ findComments does not flag the argument count and an array length (sh) (0.0685ms)
+✔ findComments does not flag a hash inside single and double quotes (sh) (0.0731ms)
+✔ findComments does not flag a path with a glob (sh) (0.0554ms)
+✔ findComments does not flag the doctype (html) (0.0663ms)
+✔ findComments does not flag a block comment mark in an attribute value (html) (0.2831ms)
+✔ findComments does not flag a colour inside style (html) (0.2095ms)
+✔ findComments returns the comment text and rejects an unknown kind (0.6379ms)
+✔ checkTree reports a comment in every checked place with file and line (13.8526ms)
+✔ checkTree skips old evidence, unchecked files and node_modules (11.2275ms)
+✔ checkTree accepts each scanner directive only in its own file with its exact text (8.3002ms)
+✔ the two real scanner directives are seen by the tokenizer (2.7473ms)
+✔ no code file in this repo holds a comment (21.5879ms)
+✔ fitScale fills one window dimension and keeps the aspect ratio (1.6548ms)
+✔ shipPoints is a narrow isosceles triangle with its tip along the heading (0.5307ms)
+✔ drawShips draws outlines only: stroke, no fill or gradient (0.7274ms)
+✔ fitCanvas sizes the canvas to fit, keep aspect and stay sharp (same checks as the smoke probe) (0.4029ms)
+✔ drawGauge only reads state and draws only around the active ship (4.5765ms)
+✔ gauges are scaled: power bar 0.5 x 60% = 0.3 and dial 0.7 x 80% = 0.56 of base size (read from config) (0.2908ms)
+✔ power bar sits below the active ship, clear of its body, centred on it (0.3953ms)
+✔ the power bar does not move when the dial appears or flips (any heading) (0.7812ms)
+✔ direction dial is on the nose side when forward and the tail side when backward, on the long axis (0.4913ms)
+✔ the dial size does not depend on the locked distance (no path preview) (0.5804ms)
+✔ gauges follow the ship: a moved ship carries its gauges along (0.2513ms)
+✔ near the map edges every gauge part stays inside the map (0.7743ms)
+✔ the power bar does not overlap the direction dial (6.1968ms)
+✔ explosionPieces at 0 ms: 6 segments joined end to end into the ship triangle (0.4574ms)
+✔ explosionPieces: the two pieces of each side differ in length (0.1879ms)
+✔ explosionPieces at explosionMs: each piece is explosionEndScale of its 0 ms length (0.1613ms)
+✔ explosionPieces: at 500 ms each midpoint is explosionSpeed x 0.5 farther from the centre (0.2408ms)
+✔ drawExplosions: nothing without explosions; strokes in the ship colour with one; state unchanged (0.6783ms)
+✔ drawScores: player 1 top-left, player 2 top-right, each in its ship colour, minus sign kept (0.5429ms)
+✔ drawScores: a state without scores draws 0 for both; margins come from config (0.2404ms)
+✔ protectionAlpha: 1, 0.75, 0.5, 0.25 at 0, 1/4, 1/2, 3/4 of the period and 1 again at one period (0.2273ms)
+✔ protectionAlpha falls strictly within a cycle (no fade back in) and snaps back to 1 (0.5309ms)
+✔ protectionAlpha reads period and minimum from config at call time (0.2164ms)
+✔ drawShips: only a spawn-protected ship is drawn below full opacity; globalAlpha back at 1; state unchanged (1.0123ms)
+✔ drawShips: a state without clock draws a protected ship at full opacity (clock 0) (0.1398ms)
+✔ respawn turn with an explosion running: only the respawned protected ship blinks (1.0205ms)
+✔ config holds the title text exactly as the human typed it (0.1088ms)
+✔ the title is drawn at 72px monospace, letter spacing 12px, line width 2.25, y 16, each equal to its config value (0.4542ms)
+✔ drawFrame draws the title last: strokeText "DELTA FRAY", centred at worldWidth / 2 in the top half, outline only (1.1143ms)
+✔ drawTitle makes no fill call and leaves the context settings as it found them (0.2272ms)
+✔ the scores of the next frame are not drawn with the title font or letter spacing (0.2742ms)
+✔ the title comes from config at call time, upper-cased, and does not depend on state (0.5098ms)
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (2.473ms)
+✔ createInitialState reads config at call time (1.2391ms)
+✔ createInitialState does not share objects with config (0.2169ms)
+✔ createInitialState starts both scores at config.scoreStart (0) (2.4835ms)
+✔ a kill gives the mover +1 and leaves the other score alone (1.3033ms)
+✔ a wall death gives the mover -2 (0.3952ms)
+✔ hit-then-wall gives the mover -1 in total and leaves the other score unchanged (0.4563ms)
+✔ a plain move changes nothing (0.4849ms)
+✔ a kill by player 2 changes only player 2's score (0.4608ms)
+✔ a wall death at 0 gives -2 and a second one gives -4 (no clamping at 0) (0.4252ms)
+✔ a refused move over maxMove changes nothing (0.3488ms)
+✔ sweeping a spawn-protected enemy scores nothing (T-006) (1.2635ms)
+✔ a state without scores starts from [0, 0] (0.4268ms)
+✔ points overridden in config are used, read at call time (0.3318ms)
+✔ scoreMove never mutates its inputs and returns a new array (0.2718ms)
+✔ endTurn keeps scores unchanged (0.2838ms)
+✔ (1) at game start, player 1 sweeping over player 2 on its spawn point leaves player 2 alive (3.4149ms)
+✔ (2) a ship on its spawn point that has moved since spawning is destroyed (0.6114ms)
+✔ (3) unmovedSinceSpawn: true but 1 unit off the spawn point is not protected and is destroyed (0.5829ms)
+✔ (4) a ship respawned by endTurn is protected until its own next move (also distance 0), then not (0.5193ms)
+✔ (5) a config.spawns override moves the protected point (0.631ms)
+✔ (6) a protected mover that reaches the wall still dies (0.4248ms)
+✔ (7) hit then wall where the swept enemy is protected destroys only the mover (1.3684ms)
+✔ (8) a ship with no unmovedSinceSpawn field on its spawn point is destroyed (scenario states) (0.3743ms)
+✔ (9) isSpawnProtected is false for a ship with alive: false (0.4474ms)
+✔ applyMove clears only the mover's flag; a refused move keeps the state; endTurn sets it on respawn only (0.5038ms)
+✔ a destroyed ship respawns at its spawn point; the living ship is unchanged; turn 0 -> 1 (3.0967ms)
+✔ turn 1 -> 0, and a move with no destruction respawns nothing (0.3823ms)
+✔ double kill: both ships respawn and the turn changes exactly once (no skipped turn) (0.4501ms)
+✔ the mover destroyed by the wall respawns at its own spawn point (1.1039ms)
+✔ reads config.spawns at call time (override) (0.5386ms)
+✔ respawned ships do not share objects with config (0.3677ms)
+✔ other fields are carried over, and a state with no gauge works (0.4504ms)
+✔ after endTurn no ship is left destroyed, so the player whose turn it is always has a live ship (0.5015ms)
+ℹ tests 183
+ℹ suites 0
+ℹ pass 183
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 195.4148
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
