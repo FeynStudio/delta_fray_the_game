@@ -1,0 +1,38 @@
+T-029 self-check (Done-when 6), on code commit fab8750
+$ grep -n "core.fsmonitor=false" scripts/handoff-check.mjs
+21:const SAFE = ['-c', 'core.fsmonitor=false'];
+$ grep -n "no-show-signature" scripts/handoff-check.mjs
+97:    const subject = clean(git(root, ['log', '-1', '--no-show-signature', '--format=%s', commit])).trim();
+$ grep -n "execFileSync(" tests/handoff-check.test.js
+(exit 1; nothing printed: the test file has no execFileSync call left, so no git call on ROOT in the real-repo test)
+$ grep -n "execFile" tests/handoff-check.test.js
+3:import { execFile } from 'node:child_process';
+30:    execFile('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true }, (error, out) => (error ? failed(error) : done(out.trim())));
+(the one execFile call is the fixture helper, cwd: the fixture repo)
+$ grep -n "ROOT" tests/handoff-check.test.js
+10:const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+277:  const outcome = checkHandoff(ROOT, taskFromBranch(currentBranch(ROOT)));
+$ node scripts/no-comments.mjs
+(exit 0)
+$ grep -nE '//|/\*|\*/|<!--' scripts/handoff-check.mjs tests/handoff-check.test.js agent-team/evidence/T-029/gaps.mjs agent-team/evidence/T-029/controls.mjs
+(exit 1; nothing printed)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' scripts/handoff-check.mjs tests/handoff-check.test.js agent-team/evidence/T-029/gaps.mjs agent-team/evidence/T-029/controls.mjs
+(exit 1; nothing printed)
+
+Every git call of scripts/handoff-check.mjs (all through the one helper git(root, args), which runs execFileSync('git', ['-c', 'core.fsmonitor=false', ...args], { cwd: root, env without the seven REPO_ENV names, ... })):
+$ grep -n "git(root\|execFileSync(\|const SAFE\|const PAGE" scripts/handoff-check.mjs
+21:const SAFE = ['-c', 'core.fsmonitor=false'];
+22:const PAGE = 200;
+41:function git(root, args) {
+43:  return execFileSync('git', [...SAFE, ...args], { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+69:    const rows = git(root, ['rev-list', '--first-parent', '--parents', '-n', String(PAGE), '--skip=' + done, 'HEAD']).split(NEWLINE).filter(Boolean);
+73:      const names = git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', ...range]).split('\0').filter(Boolean);
+93:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+97:    const subject = clean(git(root, ['log', '-1', '--no-show-signature', '--format=%s', commit])).trim();
+114:    return git(root, ['branch', '--show-current']).trim();
+As run:
+  git -c core.fsmonitor=false rev-parse --show-prefix
+  git -c core.fsmonitor=false rev-list --first-parent --parents -n 200 --skip=<0, 200, 400, ...> HEAD
+  git -c core.fsmonitor=false diff-tree --no-commit-id --name-only -r -z <parent> <commit>   (root commit: --root <commit>)
+  git -c core.fsmonitor=false log -1 --no-show-signature --format=%s <commit>
+  git -c core.fsmonitor=false branch --show-current

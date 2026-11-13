@@ -1,0 +1,24 @@
+T-029 scope check (Done-when 8), BASE bf8eaaa, head fab8750
+$ git diff --stat bf8eaaa -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md
+(nothing printed)
+$ git diff --name-only bf8eaaa -- scripts/ tests/
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git diff --numstat bf8eaaa -- scripts/ tests/ agent-team/FEATURE_MAP.md
+1	1	agent-team/FEATURE_MAP.md
+22	10	scripts/handoff-check.mjs
+74	11	tests/handoff-check.test.js
+(added plus deleted: 119 lines; limit 200)
+$ git diff --name-only bf8eaaa   (working tree against BASE, every changed tracked path outside agent-team/evidence/T-029/)
+agent-team/FEATURE_MAP.md
+agent-team/tasks/T-029.md
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git ls-files .gitignore
+(nothing printed)
+$ git log --oneline bf8eaaa..HEAD
+fab8750 T-029: test the skip reason 'git cannot be run'
+f8cde92 T-029: stale-handoff check reads history in pages, cleans the subject, hardens git calls, tests every skip reason
+5d74bb8 T-029: before evidence on bf8eaaa (verify, gaps, untested branches)
+git config --list --show-origin, taken before the after runs (two verify.sh runs, each with the unit tests) and after them: 32 lines each, sha256 of the two outputs identical (the output itself is not saved here because it holds paths of the machine's user profile)
+Folders left in the OS temp dir whose name starts with handoff-check-, handoff-gaps- or handoff-scratch-: 0

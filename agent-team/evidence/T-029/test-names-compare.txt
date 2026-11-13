@@ -1,0 +1,14 @@
+before (bf8eaaa): 209 test lines; after (fab8750): 215 test lines (one line in each is the suite 'checkHandoff on throw-away git repos'; node reports tests 208 before and 214 after = 208 + 6)
+The real-repo test line is '﹣ ... # handoff not filled in' (skipped) before and '✔ ...' (passed) after; for this comparison the mark and the skip reason of that one line are left out.
+Lines in before that are missing in after (must be none):
+(end)
+Lines only in after:
+checkHandoff and currentBranch answer for the repo at root when GIT_DIR and GIT_WORK_TREE point at another repo
+removes control characters from the subject and the reason
+skips a repo that has no commit yet
+skips a repo whose commits touch agent-team/ only
+skips a subfolder of a git repo
+skips when git cannot be run
+(end)
+Lines in after that are not passed (must be none):
+(end)

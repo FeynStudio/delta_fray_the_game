@@ -1,0 +1,3 @@
+$ node scripts/handoff-check.mjs   (on fab8750, branch task/T-029-handoff-check-fixes)
+PASS handoff names the latest code commit
+exit 0

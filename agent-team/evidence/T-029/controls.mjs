@@ -22,6 +22,7 @@ const NO_CODE = { find: '    if (commit === null) return skip(\'no commit touche
 const HISTORY = { find: '    stage = \'git history cannot be read\';\n', put: '' };
 const PAGED = { find: '\'-n\', String(PAGE), \'--skip=\' + done, \'HEAD\'', put: '\'HEAD\'' };
 const CLEANED = { find: 'clean(git(root, [\'log\', \'-1\', \'--no-show-signature\', \'--format=%s\', commit]))', put: 'git(root, [\'log\', \'-1\', \'--no-show-signature\', \'--format=%s\', commit])' };
+const NO_GIT = { find: 'skip(error.code === \'ENOENT\' ? \'git cannot be run\' : stage)', put: 'skip(stage)' };
 
 const BEFORE = [
   { name: 'the REPO_ENV filter removed', change: FILTER, fails: [] },
@@ -35,6 +36,7 @@ const AFTER = [
   { name: 'the SKIP branch \'no commit touches a path outside agent-team/\' removed', change: NO_CODE, fails: ['skips a repo whose commits touch agent-team/ only'] },
   { name: 'the SKIP branch \'git history cannot be read\' removed (the stage line)', change: HISTORY, fails: ['skips a repo that has no commit yet'] },
   { name: 'the cleaning of Fix E removed', change: CLEANED, fails: ['removes control characters from the subject and the reason'] },
+  { name: 'the SKIP reason \'git cannot be run\' removed', change: NO_GIT, fails: ['skips when git cannot be run'] },
 ];
 
 const out = [];
