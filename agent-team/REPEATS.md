@@ -14,8 +14,9 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | evidence log header commit does not match the code that ran (uncommitted change at run time) | 3 | T-008, T-009, T-017 |
 | before evidence overwritten by the after run (verify.sh writes the same artifact file names for every label) | 1 | T-012 |
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 2 | T-014, T-009 |
-| owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 1 | T-013 |
+| owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 2 | T-013, T-029 |
 | handoff claims more test coverage than the tests have (e.g. "states include explosions" with empty explosions arrays) | 1 | T-010 |
 | smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte | 1 | T-021 |
 | brief or handoff cites a section that does not exist (dangling 'open question N' reference) | 1 | T-023 |
 | check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter) | 2 | T-016, T-017 |
+| fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 1 | T-029 |
