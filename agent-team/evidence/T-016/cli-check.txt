@@ -1,0 +1,46 @@
+fixture history, newest first (branch task/T-900-fixture):
+f119db4 Handoff
+6d031e0 Add the game
+--- fixture 1: the Handoff names the code commit
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit 0
+
+fixture history, newest first (branch task/T-900-fixture):
+f81cc7e Fix the wall bounce
+84075ad Handoff
+6d031e0 Add the game
+--- fixture 2: a code commit after the Handoff
+$ node scripts/handoff-check.mjs
+FAIL handoff names the latest code commit
+Handoff does not name f81cc7e; latest code commit is f81cc7e (Fix the wall bounce)
+exit 1
+
+fixture history, newest first (branch task/T-900-fixture):
+2982213 Add the game
+--- fixture 3: the Handoff is still the placeholder
+$ node scripts/handoff-check.mjs
+SKIP handoff check (handoff not filled in)
+exit 0
+
+real repo: HEAD 24db046 T-016: stale-handoff check (scripts/handoff-check.mjs, tests/handoff-check.test.js, FEATURE_MAP section 9), branch task/T-016-stale-handoff-check
+--- real repo, task from the branch name
+$ node scripts/handoff-check.mjs
+SKIP handoff check (handoff not filled in)
+exit 0
+
+--- real repo, task given by hand
+$ node scripts/handoff-check.mjs T-016-review
+SKIP handoff check (handoff not filled in)
+exit 0
+
+--- real repo, a task with a closed brief
+$ node scripts/handoff-check.mjs T-014
+SKIP handoff check (brief T-014 is DONE)
+exit 0
+
+--- real repo, not a task
+$ node scripts/handoff-check.mjs adhoc
+SKIP handoff check (no task: not on a task branch)
+exit 0
+

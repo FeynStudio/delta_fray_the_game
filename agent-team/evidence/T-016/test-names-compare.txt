@@ -1,0 +1,30 @@
+before (c0fa4d3): 183 test lines; after (24db046): 209 test lines (one of them is the line for the suite 'checkHandoff on throw-away git repos'; node reports tests 208 = 183 + 25)
+Lines in before that are missing in after (must be none):
+(end)
+Lines only in after:
+✔ checkHandoff on throw-away git repos
+✔ fails on a code commit made after the Handoff and names that commit and its subject
+✔ fails on a merge commit that brings in code until the Handoff names the merge
+✔ looks for the hash in the Handoff section only
+✔ passes when only agent-team commits follow the code commit
+✔ passes when the Handoff names the code commit, here the root commit
+✔ reads the brief from the working tree, so a saved but uncommitted Handoff counts
+✔ report gives the result lines and the exit code
+✔ skips a brief whose Status is DONE, and fails the same brief while it is IN REVIEW
+✔ skips a folder that is not a git repo
+✔ skips when the task has no brief
+✔ skips when there is no task, and fails the same repo for its own branch name
+✔ skips while the Handoff is the placeholder
+✔ taskFromBranch gives T-016 for the branch name 'task/T-016'
+✔ taskFromBranch gives T-016 for the branch name 'task/T-016-stale-handoff-check'
+✔ taskFromBranch gives T-1234 for the branch name 'task/T-1234-x'
+✔ taskFromBranch gives null for the branch name ''
+✔ taskFromBranch gives null for the branch name 'T-016'
+✔ taskFromBranch gives null for the branch name 'fix/master-conflict-markers'
+✔ taskFromBranch gives null for the branch name 'master'
+✔ taskFromBranch gives null for the branch name 'task/T-01-x'
+✔ taskFromBranch gives null for the branch name 'task/T-016x'
+✔ taskFromBranch gives null for the branch name 'task/adhoc'
+✔ taskFromBranch gives null for the branch name 'undefined'
+✔ uses brief T-900 for the task T-900-review
+﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo

@@ -1,0 +1,118 @@
+Negative control on the committed change 24db046 (scratch change, never committed, reverted after the runs): the Handoff placeholder is replaced by one line naming 0000000.
+$ git diff -- agent-team/tasks/T-016.md
+diff --git a/agent-team/tasks/T-016.md b/agent-team/tasks/T-016.md
+index f603192..2e83880 100644
+--- a/agent-team/tasks/T-016.md
++++ b/agent-team/tasks/T-016.md
+@@ -117,7 +117,7 @@ Human answer of 2026-11-12 (item 4 is the instruction to rewrite this brief), pa
+   Context: answers the session orchestrator's eight-item loose-ends list. Item 5 is the build go-ahead for this brief (coordinator's reading: for T-015, T-016 and T-017 only; it supersedes item 1 of the 2026-11-11 answer for these three). It is not a merge or push approval and does not lift the deny list. The stack order and bases are a process choice by the session orchestrator, not a human decision.
+ 
+ ## Handoff
+-(owner fills in)
++- Scratch negative control: the latest code commit is 0000000.
+ 
+ ## Review
+ (reviewer fills in)
+
+$ node --test tests/handoff-check.test.js
+✔ taskFromBranch gives T-016 for the branch name 'task/T-016-stale-handoff-check' (0.7669ms)
+✔ taskFromBranch gives T-1234 for the branch name 'task/T-1234-x' (0.0844ms)
+✔ taskFromBranch gives T-016 for the branch name 'task/T-016' (0.0652ms)
+✔ taskFromBranch gives null for the branch name 'master' (0.0603ms)
+✔ taskFromBranch gives null for the branch name '' (0.0643ms)
+✔ taskFromBranch gives null for the branch name 'fix/master-conflict-markers' (0.2224ms)
+✔ taskFromBranch gives null for the branch name 'task/adhoc' (0.0741ms)
+✔ taskFromBranch gives null for the branch name 'task/T-01-x' (0.0519ms)
+✔ taskFromBranch gives null for the branch name 'task/T-016x' (0.2417ms)
+✔ taskFromBranch gives null for the branch name 'T-016' (0.1117ms)
+✔ taskFromBranch gives null for the branch name 'undefined' (0.0571ms)
+▶ checkHandoff on throw-away git repos
+  ✔ skips when the task has no brief (602.7463ms)
+  ✔ skips while the Handoff is the placeholder (618.2943ms)
+  ✔ skips a brief whose Status is DONE, and fails the same brief while it is IN REVIEW (1985.556ms)
+  ✔ skips when there is no task, and fails the same repo for its own branch name (2644.5523ms)
+  ✔ skips a folder that is not a git repo (78.9287ms)
+  ✔ passes when the Handoff names the code commit, here the root commit (1143.3802ms)
+  ✔ fails on a code commit made after the Handoff and names that commit and its subject (2357.6746ms)
+  ✔ passes when only agent-team commits follow the code commit (3794.9428ms)
+  ✔ fails on a merge commit that brings in code until the Handoff names the merge (4248.1105ms)
+  ✔ uses brief T-900 for the task T-900-review (2563.3877ms)
+  ✔ reads the brief from the working tree, so a saved but uncommitted Handoff counts (2911.4013ms)
+  ✔ looks for the hash in the Handoff section only (1518.0993ms)
+✔ checkHandoff on throw-away git repos (4331.8885ms)
+✔ report gives the result lines and the exit code (0.1979ms)
+✖ the Handoff of the brief for the current task branch names the latest code commit in this repo (180.3453ms)
+ℹ tests 25
+ℹ suites 1
+ℹ pass 24
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4579.0328
+
+✖ failing tests:
+
+test at tests\handoff-check.test.js:207:1
+✖ the Handoff of the brief for the current task branch names the latest code commit in this repo (180.3453ms)
+  AssertionError [ERR_ASSERTION]: Handoff does not name 24db046; latest code commit is 24db046 (T-016: stale-handoff check (scripts/handoff-check.mjs, tests/handoff-check.test.js, FEATURE_MAP section 9)). Update the Handoff in the brief, then run verify.sh again
+  
+  'FAIL' !== 'PASS'
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-016/tests/handoff-check.test.js:219:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'FAIL',
+    expected: 'PASS',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exit 1
+
+$ node scripts/handoff-check.mjs
+FAIL handoff names the latest code commit
+Handoff does not name 24db046; latest code commit is 24db046 (T-016: stale-handoff check (scripts/handoff-check.mjs, tests/handoff-check.test.js, FEATURE_MAP section 9))
+exit 1
+
+$ ./scripts/verify.sh T-016 --feature config --label negative
+commit: 24db046  branch: task/T-016-stale-handoff-check  2026-11-13T14:17:59Z
+PASS guards
+PASS lint
+FAIL unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: FAIL
+exit 1
+
+After the revert:
+$ git status --short
+?? agent-team/evidence/T-016/after-all.log
+?? agent-team/evidence/T-016/after-config.log
+?? agent-team/evidence/T-016/after-test-names.txt
+?? agent-team/evidence/T-016/balance.json
+?? agent-team/evidence/T-016/cli-check.mjs
+?? agent-team/evidence/T-016/cli-check.txt
+?? agent-team/evidence/T-016/hits.json
+?? agent-team/evidence/T-016/input-smoke-direction-backward.png
+?? agent-team/evidence/T-016/input-smoke-direction.png
+?? agent-team/evidence/T-016/input-smoke-power.png
+?? agent-team/evidence/T-016/input-smoke.json
+?? agent-team/evidence/T-016/input-smoke.png
+?? agent-team/evidence/T-016/movement.json
+?? agent-team/evidence/T-016/negative-config.log
+?? agent-team/evidence/T-016/negative-control.txt
+?? agent-team/evidence/T-016/render-smoke.json
+?? agent-team/evidence/T-016/render-smoke.png
+?? agent-team/evidence/T-016/test-names-compare.txt
+?? agent-team/evidence/T-016/turns-smoke.json
+?? agent-team/evidence/T-016/turns-smoke.png
+?? agent-team/evidence/T-016/turns.json
+$ git diff --stat -- agent-team/tasks/T-016.md (nothing = reverted)
