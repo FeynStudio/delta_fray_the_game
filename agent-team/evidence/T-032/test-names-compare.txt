@@ -1,0 +1,31 @@
+T-032 test names (Done-when 7): tests/handoff-check.test.js on BASE 838a3ae (before-test-names.txt) and on e70a264 (after-test-names.txt), TAP reporter, the suite line included
+names before: 32 (31 tests and the suite line); names after: 50 (49 tests and the suite line)
+
+Names of the before run that are missing after (none expected):
+(count: 0)
+
+Names that are new after (18 expected):
+removes U+001F and DEL from the subject and the reason, and keeps the space and U+00A0
+does not run the upload-pack command of a promisor remote when an object is missing
+does not run the fsmonitor command of the repo
+does not run the gpg program of the repo for a signed commit and names that commit
+walks first parents only, so a merged side branch that adds and removes code is not the latest code commit
+counts a name that only starts like agent-team/, a nested agent-team folder and a deleted code file as code
+gitEnv removes GIT_DIR from the environment given to git
+gitEnv removes GIT_WORK_TREE from the environment given to git
+gitEnv removes GIT_INDEX_FILE from the environment given to git
+gitEnv removes GIT_OBJECT_DIRECTORY from the environment given to git
+gitEnv removes GIT_COMMON_DIR from the environment given to git
+gitEnv removes GIT_NAMESPACE from the environment given to git
+gitEnv removes GIT_PREFIX from the environment given to git
+gitEnv removes GIT_LITERAL_PATHSPECS from the environment given to git
+gitEnv removes GIT_GLOB_PATHSPECS from the environment given to git
+gitEnv removes GIT_NOGLOB_PATHSPECS from the environment given to git
+gitEnv removes GIT_ICASE_PATHSPECS from the environment given to git
+gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1
+(count: 18)
+
+Lines removed from tests/handoff-check.test.js against BASE (git diff 838a3ae e70a264, lines starting with -):
+-import { checkHandoff, currentBranch, report, taskFromBranch } from '../scripts/handoff-check.mjs';
+-    process.env.PATH = saved;
+(the import line gains gitEnv; the PATH line is the row 5 restore; no assertion of an existing test is removed or changed)

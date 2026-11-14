@@ -1,0 +1,44 @@
+T-032 scope check (Done-when 8), BASE 838a3ae, latest code commit e70a264, working tree of the task worktree
+
+$ git diff --stat 838a3ae -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md
+(exit status 0)
+
+$ git diff --name-only 838a3ae -- scripts/ tests/
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+(exit status 0)
+
+$ git diff --name-only 838a3ae -- agent-team/tasks/
+agent-team/tasks/T-032.md
+(exit status 0)
+
+$ git diff --name-only 838a3ae -- agent-team/ | grep -v "^agent-team/evidence/T-032/"
+agent-team/FEATURE_MAP.md
+agent-team/tasks/T-032.md
+(exit status 0)
+
+$ git status --short | grep -v "agent-team/evidence/T-032/"
+ M agent-team/tasks/T-032.md
+(exit status 0)
+
+$ git ls-files .gitignore
+(exit status 0)
+
+$ git diff --numstat 838a3ae -- scripts/ tests/ agent-team/FEATURE_MAP.md
+1	1	agent-team/FEATURE_MAP.md
+20	5	scripts/handoff-check.mjs
+129	2	tests/handoff-check.test.js
+(exit status 0)
+
+Changed lines (added plus deleted) of the three files: 158 (limit 300)
+
+git config --list --show-origin, sha256 before and after one run of the test file (exit 0) and one run of gaps.mjs after (exit 0):
+  the same: yes   (the output itself is not saved, it holds paths of the user profile)
+
+Folders left in the OS temp dir with the names the tests and the evidence scripts use (handoff-check-*, handoff-gaps-*, handoff-scratch-*, and handoff-probe-* or 'handoff probe-*' of the owner's hand probes):
+  count: 0
+
+Evidence files that hold a path with a user name or the session temp folder (grep for the profile folder names and the temp folder name; nothing expected):
+(exit status 1: 1 means no file matched)
+
+Main checkout and the other worktrees: not written to by the owner. Only read by absolute path (the brief, AGENTS.md) and used for 'git worktree add'.

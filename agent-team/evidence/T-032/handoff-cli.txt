@@ -1,0 +1,7 @@
+$ node scripts/handoff-check.mjs   (in the task worktree, HEAD e70a264, the Handoff of T-032 saved in the working tree)
+PASS handoff names the latest code commit
+(exit status 0)
+
+$ node scripts/handoff-check.mjs T-032-review
+PASS handoff names the latest code commit
+(exit status 0)
