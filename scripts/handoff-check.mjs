@@ -18,7 +18,10 @@ const CLOSED = 'DONE';
 const PLACEHOLDER = '(owner fills in)';
 const TITLE = 'handoff names the latest code commit';
 const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
 const SAFE = ['-c', 'core.fsmonitor=false'];
+const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE];
+const DIFFERS = 1;
 const PAGE = 200;
 const LAST_C0 = 0x1f;
 const FIRST_C1 = 0x7f;
@@ -38,9 +41,13 @@ export function taskFromBranch(name) {
   return taskId(name.slice(BRANCH_PREFIX.length));
 }
 
+export function gitEnv(source) {
+  const removed = [...REPO_ENV, ...PATHSPEC_ENV];
+  return { ...Object.fromEntries(Object.entries(source).filter(([key]) => !removed.includes(key))), GIT_NO_LAZY_FETCH: '1' };
+}
+
 function git(root, args) {
-  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !REPO_ENV.includes(key)));
-  return execFileSync('git', [...SAFE, ...args], { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+  return execFileSync('git', [...SAFE, ...args], { cwd: root, env: gitEnv(process.env), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
 }
 
 function clean(text) {
@@ -64,14 +71,22 @@ function handoffSection(lines) {
   return (next === -1 ? rest : rest.slice(0, next)).join(NEWLINE);
 }
 
+function touchesCode(root, range) {
+  try {
+    git(root, ['diff-tree', '--quiet', '-r', ...range, '--', ...CODE_PATHS]);
+    return false;
+  } catch (error) {
+    if (error.status === DIFFERS) return true;
+    throw error;
+  }
+}
+
 function latestCodeCommit(root) {
   for (let done = 0; ; done += PAGE) {
     const rows = git(root, ['rev-list', '--first-parent', '--parents', '-n', String(PAGE), '--skip=' + done, 'HEAD']).split(NEWLINE).filter(Boolean);
     for (const row of rows) {
       const [commit, parent] = row.trim().split(' ');
-      const range = parent ? [parent, commit] : ['--root', commit];
-      const names = git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', ...range]).split('\0').filter(Boolean);
-      if (names.some((name) => !name.startsWith(NOT_CODE))) return commit;
+      if (touchesCode(root, parent ? [parent, commit] : ['--root', commit])) return commit;
     }
     if (rows.length < PAGE) return null;
   }
