@@ -337,11 +337,41 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       rmSync(join(repo.root, 'src', 'game.js'));
       const removed = await repo.commit('Remove the game', {});
       assert.equal(check(repo).commit, removed);
+      await repo.git('rm', '-r', '-q', '--cached', 'agent-team');
+      await repo.git(...WHO, 'commit', '-q', '-m', 'Untrack agent-team');
+      const index = async (subject, ...args) => {
+        await repo.git('update-index', ...args, 'agent-team');
+        await repo.git(...WHO, 'commit', '-q', '-m', subject);
+        return repo.git('rev-parse', 'HEAD');
+      };
+      const file = await index('Add a file named agent-team', '--add', '--cacheinfo', '100644', await repo.git('hash-object', '-w', BRIEF));
+      assert.equal(check(repo).commit, file);
+      await index('Remove the file named agent-team', '--force-remove');
+      const gitlink = await index('Add a gitlink named agent-team', '--add', '--cacheinfo', '160000', removed);
+      assert.equal(check(repo).commit, gitlink);
+    });
+  });
+
+  test('ignores a replace ref that hides the latest code commit', async () => {
+    await withCode(async (repo, code) => {
+      await repo.commit('Handoff', { [BRIEF]: brief({ handoff: names(code) }) });
+      const later = await repo.commit('Fix the wall bounce', { 'src/game.js': 'export const a = 2;\n' });
+      const tree = await repo.git('rev-parse', code + '^{tree}');
+      const rewrite = (line) => (line.startsWith('tree ') ? 'tree ' + tree : line.startsWith('parent ') ? 'parent ' + code : line);
+      repo.write('../replace.txt', (await repo.git('cat-file', 'commit', later)).split('\n').map(rewrite).join('\n') + '\n');
+      await repo.git('update-ref', 'refs/replace/' + later, await repo.git('hash-object', '-t', 'commit', '-w', '../replace.txt'));
+      assert.equal(await repo.git('rev-parse', 'HEAD^{tree}'), tree, 'plain git does not see the replacement');
+      const short = later.slice(0, 7);
+      assert.deepEqual(check(repo), {
+        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (Fix the wall bounce)', commit: later, subject: 'Fix the wall bounce',
+      });
     });
   });
 });
 
-for (const name of REMOVED_ENV) {
+const caseVariants = (name) => [name, name.toLowerCase(), name.split('_').map((part) => part[0] + part.slice(1).toLowerCase()).join('_')];
+
+for (const name of REMOVED_ENV.flatMap(caseVariants)) {
   test(`gitEnv removes ${name} from the environment given to git`, () => {
     const source = { [name]: 'set', KEPT: 'kept' };
     const result = gitEnv(source);
@@ -353,9 +383,34 @@ for (const name of REMOVED_ENV) {
 
 test('gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1', () => {
   const source = { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' };
-  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '1' });
+  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' });
   assert.deepEqual(source, { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' });
-  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1' });
+  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' });
+});
+
+test('gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one', () => {
+  const forced = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' };
+  for (const source of [{ GIT_NO_REPLACE_OBJECTS: '0' }, { git_no_replace_objects: '0', Git_No_Lazy_Fetch: '0' }, { Git_No_Replace_Objects: 'false', git_no_lazy_fetch: '' }]) {
+    assert.deepEqual(gitEnv({ Path: 'bin', ...source }), { Path: 'bin', ...forced });
+  }
+  const lookalikes = { git_config_global: 'a', GIT_DIRS: 'b', XGIT_DIR: 'c', GIT_DIR_: 'd', git_prefix2: 'e' };
+  assert.deepEqual(gitEnv(lookalikes), { ...lookalikes, ...forced });
+});
+
+test('checkHandoff and currentBranch answer for the repo at root when a lower-case git_dir points at another repo', async () => {
+  await withCode((repo, code) => inRepo(async (other) => {
+    repo.write(BRIEF, brief({ handoff: STALE }));
+    await other.git('symbolic-ref', 'HEAD', 'refs/heads/task/T-901-other');
+    const saved = process.env.git_dir;
+    try {
+      process.env.git_dir = join(other.root, '.git');
+      assert.equal(currentBranch(repo.root), BRANCH);
+      assert.equal(check(repo).commit, code);
+    } finally {
+      if (saved === undefined) delete process.env.git_dir;
+      else process.env.git_dir = saved;
+    }
+  }));
 });
 
 test('checkHandoff and currentBranch answer for the repo at root when GIT_DIR and GIT_WORK_TREE point at another repo', async () => {

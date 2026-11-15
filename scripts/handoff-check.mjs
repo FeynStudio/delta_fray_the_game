@@ -19,8 +19,9 @@ const PLACEHOLDER = '(owner fills in)';
 const TITLE = 'handoff names the latest code commit';
 const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
 const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
+const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' };
 const SAFE = ['-c', 'core.fsmonitor=false'];
-const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE];
+const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE + '*'];
 const DIFFERS = 1;
 const PAGE = 200;
 const LAST_C0 = 0x1f;
@@ -42,8 +43,8 @@ export function taskFromBranch(name) {
 }
 
 export function gitEnv(source) {
-  const removed = [...REPO_ENV, ...PATHSPEC_ENV];
-  return { ...Object.fromEntries(Object.entries(source).filter(([key]) => !removed.includes(key))), GIT_NO_LAZY_FETCH: '1' };
+  const removed = [...REPO_ENV, ...PATHSPEC_ENV, ...Object.keys(FORCED_ENV)];
+  return { ...Object.fromEntries(Object.entries(source).filter(([key]) => !removed.includes(key.toUpperCase()))), ...FORCED_ENV };
 }
 
 function git(root, args) {

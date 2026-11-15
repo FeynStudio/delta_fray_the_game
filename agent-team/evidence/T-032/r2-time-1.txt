@@ -1,0 +1,12 @@
+r2-time.mjs, platform win32, node v24.15.0, base 838a3ae, round 1 e70a264 and the worktree files, both run from copies outside any repo (the real-repo test skips in both)
+base run 1: tests 31, pass 30, fail 0, skipped 1, 6093 ms
+round1 run 1: tests 49, pass 48, fail 0, skipped 1, 8323 ms
+head run 1: tests 74, pass 73, fail 0, skipped 1, 10089 ms
+base run 2: tests 31, pass 30, fail 0, skipped 1, 6152 ms
+round1 run 2: tests 49, pass 48, fail 0, skipped 1, 8493 ms
+head run 2: tests 74, pass 73, fail 0, skipped 1, 10275 ms
+base run 3: tests 31, pass 30, fail 0, skipped 1, 6123 ms
+round1 run 3: tests 49, pass 48, fail 0, skipped 1, 8475 ms
+head run 3: tests 74, pass 73, fail 0, skipped 1, 10080 ms
+average base 6123 ms, head 10148 ms, difference 4025 ms (limit 3000 ms); round 1 (e70a264) 8430 ms, round 2 adds 1718 ms
+scratch folder removed: yes
