@@ -1,0 +1,20 @@
+run from the worktree at 5b1bd7f, git status --porcelain empty at the start: yes
+names.mjs skip, platform win32, node v24.15.0
+SKIP reasons, results and output wording in scripts/handoff-check.mjs (lines with skip(, result:, TITLE, PLACEHOLDER or lines: [), base 5c90a51 and head d0f0ada
+  const PLACEHOLDER = '(owner fills in)';
+  const TITLE = 'handoff names the latest code commit';
+  const skip = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+  if (id === null) return skip('no task: not on a task branch');
+  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+  if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+  if (commit === null) return skip('no commit touches a path outside agent-team/');
+  if (handoff.toLowerCase().includes(short)) return { result: 'PASS', reason: 'Handoff names ' + short, commit, subject };
+  return { result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (' + subject + ')', commit, subject };
+  return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+  if (outcome.result === 'SKIP') return { lines: ['SKIP handoff check (' + outcome.reason + ')'], code: 0 };
+  if (outcome.result === 'PASS') return { lines: ['PASS ' + TITLE], code: 0 };
+  return { lines: ['FAIL ' + TITLE, outcome.reason], code: 1 };
+the same 15 lines in base and head, unchanged: yes
+git diff of the module between base and head touches only the FORCED_ENV line: yes
