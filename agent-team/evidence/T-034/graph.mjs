@@ -18,7 +18,8 @@ const out = [];
 
 const short = (hash) => hash.slice(0, 7);
 const brief = (handoff) => ['# T-900 fixture', 'Status: IN REVIEW', '', '## Handoff', handoff, '', '## Review', '(reviewer fills in)', ''].join('\n');
-const gitNames = () => Object.keys(process.env).filter((key) => key.toUpperCase().startsWith('GIT_'));
+const moduleText = () => (REF === 'worktree' ? readFileSync(join(ROOT, MODULE), 'utf8') : execFileSync('git', ['show', REF + ':' + MODULE], { cwd: ROOT, encoding: 'utf8', windowsHide: true }));
+const gitNames =() => Object.keys(process.env).filter((key) => key.toUpperCase().startsWith('GIT_'));
 
 function place(dir, file, text) {
   mkdirSync(dirname(join(dir, file)), { recursive: true });
@@ -50,7 +51,7 @@ function forge(file, commit, parent) {
 
 async function loadModule(scratch) {
   const dir = join(scratch, 'module');
-  place(dir, MODULE, execFileSync('git', ['show', REF + ':' + MODULE], { cwd: ROOT, encoding: 'utf8', windowsHide: true }));
+  place(dir, MODULE, moduleText());
   return import(pathToFileURL(join(dir, MODULE)).href);
 }
 
@@ -252,8 +253,8 @@ const START_NAMES = gitNames();
 async function main() {
   if (!REF || !['graph', 'switch', 'alternates'].includes(PART)) throw new Error('use <ref> graph|switch|alternates');
   const scratch = mkdtempSync(join(tmpdir(), 'handoff-t034-graph-'));
-  const commit = execFileSync('git', ['rev-parse', '--short', REF], { cwd: ROOT, encoding: 'utf8', windowsHide: true }).trim();
-  const safe = execFileSync('git', ['show', REF + ':' + MODULE], { cwd: ROOT, encoding: 'utf8', windowsHide: true }).split('\n').find((row) => row.startsWith('const SAFE'));
+  const commit = REF === 'worktree' ? 'the files of the folder the script runs from' : execFileSync('git', ['rev-parse', '--short', REF], { cwd: ROOT, encoding: 'utf8', windowsHide: true }).trim();
+  const safe = moduleText().split('\n').find((row) => row.startsWith('const SAFE'));
   try {
     const mod = await loadModule(scratch);
     out.push('module ' + MODULE + ' at ' + commit + ': ' + safe);
