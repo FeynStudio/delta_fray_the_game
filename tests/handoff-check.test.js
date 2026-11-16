@@ -16,6 +16,7 @@ const PLACEHOLDER = '(owner fills in)';
 const STALE = '- Latest code commit: 0000000.';
 const TITLE = 'handoff names the latest code commit';
 const NO_GRAFTS = join(ROOT, 'scripts', 'handoff-check.mjs', 'none');
+const FORCED = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0', GIT_TEST_ASSUME_DIFFERENT_OWNER: '0', GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE: '0' };
 const NO_TASK = { result: 'SKIP', reason: 'no task: not on a task branch', commit: null, subject: null };
 
 const brief = ({ status = 'IN REVIEW', context = 'None.', handoff = PLACEHOLDER, eol = '\n' } = {}) => [
@@ -449,6 +450,21 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
     });
   });
+
+  test('fails a stale Handoff and names the latest code commit when GIT_TEST_ASSUME_DIFFERENT_OWNER or GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE is 1', async () => {
+    await withCode(async (repo, code) => {
+      await repo.commit('Handoff', { [BRIEF]: brief({ handoff: names(code) }) });
+      const later = await repo.commit('Fix the wall bounce', { 'src/game.js': 'export const a = 2;\n' });
+      for (const [key, args] of [['GIT_TEST_ASSUME_DIFFERENT_OWNER', []], ['GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE', ['-c', 'core.commitGraph=false']]]) {
+        for (const name of process.platform === 'win32' ? [key, key.toLowerCase()] : [key]) {
+          repo.env[name] = '1';
+          await assert.rejects(repo.git(...args, 'rev-list', '--first-parent', '--parents', '-n', '200', 'HEAD'), Error, 'plain git does not fail under ' + name + '=1');
+          delete repo.env[name];
+          assert.deepEqual(withEnv(name, '1', () => check(repo)), failure(later, 'Fix the wall bounce'));
+        }
+      }
+    });
+  });
 });
 
 const caseVariants = (name) => [name, name.toLowerCase(), name.split('_').map((part) => part[0] + part.slice(1).toLowerCase()).join('_')];
@@ -463,28 +479,48 @@ for (const name of REMOVED_ENV.flatMap(caseVariants)) {
   });
 }
 
-for (const name of caseVariants('GIT_GRAFT_FILE')) {
+const TABLES = new Set();
+const caseTable = (key, run) => {
+  TABLES.add(key);
+  for (const name of caseVariants(key)) run(name);
+};
+
+caseTable('GIT_GRAFT_FILE', (name) => {
   test(`gitEnv sets ${name} to a file that cannot exist over any value`, () => {
-    for (const value of ['', 'grafts', '.git/info/grafts']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0' });
+    for (const value of ['', 'grafts', '.git/info/grafts']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', ...FORCED });
     assert.equal(existsSync(NO_GRAFTS), false);
+  });
+});
+
+for (const key of ['GIT_TEST_COMMIT_GRAPH', 'GIT_TEST_ASSUME_DIFFERENT_OWNER', 'GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE']) {
+  caseTable(key, (name) => {
+    test(`gitEnv sets ${name} to 0 over any value`, () => {
+      for (const value of ['1', 'true', 'yes', '']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', ...FORCED });
+    });
   });
 }
 
-for (const name of caseVariants('GIT_TEST_COMMIT_GRAPH')) {
-  test(`gitEnv sets ${name} to 0 over any value`, () => {
-    for (const value of ['1', 'true', 'yes', '']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0' });
+for (const key of ['GIT_NO_LAZY_FETCH', 'GIT_NO_REPLACE_OBJECTS']) {
+  caseTable(key, (name) => {
+    test(`gitEnv sets ${name} to 1 over any value`, () => {
+      for (const value of ['0', 'false', '']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', ...FORCED });
+    });
   });
 }
+
+test('every name that gitEnv forces has a caseVariants table', () => {
+  assert.deepEqual([...TABLES].sort(), Object.keys(gitEnv({})).sort());
+});
 
 test('gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1', () => {
   const source = { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' };
-  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0' });
+  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', ...FORCED });
   assert.deepEqual(source, { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' });
-  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0' });
+  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', ...FORCED });
 });
 
 test('gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one', () => {
-  const forced = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS, GIT_TEST_COMMIT_GRAPH: '0' };
+  const forced = { ...FORCED };
   for (const source of [{ GIT_NO_REPLACE_OBJECTS: '0' }, { git_no_replace_objects: '0', Git_No_Lazy_Fetch: '0' }, { Git_No_Replace_Objects: 'false', git_no_lazy_fetch: '' }]) {
     assert.deepEqual(gitEnv({ Path: 'bin', ...source }), { Path: 'bin', ...forced });
   }

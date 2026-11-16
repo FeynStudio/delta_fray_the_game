@@ -37,4 +37,14 @@ guard "render-no-state-change" '(^|[^[:alnum:]_$])state\.[A-Za-z_.]+[[:space:]]*
 guard "no-magic-numbers" '(^|[^[:alnum:]_$])(1280|960|150|900)([^[:alnum:]_$]|$)' \
   src "Read tunable values from src/config.js" "config.js"
 node scripts/no-comments.mjs || FAIL=1
+fmt_sq="'([^'\\\\]|\\\\.)*'"
+fmt_dq='"([^"\\]|\\.)*"'
+fmt_tq='`([^`\\]|\\.)*'
+fmt_call='(^|[^[:alnum:]_$])(console\.(log|error|warn|info)|util\.format)[[:space:]]*\([[:space:]]*'
+fmt_bad="$fmt_call(\$|[^'\"\`)[:space:]]|($fmt_sq|$fmt_dq|$fmt_tq\`)[[:space:]]*([^,)[:space:]]|\$)|$fmt_tq(\\\$\\{|\$))"
+fmt_hits=$(grep -rnE --exclude-dir=node_modules --include='*.js' --include='*.mjs' -- "$fmt_bad" scripts tests sim src agent-team/evidence 2>/dev/null)
+if [ -n "$fmt_hits" ]; then
+  echo "GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it"
+  echo "$fmt_hits"; FAIL=1
+fi
 exit $FAIL
