@@ -1,5 +1,5 @@
 graph.mjs, platform win32, node v24.15.0, git version 2.56.0.windows.4
-module scripts/handoff-check.mjs at cd0f6c9: const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
+module scripts/handoff-check.mjs at d0f0ada: const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
 fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ only, HEAD). True latest code commit: C
 no graph:
   no GIT_TEST_COMMIT_GRAPH variable: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
