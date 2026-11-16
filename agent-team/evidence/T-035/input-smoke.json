@@ -1,0 +1,12 @@
+{
+  "starts on the power gauge": true,
+  "first Space locks distance": true,
+  "distance is 60% of max at a 60% reading": true,
+  "direction defaults to forward": true,
+  "second Space launches with no confirm step": true,
+  "direction locked at 30 forward": true,
+  "Shift ignored after direction is locked": true,
+  "Shift flips the direction gauge to backward": true,
+  "a real Space keypress locks distance": true,
+  "key repeat does not count as a second press": true
+}
