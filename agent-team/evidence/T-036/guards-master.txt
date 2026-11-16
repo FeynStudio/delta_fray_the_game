@@ -1,0 +1,26 @@
+proof.mjs guards-master, run from the worktree at 2e7c145, platform win32, node v24.15.0, git version 2.56.0.windows.4
+(a) scratch export of BASE c0f6d36 (no sim fix) with the proposed guards.sh: exit 1
+  GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it
+  sim/balance.mjs:77:  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
+(b) scratch copy of the task head with all four proposed files: exit 0, output ""
+(c) clean tree of the task head: BASE guards.sh exit 0 output ""; proposed guards.sh exit 0 output ""; same: yes
+(d) TODO in a new src/planted.js: BASE guards.sh exit 1, proposed exit 1, same output: yes
+  GUARD FAIL [no-hack-markers]: Fix it now or log it in agent-team/BACKLOG.md
+  src/planted.js:1:export const TODO = 1;
+(d) console.log('x') appended to src/game.js: BASE guards.sh exit 1, proposed exit 1, same output: yes
+  GUARD FAIL [no-debug-prints]: Use the project logger in src/log.js
+  src/game.js:67:console.log('x');
+(e) diff of BASE and proposed guards.sh: 10 added, 0 deleted lines
+  @@ -39,0 +40,10 @@ node scripts/no-comments.mjs || FAIL=1
+  +fmt_sq="'([^'\\\\]|\\\\.)*'"
+  +fmt_dq='"([^"\\]|\\.)*"'
+  +fmt_tq='`([^`\\]|\\.)*'
+  +fmt_call='(^|[^[:alnum:]_$])(console\.(log|error|warn|info)|util\.format)[[:space:]]*\([[:space:]]*'
+  +fmt_bad="$fmt_call(\$|[^'\"\`)[:space:]]|($fmt_sq|$fmt_dq|$fmt_tq\`)[[:space:]]*([^,)[:space:]]|\$)|$fmt_tq(\\\$\\{|\$))"
+  +fmt_hits=$(grep -rnE --exclude-dir=node_modules --include='*.js' --include='*.mjs' -- "$fmt_bad" scripts tests sim src agent-team/evidence 2>/dev/null)
+  +if [ -n "$fmt_hits" ]; then
+  +  echo "GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it"
+  +  echo "$fmt_hits"; FAIL=1
+  +fi
+scratch folder removed: yes
+process.env holds the same GIT_ names as at the start: yes
