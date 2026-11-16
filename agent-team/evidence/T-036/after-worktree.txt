@@ -1,0 +1,5 @@
+after run in the worktree at e2f5f68 (branch task/T-036-handoff-followups-guards); the real checker files are unchanged here, so this proves the branch itself
+git status --porcelain at the start: (empty)
+./scripts/verify.sh T-036 --feature config --label after: RESULT: PASS, exit 0, unit tests 266 (pass 266, fail 0, skipped 0: the real-repo Handoff test now runs and passes); log after-config.log
+./scripts/guards.sh: exit 0, no output
+node scripts/handoff-check.mjs: PASS handoff names the latest code commit (exit 0)
