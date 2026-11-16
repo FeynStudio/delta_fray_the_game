@@ -1,0 +1,51 @@
+T-028 Done-when 6: nothing else changed. Run on bd0f181 with the after evidence in the working tree (not yet committed).
+BASE = 9d71f79
+
+$ git diff --stat 9d71f79 -- src/ sim/ scripts/ index.html scenarios/ expected/ docs/ AGENTS.md agent-team/FEATURE_MAP.md   (prints nothing)
+exit 0
+
+$ git diff --name-status 9d71f79 -- tests/
+M	tests/game.test.js
+
+$ git status --short -- tests/ src/ scripts/ sim/   (prints nothing: no untracked or changed file there)
+
+$ git diff --name-status 9d71f79 -- . ':(exclude)agent-team/evidence/T-028' ':(exclude)agent-team/tasks/T-028.md'
+M	tests/game.test.js
+
+$ git diff --stat 9d71f79 -- .github .claude .gitattributes package.json package-lock.json agent-team/DECISIONS.md agent-team/BACKLOG.md agent-team/REPEATS.md agent-team/design   (prints nothing)
+
+$ git diff --numstat 9d71f79 -- tests/game.test.js
+23	1	tests/game.test.js
+
+$ ./scripts/guards.sh
+exit 0
+$ node scripts/no-comments.mjs
+exit 0
+$ node scripts/conflict-markers.mjs
+exit 0
+
+$ grep -nE '//|/\*' tests/game.test.js   (prints nothing: no comment in the test file)
+
+$ grep -nE 'console\.(warn|error|log|debug)' tests/game.test.js   (prints nothing: only console.info is replaced)
+$ grep -n 'console\.info' tests/game.test.js
+24:  const info = console.info;
+26:  console.info = (...args) => { calls.push(args); };
+30:    console.info = info;
+32:  startup = { calls, before: info, after: console.info };
+463:test('loading the game logs one start-up line through the project logger; console.info is put back after', () => {
+472:  assert.equal(startup.after, startup.before, 'console.info after the import is the function from before it');
+473:  assert.equal(console.info, startup.before);
+
+$ ls -a | grep -c '^\.gitignore$'   (0: no .gitignore in the worktree)
+0
+$ git ls-files .gitignore   (prints nothing: none in the branch)
+
+one-off scripts in agent-team/evidence/T-028/ (.js, .mjs, .sh, .html): 0
+
+main checkout, read only (C:/Projects/my_ai_agent_company/product-a):
+$ git -C ../../../product-a status --short
+?? .gitignore
+$ git -C ../../../product-a log --oneline -1
+c1da5e6 Record the decision to build T-018, T-026, T-028 and T-030
+$ git -C ../../../product-a branch --show-current
+master

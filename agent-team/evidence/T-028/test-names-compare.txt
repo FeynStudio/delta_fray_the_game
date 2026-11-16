@@ -1,0 +1,78 @@
+T-028 Done-when 3: unit-test count and test names, before (9d71f79) against after (bd0f181)
+
+before-config.log: ℹ tests 324
+after-config.log:  ℹ tests 325
+324 + 1 = 325
+
+name lists: reporter lines of each log with the time and the skip note cut off (before-test-names.txt, after-test-names.txt)
+$ wc -l < before-test-names.txt
+326
+$ wc -l < after-test-names.txt
+327
+
+$ diff before-test-names.txt after-test-names.txt   (exit status on the last line)
+76a77
+> ✔ loading the game logs one start-up line through the project logger; console.info is put back after
+exit 1
+
+names in before that are missing in after (sorted lists, comm -23):
+0
+names in after that are not in before (comm -13):
+✔ loading the game logs one start-up line through the project logger; console.info is put back after
+
+tests in tests/game.test.js: BASE 26 , after 27
+
+$ git diff --stat 9d71f79 bd0f181 -- tests/game.test.js
+ tests/game.test.js | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+$ git diff --numstat 9d71f79 bd0f181 -- tests/game.test.js
+23	1	tests/game.test.js
+
+$ git diff 9d71f79 bd0f181 -- tests/game.test.js
+diff --git a/tests/game.test.js b/tests/game.test.js
+index c5bb0aa..0c811aa 100644
+--- a/tests/game.test.js
++++ b/tests/game.test.js
+@@ -10,6 +10,7 @@ import { moveFromGauge } from '../src/input.js';
+ const listeners = {};
+ let game;
+ let loaded;
++let startup;
+ 
+ before(async () => {
+   const ctx = new Proxy({}, { get: () => () => {} });
+@@ -20,7 +21,15 @@ before(async () => {
+   };
+   globalThis.location = { search: '?debug=1' };
+   globalThis.requestAnimationFrame = () => 0;
+-  await import('../src/game.js');
++  const info = console.info;
++  const calls = [];
++  console.info = (...args) => { calls.push(args); };
++  try {
++    await import('../src/game.js');
++  } finally {
++    console.info = info;
++  }
++  startup = { calls, before: info, after: console.info };
+   game = window.__game;
+   loaded = game.getState();
+ });
+@@ -450,3 +459,16 @@ test("after player 1's first move only player 2's ship is still protected (blink
+   assert.equal(isSpawnProtected(s, 0), false, "player 1's ship moved: no longer protected");
+   assert.equal(isSpawnProtected(s, 1), true, "player 2's ship has not moved: still protected");
+ });
++
++test('loading the game logs one start-up line through the project logger; console.info is put back after', () => {
++  assert.equal(startup.calls.length, 1);
++  const args = startup.calls[0];
++  assert.equal(args.length, 3);
++  assert.equal(args[0], '[game]');
++  assert.equal(args[1], 'game started');
++  assert.equal(typeof args[2], 'object');
++  assert.ok(Array.isArray(args[2].ships), 'third argument has a ships array');
++  assert.equal(args[2].ships.length, 2);
++  assert.equal(startup.after, startup.before, 'console.info after the import is the function from before it');
++  assert.equal(console.info, startup.before);
++});

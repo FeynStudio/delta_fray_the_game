@@ -1,0 +1,49 @@
+T-028 extra control for the brief's coordinator choice 'put back right after the import (also if the import throws)', on bd0f181
+scratch changes in tests/game.test.js only, never committed, reverted with git restore; src/ is not touched
+A: the document stub is replaced by an empty object, so the import of src/game.js throws; a probe prints at process exit whether console.info is the function it was when the test file was loaded
+
+$ git diff -- tests/game.test.js
+diff --git a/tests/game.test.js b/tests/game.test.js
+index 0c811aa..31fac3f 100644
+--- a/tests/game.test.js
++++ b/tests/game.test.js
+@@ -11,10 +11,13 @@ const listeners = {};
+ let game;
+ let loaded;
+ let startup;
++const probe = console.info;
++process.on('exit', () => { process.stdout.write(`probe at exit: console.info is the function from before the hook: ${console.info === probe}
++`); });
+ 
+ before(async () => {
+   const ctx = new Proxy({}, { get: () => () => {} });
+-  globalThis.document = { getElementById: () => ({ style: {}, getContext: () => ctx }) };
++  globalThis.document = {};
+   globalThis.window = {
+     innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1,
+     addEventListener: (type, fn) => { listeners[type] = fn; },
+
+$ node tests/game.test.js 2>&1 | grep -E 'probe at exit|getElementById|^# (tests|pass|fail)|^ℹ (tests|pass|fail)'
+     27   TypeError: document.getElementById is not a function
+      1 probe at exit: console.info is the function from before the hook: true
+      1 ℹ fail 27
+      1 ℹ pass 0
+      1 ℹ tests 27
+
+B: the same scratch changes, and the line console.info = info; removed from the finally block as well (so the probe is shown to tell the two cases apart)
+
+$ git diff -- tests/game.test.js | grep -E '^[-+] '   (only changed lines that start with a space after the sign; the two probe lines are there as in A)
+-  globalThis.document = { getElementById: () => ({ style: {}, getContext: () => ctx }) };
++  globalThis.document = {};
+-    console.info = info;
+
+$ node tests/game.test.js 2>&1 | grep -E 'probe at exit|getElementById|^# (tests|pass|fail)|^ℹ (tests|pass|fail)'
+     27   TypeError: document.getElementById is not a function
+      1 probe at exit: console.info is the function from before the hook: false
+      1 ℹ fail 27
+      1 ℹ pass 0
+      1 ℹ tests 27
+
+$ git restore tests/game.test.js
+$ git status --short -- src tests scripts   (prints nothing)
+$ git diff --stat bd0f181 -- src tests scripts   (prints nothing)

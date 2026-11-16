@@ -1,0 +1,122 @@
+T-028 Done-when 4: negative control on bd0f181, scratch change, never committed, reverted with git restore
+scratch change: the line log.info('game started', state); removed from src/game.js
+
+$ git status --short
+ M src/game.js
+?? agent-team/evidence/T-028/after-all.log
+?? agent-team/evidence/T-028/after-config.log
+?? agent-team/evidence/T-028/after-count.txt
+?? agent-team/evidence/T-028/after-test-names.txt
+?? agent-team/evidence/T-028/balance.json
+?? agent-team/evidence/T-028/hits.json
+?? agent-team/evidence/T-028/input-smoke-direction-backward.png
+?? agent-team/evidence/T-028/input-smoke-direction.png
+?? agent-team/evidence/T-028/input-smoke-power.png
+?? agent-team/evidence/T-028/input-smoke.json
+?? agent-team/evidence/T-028/input-smoke.png
+?? agent-team/evidence/T-028/movement.json
+?? agent-team/evidence/T-028/negative-1-no-startup-log.txt
+?? agent-team/evidence/T-028/render-smoke.json
+?? agent-team/evidence/T-028/render-smoke.png
+?? agent-team/evidence/T-028/test-names-compare.txt
+?? agent-team/evidence/T-028/turns-smoke-backward-end.png
+?? agent-team/evidence/T-028/turns-smoke-backward-mid.png
+?? agent-team/evidence/T-028/turns-smoke-explosion.png
+?? agent-team/evidence/T-028/turns-smoke.json
+?? agent-team/evidence/T-028/turns-smoke.png
+?? agent-team/evidence/T-028/turns.json
+
+$ git diff -- src/game.js
+diff --git a/src/game.js b/src/game.js
+index 7664664..d9aeadf 100644
+--- a/src/game.js
++++ b/src/game.js
+@@ -54,7 +54,6 @@ function loop(now) {
+ window.addEventListener('resize', fit);
+ fit();
+ requestAnimationFrame(loop);
+-log.info('game started', state);
+ 
+ if (new URLSearchParams(location.search).has('debug')) {
+   window.__game = {
+
+$ node --test tests/game.test.js
+✔ second Space flies ship 0 to the rules end point; gauge back to power, turn passes to 1 (2.7369ms)
+✔ with Shift the ship turns to the travel angle at launch, flies there and keeps that heading (1.2363ms)
+✔ after a backward move, on its next turn the dial sits at the new nose and a forward move follows it (0.9224ms)
+✔ halfway: still moving, Space and Shift change nothing, ship not yet at its end point (0.7402ms)
+✔ a large step never takes the ship past the applyMove end point (0.3064ms)
+✔ a real Space keydown launches the move like press(); key repeat is ignored (0.2735ms)
+✔ turns smoke scenario: enemy destroyed on the path respawns, attacker stays, turn 1 on power (0.2585ms)
+✔ the end point is the resolveMove result: the enemy stays drawn alive until the move ends (0.2132ms)
+✔ a move into the wall: the mover is back at its spawn point, alive, and the turn has passed (0.247ms)
+✔ a plain move passes the turn, and the next Space, Space moves the other ship (0.2549ms)
+✔ later steps never change the turn again: no turn timer and no second endTurn (0.2788ms)
+✔ double kill through the game: both respawn, the turn passes once, and the next mover is alive (0.2101ms)
+✔ explosion after a hit: one entry at the enemy where it was hit; turn and gauge as before T-007 (0.2382ms)
+✔ explosion after a wall death: centre moved so the whole triangle is inside the map (0.2618ms)
+✔ explosions after a double kill: two entries, enemy where hit, mover inside the map (0.2079ms)
+✔ no explosion after a plain move (0.1808ms)
+✔ an explosion is present at explosionMs - 1 and gone at explosionMs; turn, ships, gauge untouched (0.2671ms)
+✔ the next player can press Space while an explosion plays, and its move ends on time (0.2658ms)
+✔ score after a hit: unchanged during the animation, +1 for the mover in the step it ends (0.2192ms)
+✔ score after a wall death: unchanged during the animation, -2 for the mover when it ends (0.1884ms)
+✔ scores add up over several turns; turn and gauge behave as before (0.479ms)
+✔ a state loaded without scores starts from [0, 0] when a move ends (0.2342ms)
+✔ moving phase with no anim: step goes back to power, same player, ships unmoved; then plays on (0.3329ms)
+✔ the game starts with clock 0 and both ships spawn protected (0.4818ms)
+✔ step(ms) grows the clock by exactly ms, in every phase and across the end of a move (0.2894ms)
+✔ after player 1's first move only player 2's ship is still protected (blinks) (0.1379ms)
+✖ loading the game logs one start-up line through the project logger; console.info is put back after (0.6695ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 26
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 85.7314
+
+✖ failing tests:
+
+test at tests\game.test.js:463:1
+✖ loading the game logs one start-up line through the project logger; console.info is put back after (0.6695ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-028/tests/game.test.js:464:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exit 1
+
+$ ./scripts/verify.sh T-028 --feature config --label negative   (same scratch change; full log in negative-config.log)
+commit: bd0f181  branch: task/T-028-quiet-game-tests  2026-11-16T09:18:20Z
+dirty: yes
+PASS guards
+PASS lint
+FAIL unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: FAIL
+ℹ tests 325
+ℹ pass 323
+ℹ fail 1
+ℹ skipped 1
+failing tests in negative-config.log:
+81:✖ loading the game logs one start-up line through the project logger; console.info is put back after (1.4244ms)
+341:✖ failing tests:
+344:✖ loading the game logs one start-up line through the project logger; console.info is put back after (1.4244ms)
+
+$ git restore src/game.js
+$ git status --short -- src tests scripts   (prints nothing)
+$ git diff --stat bd0f181 -- src tests scripts   (prints nothing)

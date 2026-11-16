@@ -1,0 +1,78 @@
+T-028 Done-when 2: after, on the committed change
+commit: bd0f181db2e123bcaf4bfa2a45df97e77f9eeeda (short bd0f181), branch task/T-028-quiet-game-tests
+tree before the runs: clean (header line 2 of after-config.log: dirty: no; of after-all.log: dirty: no)
+command: ./scripts/verify.sh T-028 --feature config --label after
+last line of after-config.log: RESULT: PASS
+command: ./scripts/verify.sh T-028 --feature all --label after
+last line of after-all.log: RESULT: PASS
+
+$ grep -c '\[game\]' agent-team/evidence/T-028/after-config.log
+0
+$ wc -l < agent-team/evidence/T-028/after-config.log
+344
+
+$ grep -c '\[game\]' agent-team/evidence/T-028/after-all.log
+0
+$ wc -l < agent-team/evidence/T-028/after-all.log
+359
+
+before-config.log had 372 lines and 1 '[game]' line (before-count.txt). 372 - 29 (start-up line and printed state) + 1 (the new test) = 344.
+
+unit-test summary lines of after-config.log:
+ℹ tests 325
+ℹ suites 1
+ℹ pass 324
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+
+unit-test summary lines of after-all.log:
+ℹ tests 325
+ℹ suites 1
+ℹ pass 324
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+
+the one skipped test (Handoff not filled in yet at the time of these runs):
+180:﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo (37.6969ms) # handoff not filled in
+
+the new test in after-config.log:
+81:✔ loading the game logs one start-up line through the project logger; console.info is put back after (0.1697ms)
+
+lines of after-config.log that are not test-reporter lines:
+commit: bd0f181  branch: task/T-028-quiet-game-tests  2026-11-16T09:17:07Z
+dirty: no
+PASS guards
+PASS lint
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
+
+PASS, FAIL and RESULT lines of after-all.log:
+PASS guards
+PASS lint
+PASS unit tests
+PASS render browser runs
+PASS render browser output
+PASS input browser runs
+PASS input browser output
+PASS movement scenario runs
+PASS movement output
+PASS hits scenario runs
+PASS hits output
+PASS turns scenario runs
+PASS turns output
+PASS turns browser runs
+PASS turns browser output
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+PASS movesToFirstEncounter: median = 5 (target 3 to 35)
+PASS edgeDeathRate: mean = 0.0011892724212719927 (target - to 0.1)
+PASS balance sim
+RESULT: PASS
