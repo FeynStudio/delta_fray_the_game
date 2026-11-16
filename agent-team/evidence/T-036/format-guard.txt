@@ -1,0 +1,192 @@
+proof.mjs format-guard, run from the worktree at 2dd02b7, platform win32, node v24.15.0, git version 2.56.0.windows.4
+scratch copy of the task head with the four proposed files; guards.sh before planting: exit 0, output ""
+brief cases, one planted file at a time, .mjs and .js in each covered folder (src/deep/a shows any depth):
+ok    scripts/planted-format.mjs `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.js `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.js `console.log(v)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    scripts/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at scripts/planted-format.js:1, file removed: yes
+ok    tests/planted-format.mjs `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at tests/planted-format.mjs:1, file removed: yes
+ok    tests/planted-format.js `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    tests/planted-format.js `console.log(v)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    tests/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at tests/planted-format.js:1, file removed: yes
+ok    sim/planted-format.mjs `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at sim/planted-format.mjs:1, file removed: yes
+ok    sim/planted-format.js `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    sim/planted-format.js `console.log(v)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    sim/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at sim/planted-format.js:1, file removed: yes
+ok    src/planted-format.mjs `console.log('x')` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.log("a %s", v)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.error(`plain`)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/planted-format.mjs `console.info( 'x', a + b )` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.log()` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at src/planted-format.mjs:1, file removed: yes
+ok    src/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at src/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log('x')` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log("a %s", v)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.error(`plain`)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/planted-format.js `console.info( 'x', a + b )` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log()` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log(v)` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at src/planted-format.js:1, file removed: yes
+ok    src/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at src/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.mjs:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log('x')` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log("a %s", v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.error(`plain`)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.info( 'x', a + b )` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log()` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log(v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    agent-team/evidence/T-999/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at agent-team/evidence/T-999/planted-format.js:1, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log('x')` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log("a %s", v)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.error(`plain`)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.info( 'x', a + b )` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log()` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log(v)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log(v, w)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.warn('a' + v)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.error(`a ${v}`)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `util.format(fmt, v)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.info(obj.msg)` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.mjs `console.log(\n  'x'\n);` -> exit 1, format guard HIT at src/deep/a/planted-format.mjs:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log('x')` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log("a %s", v)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.error(`plain`)` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `util.format('%s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/deep/a/planted-format.js `console.info( 'x', a + b )` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log()` -> exit 1, format guard no hit, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log(v)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log(v, w)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.warn('a' + v)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.error(`a ${v}`)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `util.format(fmt, v)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, file removed: yes
+ok    src/deep/a/planted-format.js `console.info(obj.msg)` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+ok    src/deep/a/planted-format.js `console.log(\n  'x'\n);` -> exit 1, format guard HIT at src/deep/a/planted-format.js:1, no-debug-prints fires too, file removed: yes
+owner extras in scripts/ (.mjs): stricter cases the rule makes hits, and lines that must pass
+ok    scripts/planted-format.mjs `console.log('a'\n  + v);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log(`a\n${v}`);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log('a'.concat(v));` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `globalThis.console.log(v);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log('a' ? v : w);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log(1);` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log(('a' + v));` -> exit 1, format guard HIT at scripts/planted-format.mjs:1, file removed: yes
+ok    scripts/planted-format.mjs `console.log('%s', `a ${v}`)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log ('x', v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log('it\'s %s', v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console.log("say \"%s\"", v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `myconsole.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/planted-format.mjs `console[method]('[game]', ...args)` -> exit 0, format guard no hit, file removed: yes
+places that are not checked: the same hit text gives no format-guard line
+ok    docs/x.mjs `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    docs/x.mjs `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/tasks/x.mjs `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    agent-team/tasks/x.mjs `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+ok    node_modules/x/x.mjs `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    node_modules/x/x.mjs `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/node_modules/x/x.mjs `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    src/node_modules/x/x.mjs `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/x.cjs `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/x.cjs `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/x.ts `console.log(v)` -> exit 0, format guard no hit, file removed: yes
+ok    scripts/x.ts `util.format(fmt, v)` -> exit 0, format guard no hit, file removed: yes
+cases: 181, as expected: 181, wrong: 0
+guards.sh after all cases: exit 0; scratch is not a git repo (git status exit 128), so removal is checked per file above
+scratch folder removed: yes
+process.env holds the same GIT_ names as at the start: yes
+
+Notes: in src/ the existing no-debug-prints guard fires too for console.* (expected, as on BASE); util.format in src/ is not a debug print, so those PASS cases exit 0 there. scripts/x.cjs and scripts/x.ts are listed under 'not checked' to show a known limit (other file types), not a place the brief requires.
