@@ -1,0 +1,12 @@
+BASE: 80424688605a91b583c6c643c72881ed2beb93b1 = master HEAD at build start (read with git rev-parse master in the main checkout, read only)
+BASE is 5459747 (T-032 merge) plus the brief-only commit; the two checker files are the same in both: yes
+$ git ls-files scripts/handoff-check.mjs tests/handoff-check.test.js   (worktree at BASE)
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ grep -n "handoff-check" .claude/settings.json
+(prints nothing, exit 1)
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+OS: Windows 11 (Git Bash MINGW64_NT-10.0-26300)

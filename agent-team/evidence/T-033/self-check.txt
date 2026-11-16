@@ -1,0 +1,29 @@
+self-check on caaab1f (latest code commit 4c329b2), BASE 8042468
+$ grep -n "GIT_GRAFT_FILE" scripts/handoff-check.mjs
+22:const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none') };
+$ grep -n "SHALLOW" scripts/handoff-check.mjs
+(exit 1, prints nothing)
+$ grep -n "startsWith('GIT_')" tests/handoff-check.test.js
+27:  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_')));
+$ git diff 8042468 -- scripts/handoff-check.mjs
+diff --git a/scripts/handoff-check.mjs b/scripts/handoff-check.mjs
+index fe51e46..f5fcd15 100644
+--- a/scripts/handoff-check.mjs
++++ b/scripts/handoff-check.mjs
+@@ -19,7 +19,7 @@ const PLACEHOLDER = '(owner fills in)';
+ const TITLE = 'handoff names the latest code commit';
+ const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+ const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
+-const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' };
++const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none') };
+ const SAFE = ['-c', 'core.fsmonitor=false'];
+ const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE + '*'];
+ const DIFFERS = 1;
+$ git diff -U0 8042468 -- scripts/handoff-check.mjs | grep -E "CODE_PATHS|latestCodeCommit|touchesCode|rev-list|function clean|LAST_C0|FIRST_C1|LAST_C1"
+(exit 1, prints nothing: CODE_PATHS, the walk, clean, LAST_C0, FIRST_C1 and LAST_C1 are unchanged)
+$ node scripts/no-comments.mjs
+(exit 0)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' scripts/handoff-check.mjs tests/handoff-check.test.js
+(exit 1, prints nothing)
+$ the same on agent-team/evidence/T-033/*.mjs
+(exit 1, prints nothing)

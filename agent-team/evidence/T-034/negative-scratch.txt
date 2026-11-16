@@ -1,0 +1,25 @@
+all outputs of this file come from one batch run from the worktree at be2c73f, git status --porcelain empty at the start: yes (agent-team/evidence/T-034/*.mjs as committed in be2c73f)
+controls.mjs, platform win32, node v24.15.0, worktree at be2c73f, git status --porcelain empty at the start: yes
+scratch copy of the worktree (without .git, node_modules, .env files and secrets folders), nothing changed: exit 0, tests 80, pass 79, fail 0, skipped 1 [as expected: yes]
+with '-c', 'core.commitGraph=false' removed from SAFE (scripts/handoff-check.mjs): exit 1, tests 80, pass 78, fail 1, skipped 1; failed tests (1): "ignores a forged commit-graph file or chain that hides the latest code commit"; failure messages: Expected values to be strictly deep-equal: [as expected: yes]
+  graph.mjs worktree graph on this scratch copy:
+    module scripts/handoff-check.mjs at the files of the folder the script runs from: const SAFE = ['-c', 'core.fsmonitor=false'];
+    no graph: plain git parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+    case (i) single file .git/objects/info/commit-graph, D's first-parent index set to H, SHA-1 trailer recomputed:
+    checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+    case (ii) split chain .git/objects/info/commit-graphs/ (commit-graph-chain lists 1 layer, base graphs in the layer: 0), the layer's D first-parent index set to H, trailer recomputed, layer renamed to graph-<new trailer>.graph and the chain file updated (name changed: yes):
+    checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+with SAFE value set to core.commitGraph=true (scripts/handoff-check.mjs): exit 1, tests 80, pass 78, fail 1, skipped 1; failed tests (1): "ignores a forged commit-graph file or chain that hides the latest code commit"; failure messages: Expected values to be strictly deep-equal: [as expected: yes]
+  graph.mjs worktree graph on this scratch copy:
+    module scripts/handoff-check.mjs at the files of the folder the script runs from: const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.commitGraph=true'];
+    no graph: plain git parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+    case (i) single file .git/objects/info/commit-graph, D's first-parent index set to H, SHA-1 trailer recomputed:
+    checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+    case (ii) split chain .git/objects/info/commit-graphs/ (commit-graph-chain lists 1 layer, base graphs in the layer: 0), the layer's D first-parent index set to H, trailer recomputed, layer renamed to graph-<new trailer>.graph and the chain file updated (name changed: yes):
+    checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+with the new test forges the single file with the true parent C (dead fixture for case (i)) (tests/handoff-check.test.js): exit 1, tests 80, pass 78, fail 1, skipped 1; failed tests (1): "ignores a forged commit-graph file or chain that hides the latest code commit"; failure messages: plain git does not follow the forged commit-graph file [as expected: yes]
+with the new test skips the forge step of the single file (tests/handoff-check.test.js): exit 1, tests 80, pass 78, fail 1, skipped 1; failed tests (1): "ignores a forged commit-graph file or chain that hides the latest code commit"; failure messages: plain git does not follow the forged commit-graph file [as expected: yes]
+with the new test forges the chain layer with the true parent C (dead fixture for case (ii)) (tests/handoff-check.test.js): exit 1, tests 80, pass 78, fail 1, skipped 1; failed tests (1): "ignores a forged commit-graph file or chain that hides the latest code commit"; failure messages: plain git does not follow the forged commit-graph chain [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all as expected: yes

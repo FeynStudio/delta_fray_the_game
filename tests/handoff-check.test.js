@@ -1,7 +1,8 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,7 @@ const BRIEF = 'agent-team/tasks/T-900.md';
 const PLACEHOLDER = '(owner fills in)';
 const STALE = '- Latest code commit: 0000000.';
 const TITLE = 'handoff names the latest code commit';
+const NO_GRAFTS = join(ROOT, 'scripts', 'handoff-check.mjs', 'none');
 const NO_TASK = { result: 'SKIP', reason: 'no task: not on a task branch', commit: null, subject: null };
 
 const brief = ({ status = 'IN REVIEW', context = 'None.', handoff = PLACEHOLDER, eol = '\n' } = {}) => [
@@ -23,7 +25,7 @@ const brief = ({ status = 'IN REVIEW', context = 'None.', handoff = PLACEHOLDER,
 async function inRepo(run) {
   const base = mkdtempSync(join(tmpdir(), 'handoff-check-'));
   const root = join(base, 'repo');
-  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_')));
   env.GIT_CONFIG_GLOBAL = join(base, 'gitconfig');
   env.GIT_CONFIG_NOSYSTEM = '1';
   const git = (...args) => new Promise((done, failed) => {
@@ -44,7 +46,7 @@ async function inRepo(run) {
     writeFileSync(env.GIT_CONFIG_GLOBAL, '');
     await git('init', '-q');
     await git('symbolic-ref', 'HEAD', 'refs/heads/' + BRANCH);
-    return await run({ root, git, write, commit });
+    return await run({ root, env, git, write, commit });
   } finally {
     rmSync(base, { recursive: true, force: true, maxRetries: 5 });
   }
@@ -66,6 +68,11 @@ const REMOVED_ENV = [
   'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX',
   'GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS',
 ];
+const failure = (commit, subject) => ({ result: 'FAIL', reason: 'Handoff does not name ' + commit.slice(0, 7) + '; latest code commit is ' + commit.slice(0, 7) + ' (' + subject + ')', commit, subject });
+const withEnv = (name, value, run, saved = process.env[name]) => {
+  process.env[name] = value;
+  try { return run(); } finally { if (saved === undefined) delete process.env[name]; else process.env[name] = saved; }
+};
 const signed = (text) => text.replace('\n\n', '\n' + SIGNATURE + '\n\n');
 const dated = (text) => text.split('\n').map((line) => (line.startsWith('committer ') ? LATE : line)).join('\n');
 
@@ -83,6 +90,17 @@ async function live(repo, ...args) {
   assert.equal(existsSync(marker), true, 'the fixture does not run its marker command');
   rmSync(marker);
   return marker;
+}
+
+function forge(file, commit, parent) {
+  const data = readFileSync(file);
+  const chunk = (id) => Number(data.readBigUInt64BE(data.indexOf(id, 8, 'latin1') + 4));
+  const oids = data.subarray(chunk('OIDL'), chunk('OIDL') + 20 * data.readUInt32BE(chunk('OIDF') + 1020));
+  const position = (hash) => oids.indexOf(Buffer.from(hash, 'hex')) / 20;
+  data.writeUInt32BE(position(parent), chunk('CDAT') + 36 * position(commit) + 20);
+  createHash('sha1').update(data.subarray(0, -20)).digest().copy(data, data.length - 20);
+  rmSync(file);
+  return data;
 }
 
 function withCode(run) {
@@ -272,6 +290,13 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
     });
   });
 
+  test('keeps U+007E and removes U+009F in the subject and the reason', async () => {
+    await inRepo(async (repo) => {
+      const code = await repo.commit('Fix' + String.fromCharCode(0x7e) + 'the' + String.fromCharCode(0x9f) + 'wall', { 'src/game.js': 'export const a = 1;\n', [BRIEF]: brief({ handoff: STALE }) });
+      assert.deepEqual(check(repo), failure(code, 'Fix' + String.fromCharCode(0x7e) + 'thewall'));
+    });
+  });
+
   test('does not run the upload-pack command of a promisor remote when an object is missing', async () => {
     await withCode(async (repo) => {
       repo.write(BRIEF, brief({ handoff: STALE }));
@@ -349,6 +374,14 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       await index('Remove the file named agent-team', '--force-remove');
       const gitlink = await index('Add a gitlink named agent-team', '--add', '--cacheinfo', '160000', removed);
       assert.equal(check(repo).commit, gitlink);
+      for (const name of ['Agent-Team/x', 'AGENT-TEAM/x']) {
+        await repo.git('update-index', '--add', '--cacheinfo', '100644', await repo.git('hash-object', '-w', BRIEF), name);
+        await repo.git(...WHO, 'commit', '-q', '-m', 'Add ' + name);
+        for (const ignoreCase of ['false', 'true']) {
+          await repo.git('config', 'core.ignorecase', ignoreCase);
+          assert.equal(check(repo).commit, await repo.git('rev-parse', 'HEAD'), name + ' with core.ignorecase ' + ignoreCase);
+        }
+      }
     });
   });
 
@@ -367,6 +400,49 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       });
     });
   });
+
+  test('ignores a graft in .git/info/grafts or in GIT_GRAFT_FILE that hides the latest code commit', async () => {
+    await withCode(async (repo, code) => {
+      const handoff = await repo.commit('Handoff', { [BRIEF]: brief({ handoff: names(code) }) });
+      await repo.commit('Change the game', { 'src/game.js': 'export const a = 2;\n' });
+      const revert = await repo.commit('Revert the change', { 'src/game.js': 'export const a = 1;\n' });
+      const graft = await repo.commit('Notes', { 'agent-team/notes.md': 'Notes.\n' }) + ' ' + handoff + '\n';
+      const file = join(repo.root, '..', 'grafts');
+      writeFileSync(file, graft);
+      for (const name of process.platform === 'win32' ? ['GIT_GRAFT_FILE', 'git_graft_file'] : ['GIT_GRAFT_FILE']) {
+        repo.env[name] = file;
+        assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow ' + name);
+        delete repo.env[name];
+        assert.deepEqual(withEnv(name, file, () => check(repo)), failure(revert, 'Revert the change'));
+      }
+      repo.write('.git/info/grafts', graft);
+      assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow .git/info/grafts');
+      assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
+    });
+  });
+
+  test('ignores a forged commit-graph file or chain that hides the latest code commit', async () => {
+    await withCode(async (repo, code) => {
+      const handoff = await repo.commit('Handoff', { [BRIEF]: brief({ handoff: names(code) }) });
+      await repo.commit('Change the game', { 'src/game.js': 'export const a = 2;\n' });
+      const revert = await repo.commit('Revert the change', { 'src/game.js': 'export const a = 1;\n' });
+      const notes = await repo.commit('Notes', { 'agent-team/notes.md': 'Notes.\n' });
+      const graph = join(repo.root, '.git', 'objects', 'info', 'commit-graph');
+      await repo.git('commit-graph', 'write', '--reachable');
+      writeFileSync(graph, forge(graph, notes, handoff));
+      assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph file');
+      assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
+      rmSync(graph);
+      await repo.git('commit-graph', 'write', '--reachable', '--split');
+      const layer = (name) => join(graph + 's', name ? 'graph-' + name + '.graph' : 'commit-graph-chain');
+      const data = forge(layer(readFileSync(layer(), 'utf8').trim()), notes, handoff);
+      writeFileSync(layer(data.toString('hex', data.length - 20)), data);
+      rmSync(layer());
+      writeFileSync(layer(), data.toString('hex', data.length - 20) + '\n');
+      assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph chain');
+      assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
+    });
+  });
 });
 
 const caseVariants = (name) => [name, name.toLowerCase(), name.split('_').map((part) => part[0] + part.slice(1).toLowerCase()).join('_')];
@@ -381,15 +457,22 @@ for (const name of REMOVED_ENV.flatMap(caseVariants)) {
   });
 }
 
+for (const name of caseVariants('GIT_GRAFT_FILE')) {
+  test(`gitEnv sets ${name} to a file that cannot exist over any value`, () => {
+    for (const value of ['', 'grafts', '.git/info/grafts']) assert.deepEqual(gitEnv({ PATH: 'bin', [name]: value }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS });
+    assert.equal(existsSync(NO_GRAFTS), false);
+  });
+}
+
 test('gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1', () => {
   const source = { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' };
-  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' });
+  assert.deepEqual(gitEnv(source), { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS });
   assert.deepEqual(source, { PATH: 'bin', GIT_CONFIG_GLOBAL: 'gitconfig', GIT_NO_LAZY_FETCH: '0' });
-  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' });
+  assert.deepEqual(gitEnv({ PATH: 'bin' }), { PATH: 'bin', GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS });
 });
 
 test('gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one', () => {
-  const forced = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1' };
+  const forced = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: NO_GRAFTS };
   for (const source of [{ GIT_NO_REPLACE_OBJECTS: '0' }, { git_no_replace_objects: '0', Git_No_Lazy_Fetch: '0' }, { Git_No_Replace_Objects: 'false', git_no_lazy_fetch: '' }]) {
     assert.deepEqual(gitEnv({ Path: 'bin', ...source }), { Path: 'bin', ...forced });
   }

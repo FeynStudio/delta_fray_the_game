@@ -1,0 +1,32 @@
+scope check on caaab1f, BASE 8042468
+$ git diff --stat 8042468 -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md agent-team/ROADMAP.md
+(prints nothing)
+$ git diff --name-only 8042468 -- scripts/ tests/
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git diff --name-only 8042468 -- agent-team/tasks/
+agent-team/tasks/T-033.md
+$ git diff --name-only 8042468 (tracked files of the branch; the new, still untracked evidence files of this round are not listed: names.mjs, self-check.txt, scope-check.txt, test-names-compare.txt, skip-reasons.txt, after-config.log, after-all.log and the after-all outputs)
+agent-team/FEATURE_MAP.md
+agent-team/evidence/T-033/after-gaps.txt
+agent-team/evidence/T-033/before-config.log
+agent-team/evidence/T-033/before-gaps.txt
+agent-team/evidence/T-033/before-mutations.txt
+agent-team/evidence/T-033/config.json
+agent-team/evidence/T-033/controls.mjs
+agent-team/evidence/T-033/gaps.mjs
+agent-team/evidence/T-033/negative-scratch.txt
+agent-team/evidence/T-033/precheck.txt
+agent-team/evidence/T-033/stop-config.log
+agent-team/evidence/T-033/time-options.mjs
+agent-team/evidence/T-033/time-options.txt
+agent-team/evidence/T-033/time.mjs
+agent-team/evidence/T-033/time.txt
+agent-team/tasks/T-033.md
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git ls-files .gitignore
+(prints nothing)
+git config --list --show-origin checksum before and after one run of node --test tests/handoff-check.test.js (exit 0): same (output not saved)
+handoff-*, handoff-t033-* folders left in the OS temp dir: none
+evidence files or brief holding the user name or the session temp path: (nothing listed = none)

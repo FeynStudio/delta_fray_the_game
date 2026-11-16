@@ -1,0 +1,15 @@
+all outputs of this file come from one batch run from the worktree at be2c73f, git status --porcelain empty at the start: yes (agent-team/evidence/T-034/*.mjs as committed in be2c73f); module taken from START 7b64dc5, identical to BASE 3cb76db
+graph.mjs graph, platform win32, node v24.15.0, git version 2.56.0.windows.4
+module scripts/handoff-check.mjs at 7b64dc5: const SAFE = ['-c', 'core.fsmonitor=false'];
+fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ only, HEAD). True latest code commit: C
+no graph: plain git parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+case (i) single file .git/objects/info/commit-graph, D's first-parent index set to H, SHA-1 trailer recomputed:
+  plain git parent of D = H (the Handoff commit) (live: yes); git -c core.commitGraph=false parent of D = C
+  plain git rev-list --first-parent HEAD = D, H (the Handoff commit), A
+  checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+case (ii) split chain .git/objects/info/commit-graphs/ (commit-graph-chain lists 1 layer, base graphs in the layer: 0), the layer's D first-parent index set to H, trailer recomputed, layer renamed to graph-<new trailer>.graph and the chain file updated (name changed: yes):
+  single-file graph present: no
+  plain git parent of D = H (the Handoff commit) (live: yes); git -c core.commitGraph=false parent of D = C
+  git commit-graph verify: reports the forgery, error (exit 1)
+  checkHandoff PASS naming A (reason: Handoff names <A>) = stale
+scratch folder removed: yes

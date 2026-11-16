@@ -1,0 +1,33 @@
+time-options.mjs, platform win32, node v24.15.0: the checker test file run from exports outside any repo, interleaved, three runs each. base = 8042468; head = 4c329b2; the other rows are scratch variants of the head test file, never committed: onlyAgentTeam = AGENT-TEAM/x left out of the same-rule loop; separateTest = the Agent-Team loop moved out of the same-rule test into its own test in the concurrent suite; withoutAgentTeamLoop, withoutGraftTest, withoutEdgeTest, withoutGraftRows = the head with that one addition removed. Same-rule test = the longest test of the concurrent suite.
+base run 1 tests 74 fail 0 file 9777 ms, same-rule test 8266 ms
+head run 1 tests 79 fail 0 file 11893 ms, same-rule test 10384 ms
+onlyAgentTeam run 1 tests 79 fail 0 file 11471 ms, same-rule test 9962 ms
+separateTest run 1 tests 80 fail 0 file 11745 ms, same-rule test 10232 ms
+withoutAgentTeamLoop run 1 tests 79 fail 0 file 11011 ms, same-rule test 9480 ms
+withoutGraftTest run 1 tests 78 fail 0 file 11426 ms, same-rule test 9907 ms
+withoutEdgeTest run 1 tests 78 fail 0 file 12130 ms, same-rule test 10613 ms
+withoutGraftRows run 1 tests 76 fail 0 file 11915 ms, same-rule test 10408 ms
+base run 2 tests 74 fail 0 file 10135 ms, same-rule test 8648 ms
+head run 2 tests 79 fail 0 file 12174 ms, same-rule test 10649 ms
+onlyAgentTeam run 2 tests 79 fail 0 file 11744 ms, same-rule test 10215 ms
+separateTest run 2 tests 80 fail 0 file 11722 ms, same-rule test 10228 ms
+withoutAgentTeamLoop run 2 tests 79 fail 0 file 10959 ms, same-rule test 9444 ms
+withoutGraftTest run 2 tests 78 fail 0 file 11480 ms, same-rule test 9966 ms
+withoutEdgeTest run 2 tests 78 fail 0 file 12106 ms, same-rule test 10600 ms
+withoutGraftRows run 2 tests 76 fail 0 file 12153 ms, same-rule test 10610 ms
+base run 3 tests 74 fail 0 file 10194 ms, same-rule test 8531 ms
+head run 3 tests 79 fail 0 file 12145 ms, same-rule test 10579 ms
+onlyAgentTeam run 3 tests 79 fail 0 file 11587 ms, same-rule test 10072 ms
+separateTest run 3 tests 80 fail 0 file 11842 ms, same-rule test 10299 ms
+withoutAgentTeamLoop run 3 tests 79 fail 0 file 11074 ms, same-rule test 9534 ms
+withoutGraftTest run 3 tests 78 fail 0 file 11571 ms, same-rule test 10045 ms
+withoutEdgeTest run 3 tests 78 fail 0 file 12071 ms, same-rule test 10561 ms
+withoutGraftRows run 3 tests 76 fail 0 file 12039 ms, same-rule test 10535 ms
+average base file 10035 ms (vs base 0 ms), same-rule test 8482 ms
+average head file 12071 ms (vs base 2036 ms), same-rule test 10537 ms
+average onlyAgentTeam file 11601 ms (vs base 1566 ms), same-rule test 10083 ms
+average separateTest file 11770 ms (vs base 1735 ms), same-rule test 10253 ms
+average withoutAgentTeamLoop file 11015 ms (vs base 980 ms), same-rule test 9486 ms
+average withoutGraftTest file 11492 ms (vs base 1457 ms), same-rule test 9973 ms
+average withoutEdgeTest file 12102 ms (vs base 2067 ms), same-rule test 10591 ms
+average withoutGraftRows file 12036 ms (vs base 2001 ms), same-rule test 10518 ms

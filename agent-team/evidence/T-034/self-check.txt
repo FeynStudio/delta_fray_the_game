@@ -1,0 +1,41 @@
+self-check by reading, worktree at be2c73f, code commit eee9833
+$ grep -n "commitGraph" scripts/handoff-check.mjs
+23:const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.commitGraph=false'];
+$ git diff 3cb76db -- scripts/handoff-check.mjs
+diff --git a/scripts/handoff-check.mjs b/scripts/handoff-check.mjs
+index f5fcd15..66ee081 100644
+--- a/scripts/handoff-check.mjs
++++ b/scripts/handoff-check.mjs
+@@ -20,7 +20,7 @@ const TITLE = 'handoff names the latest code commit';
+ const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+ const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
+ const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none') };
+-const SAFE = ['-c', 'core.fsmonitor=false'];
++const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.commitGraph=false'];
+ const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE + '*'];
+ const DIFFERS = 1;
+ const PAGE = 200;
+only the SAFE line changed; FORCED_ENV, gitEnv, CODE_PATHS, the walk (latestCodeCommit, touchesCode), clean, LAST_C0, FIRST_C1 and LAST_C1 are outside the hunk: yes (0 other changed lines)
+$ node scripts/no-comments.mjs
+(exit 0)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' scripts/handoff-check.mjs tests/handoff-check.test.js
+(prints nothing, exit 1)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' agent-team/evidence/T-034/*.mjs
+(prints nothing, exit 1)
+$ grep -nE 'nosemgrep|eslint-disable|@ts-' scripts/handoff-check.mjs tests/handoff-check.test.js agent-team/evidence/T-034/*.mjs   (no scanner directive)
+(prints nothing, exit 1)
+$ grep -n "from '" tests/handoff-check.test.js   (imports: node: built-ins and the module only)
+1:import { describe, test } from 'node:test';
+2:import assert from 'node:assert/strict';
+3:import { execFile } from 'node:child_process';
+4:import { createHash } from 'node:crypto';
+5:import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+6:import { tmpdir } from 'node:os';
+7:import { dirname, join, resolve } from 'node:path';
+8:import { fileURLToPath } from 'node:url';
+9:import { checkHandoff, currentBranch, gitEnv, report, taskFromBranch } from '../scripts/handoff-check.mjs';
+$ grep -n 'SAFE' tests/handoff-check.test.js   (no existing assertion lists SAFE)
+(prints nothing, exit 1)
+$ git diff 3cb76db -- tests/handoff-check.test.js | grep -E "^-[^-]"   (deleted lines of the test file)
+-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+the one deleted line is the node:fs import, replaced by the same import plus readFileSync; no assertion line of an existing test is deleted or changed
