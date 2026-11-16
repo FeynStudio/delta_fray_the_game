@@ -1,0 +1,18 @@
+scope-check.txt, run in the worktree at 42080ce
+$ git diff --stat 60bd3df -- scripts/ tests/ .github/ .claude/ src/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md agent-team/ROADMAP.md agent-team/FEATURE_MAP.md
+(end of output)
+
+$ git diff --stat 60bd3df -- . ':(exclude)agent-team/evidence/T-036' ':(exclude)agent-team/tasks/T-036.md'
+ sim/balance.mjs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ git ls-files .gitignore
+(end of output)
+
+process.env GIT_TEST_ names: every proof.mjs step ends with 'process.env holds the same GIT_ names as at the start: yes' (see each evidence file); the tests restore process.env through withEnv; in this shell: 0 GIT_TEST_ names set
+
+OS temp dir entries left by this task (prefixes t036- and handoff-check-):
+none
+
+user name or session temp path in the evidence and the brief:
+checked with node: the user name, the OS temp dir and the home dir (both slash forms) in 29 files (agent-team/evidence/T-036 and the brief): no hits

@@ -1,0 +1,7 @@
+size.txt: added and deleted lines from diff -u between each real file on START 60bd3df and its proposed version (limits from the brief)
+scripts/handoff-check.mjs: +1 -1 = 2 (limit 4): within
+tests/handoff-check.test.js: +44 -8 = 52 (limit 60): within
+scripts/guards.sh: +10 -0 = 10 (limit 40): within
+scripts/verify.sh: +4 -0 = 4 (limit 40): within
+survey fixes in non-protected files: sim/balance.mjs +1 -1 = 2 (limit 10 in total): within
+guards.sh deleted lines: 0 (added lines only, as required); verify.sh line 19 unchanged (see proposed.diff, it is a context line)

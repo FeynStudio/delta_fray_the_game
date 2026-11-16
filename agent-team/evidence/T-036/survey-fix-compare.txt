@@ -1,0 +1,36 @@
+survey-fix-compare: sim/balance.mjs line 77
+before: START 60bd3df exported with git archive into the OS temp dir, run there; after: the worktree with the fix, run from the worktree
+command each time: node sim/balance.mjs --games 2000 --out <tmp>/<side>.json > <tmp>/<side>.txt  (platform win32, node v24.15.0); outputs kept in the OS temp dir only
+before exit 0
+after exit 0
+8969a484c68c86cd2283d4a7229a401b60db35c173338c00267993579394dac1 *before.txt
+8969a484c68c86cd2283d4a7229a401b60db35c173338c00267993579394dac1 *after.txt
+d9f4aa3d1917ff71a6a4ee133826b617ebbbd0418c0f51ef91b15388279fbeff *before.json
+d9f4aa3d1917ff71a6a4ee133826b617ebbbd0418c0f51ef91b15388279fbeff *after.json
+123 before.txt
+123 after.txt
+338 before.json
+338 after.json
+922 total
+$ cmp before.txt after.txt
+stdout identical byte for byte (cmp exit 0)
+$ cmp before.json after.json
+--out JSON identical byte for byte (cmp exit 0)
+stdout of the run (same before and after):
+PASS movesToFirstEncounter: median = 5 (target 3 to 35)
+PASS edgeDeathRate: mean = 0.0011892724212719927 (target - to 0.1)
+
+$ git diff 60bd3df -- sim/balance.mjs
+diff --git a/sim/balance.mjs b/sim/balance.mjs
+index 01312c7..d2b9f4f 100644
+--- a/sim/balance.mjs
++++ b/sim/balance.mjs
+@@ -74,7 +74,7 @@ for (const [name, t] of Object.entries(targets)) {
+   const value = xs.length ? stats[t.stat](xs) : null;
+   const ok = value !== null && (t.min === undefined || value >= t.min) && (t.max === undefined || value <= t.max);
+   report[name] = { ...t, value, samples: xs.length, ok };
+-  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
++  console.log('%s', `${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
+   if (!ok) fail = true;
+ }
+ if (args.out) writeFileSync(args.out, JSON.stringify({ games, report }, null, 2));

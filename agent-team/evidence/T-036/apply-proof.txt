@@ -1,0 +1,42 @@
+proof.mjs apply, run from the worktree at 793f1af, platform win32, node v24.15.0, git version 2.56.0.windows.4
+throw-away git repo made from the task head (git archive HEAD), branch human-apply, the 100755 modes of HEAD set in its index: scripts/guards.sh, scripts/verify.sh
+$ cp agent-team/evidence/T-036/proposed/scripts/handoff-check.mjs scripts/handoff-check.mjs   -> exit 0
+$ cp agent-team/evidence/T-036/proposed/tests/handoff-check.test.js tests/handoff-check.test.js   -> exit 0
+$ cp agent-team/evidence/T-036/proposed/scripts/guards.sh scripts/guards.sh   -> exit 0
+$ cp agent-team/evidence/T-036/proposed/scripts/verify.sh scripts/verify.sh   -> exit 0
+$ git diff --stat   -> exit 0
+   scripts/guards.sh           | 10 +++++++++
+   scripts/handoff-check.mjs   |  2 +-
+   scripts/verify.sh           |  4 ++++
+   tests/handoff-check.test.js | 52 ++++++++++++++++++++++++++++++++++++++-------
+   4 files changed, 59 insertions(+), 9 deletions(-)
+$ git ls-files -s scripts/guards.sh scripts/verify.sh   -> exit 0
+  100755 9f41de23129d47ba9778f6f144c6a4848b469250 0	scripts/guards.sh
+  100755 cdcef1721b090107287e39fb99b3a95935a26b02 0	scripts/verify.sh
+$ ./scripts/verify.sh T-036-applied --feature all   -> exit 0
+  commit: d91460d  branch: human-apply  2026-11-16T08:00:22Z
+  dirty: yes
+  PASS guards
+  PASS lint
+  PASS unit tests
+  PASS render browser runs
+  PASS render browser output
+  PASS input browser runs
+  PASS input browser output
+  PASS movement scenario runs
+  PASS movement output
+  PASS hits scenario runs
+  PASS hits output
+  PASS turns scenario runs
+  PASS turns output
+  PASS turns browser runs
+  PASS turns browser output
+  PASS config: no magic numbers
+  PASS config: override honored
+  PASS config output
+  PASS balance sim
+  RESULT: PASS
+log line 2: dirty: yes
+$ ./scripts/guards.sh   -> exit 0, output ""
+scratch folder removed: yes
+process.env holds the same GIT_ names as at the start: yes

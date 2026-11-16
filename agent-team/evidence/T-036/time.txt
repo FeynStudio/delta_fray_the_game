@@ -1,0 +1,10 @@
+proof.mjs time, run from the worktree at ae035bb, platform win32, node v24.15.0, git version 2.56.0.windows.4
+base run 1: tests 83, pass 82, fail 0, skipped 1, 12757 ms
+proposed run 1: tests 97, pass 96, fail 0, skipped 1, 13579 ms
+base run 2: tests 83, pass 82, fail 0, skipped 1, 12884 ms
+proposed run 2: tests 97, pass 96, fail 0, skipped 1, 13749 ms
+base run 3: tests 83, pass 82, fail 0, skipped 1, 13309 ms
+proposed run 3: tests 97, pass 96, fail 0, skipped 1, 13909 ms
+average base 12983 ms, proposed 13746 ms, difference 763 ms (limit 1000 ms): within the limit
+scratch folder removed: yes
+process.env holds the same GIT_ names as at the start: yes

@@ -1,0 +1,24 @@
+proof.mjs semgrep, run from the worktree at 2e7c145, platform win32, node v24.15.0, git version 2.56.0.windows.4
+git diff -U0 5c90a51^ 5c90a51 -- agent-team/evidence/T-033/time-options.mjs (the line the CI semgrep rule flagged and its fix):
+  diff --git a/agent-team/evidence/T-033/time-options.mjs b/agent-team/evidence/T-033/time-options.mjs
+  index fbba6d8..c25edbb 100644
+  --- a/agent-team/evidence/T-033/time-options.mjs
+  +++ b/agent-team/evidence/T-033/time-options.mjs
+  @@ -51 +51 @@ try {
+  -      console.log(name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
+  +      console.log('%s', name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
+proposed guards.sh on the pre-fix file (5c90a51^): exit 1
+  GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it
+  agent-team/evidence/T-033/time-options.mjs:51:      console.log(name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
+proposed guards.sh on the fixed file (5c90a51 and later): exit 0, output ""
+scratch folder removed: yes
+process.env holds the same GIT_ names as at the start: yes
+
+Result: the proposed guard flags the pre-fix file at line 51, the line 5c90a51 changed (the CI semgrep unsafe-formatstring failure the brief names), and passes the fixed file.
+
+Stricter or looser than semgrep's unsafe-formatstring rule:
+- The rule's published text was NOT read: this session has no web-fetch tool and network code is not allowed, so the comparison below rests on what the CI run showed and on general knowledge of the rule, and is marked not verified where it goes beyond that.
+- Shown by this repo's history: semgrep flagged console.log(name, ...) with a non-literal first argument followed by more arguments (T-033 line 51); the guard flags it too. CI semgrep did not flag sim/balance.mjs:77, a single template literal holding ${...} as the only argument (brief, Context); the guard flags it. So the guard is stricter there, as the human's option text asks ("first argument isn't a fixed string").
+- Not verified (from general knowledge of the rule, not read): semgrep's rule is a taint-style check that looks for a non-literal format string combined with further arguments in console.* and util.format calls, and it understands JavaScript syntax, so it sees calls split over lines, aliases in the same function and computed members that a line-based grep cannot. Where it does, it is looser than nothing: the guard cannot see aliases (const p = console.log), console['log'], console .log, console?.log, format imported from node:util and called bare, or .cjs/.ts files; the guard flags a ( at the end of a line and a template literal that does not close on its line instead.
+- Stricter in the guard (shown in format-guard.txt): any first argument that is not a quoted or plain template literal followed by , or ), so console.log(v) with no further argument, console.log(1), console.log('a'.concat(v)), console.log('a' ? v : w) and console.log(('a' + v)) are hits.
+- semgrep itself was not run.

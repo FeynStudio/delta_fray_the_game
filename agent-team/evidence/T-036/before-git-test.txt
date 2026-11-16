@@ -1,0 +1,18 @@
+proof.mjs git-test-before, run from the worktree at ac1157c, platform win32, node v24.15.0, git version 2.56.0.windows.4
+module: scripts/handoff-check.mjs at START 60bd3df; const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
+fixture: stale Handoff; commit A 66bc944 (Add the game), Handoff names A, then code commit B f3c677a (Fix the wall bounce) is the true latest code commit; checkHandoff runs with an empty GIT_CONFIG_GLOBAL and GIT_CONFIG_NOSYSTEM=1, every other GIT_ name removed for the call and restored after it
+GIT_TEST_ASSUME_DIFFERENT_OWNER=1: plain git rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (not a git repo); report exit 0
+git_test_assume_different_owner=1: plain git rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (not a git repo); report exit 0
+Git_Test_Assume_Different_Owner=1: plain git rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (not a git repo); report exit 0
+GIT_TEST_ASSUME_DIFFERENT_OWNER=true: plain git rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (not a git repo); report exit 0
+GIT_TEST_ASSUME_DIFFERENT_OWNER=yes: plain git rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (not a git repo); report exit 0
+GIT_TEST_ASSUME_DIFFERENT_OWNER=0: plain git rev-list --first-parent --parents -n 200 HEAD exit 0 (live: no); checkHandoff FAIL (Handoff does not name f3c677a; latest code commit is f3c677a (Fix the wall bounce)); report exit 1; names the true latest code commit B
+GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE=1: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (git history cannot be read); report exit 0
+git_test_commit_graph_die_on_parse=1: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (git history cannot be read); report exit 0
+Git_Test_Commit_Graph_Die_On_Parse=1: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (git history cannot be read); report exit 0
+GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE=true: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (git history cannot be read); report exit 0
+GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE=yes: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 128 (live: yes); checkHandoff SKIP (git history cannot be read); report exit 0
+GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE=0: plain git -c core.commitGraph=false rev-list --first-parent --parents -n 200 HEAD exit 0 (live: no); checkHandoff FAIL (Handoff does not name f3c677a; latest code commit is f3c677a (Fix the wall bounce)); report exit 1; names the true latest code commit B
+summary: variable set to 1/true/yes in 10 cases, live in 10, SKIP in 10, FAIL naming B in 0; value 0 in 2 cases, FAIL naming B in 2
+fixture folder removed: yes
+process.env holds the same GIT_ names as at the start: yes

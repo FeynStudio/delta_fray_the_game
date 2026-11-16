@@ -74,7 +74,7 @@ for (const [name, t] of Object.entries(targets)) {
   const value = xs.length ? stats[t.stat](xs) : null;
   const ok = value !== null && (t.min === undefined || value >= t.min) && (t.max === undefined || value <= t.max);
   report[name] = { ...t, value, samples: xs.length, ok };
-  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
+  console.log('%s', `${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
   if (!ok) fail = true;
 }
 if (args.out) writeFileSync(args.out, JSON.stringify({ games, report }, null, 2));
