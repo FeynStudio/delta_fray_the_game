@@ -1,7 +1,7 @@
-proof.mjs scratch-verify, run from the worktree at ead3bfa, platform win32, node v24.15.0, git version 2.56.0.windows.4
+proof.mjs scratch-verify, run from the worktree at ab5a05d, platform win32, node v24.15.0, git version 2.56.0.windows.4
 $ ./scripts/verify.sh T-036-scratch --feature config   (scratch copy of the task head with the four proposed files and the sim fix; not a git repo)
 exit 0
-  commit: none  branch: none  2026-11-16T07:32:39Z
+  commit: none  branch: none  2026-11-16T07:42:29Z
   dirty: unknown
   PASS guards
   PASS lint
@@ -10,7 +10,7 @@ exit 0
   PASS config: override honored
   PASS config output
   RESULT: PASS
-unit-test summary from the log: ℹ tests 280; ℹ suites 1; ℹ pass 279; ℹ fail 0; ℹ cancelled 0; ℹ skipped 1; ℹ todo 0; ℹ duration_ms 13090.1554
+unit-test summary from the log: ℹ tests 280; ℹ suites 1; ℹ pass 279; ℹ fail 0; ℹ cancelled 0; ℹ skipped 1; ℹ todo 0; ℹ duration_ms 13686.2363
 $ ./scripts/guards.sh -> exit 0, output ""
 $ node --test tests/handoff-check.test.js -> exit 0, tests 97, pass 96, fail 0, skipped 1
 $ node scripts/no-comments.mjs -> exit 0, output ""

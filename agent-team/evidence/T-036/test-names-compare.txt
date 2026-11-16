@@ -20,3 +20,4 @@ new names after (14), each passing: yes
   ok 0:gitEnv sets git_no_replace_objects to 1 over any value
   ok 0:gitEnv sets Git_No_Replace_Objects to 1 over any value
   ok 0:every name that gitEnv forces has a caseVariants table
+Name prefix: 0: is a top-level test, 1: a test inside the describe block 'checkHandoff on throw-away git repos' (TAP indent / 4). The describe block itself is one result line in both runs, so result lines = tests + 1.
