@@ -11,7 +11,7 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | task past ~400 changed lines with no recorded split decision | 1 | T-002 |
 | handoff text left stale after a later change or decision | 3 | T-002, T-006, T-009 |
 | build started without a recorded human go-ahead (latest tagged decision says don't build) | 1 | T-006 |
-| evidence log header commit does not match the code that ran (uncommitted change at run time) | 3 | T-008, T-009, T-017 |
+| evidence log header commit does not match the code that ran (uncommitted change at run time) | 4 | T-008, T-009, T-017, T-033 |
 | before evidence overwritten by the after run (verify.sh writes the same artifact file names for every label) | 1 | T-012 |
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 2 | T-014, T-009 |
 | owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 2 | T-013, T-029 |
