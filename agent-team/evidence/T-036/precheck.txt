@@ -1,0 +1,23 @@
+precheck for T-036, run in the worktree on branch task/T-036-handoff-followups-guards
+BASE: c0f6d36b07f571130fe7b6aee003220288148ccb
+START: 60bd3dfcd13bdcba85515169d07e27fabdcb6575
+
+$ git diff --stat c0f6d36 60bd3df
+ agent-team/BACKLOG.md     |  10 ++
+ agent-team/tasks/T-036.md | 380 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 390 insertions(+)
+
+$ grep -n "handoff-check" .claude/settings.json
+19:      "Edit(./scripts/handoff-check.mjs)", "Edit(./tests/handoff-check.test.js)"
+
+$ grep -n "GIT_TEST" scripts/handoff-check.mjs
+22:const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
+
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+
+before run on START, git status --porcelain at the start: (empty)
+./scripts/verify.sh T-036 --feature config --label before: RESULT: PASS, unit tests 266 (pass 265, fail 0, skipped 1: the real-repo Handoff test skips while the Handoff is the placeholder); log agent-team/evidence/T-036/before-config.log
+./scripts/guards.sh: exit 0, no output
