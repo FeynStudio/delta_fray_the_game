@@ -1,0 +1,16 @@
+T-035 time limit: which part costs the most (Stop rule, limit hit in time.txt)
+
+Method: scripts/handoff-check.mjs, tests/handoff-check.test.js and package.json exported with git show from BASE 5c90a51 and from the fix commit cd0f6c9 into two folders in the OS temp dir (outside any repo; the real-repo test skips in both), then `node --test --test-reporter=spec tests/handoff-check.test.js` three times each, interleaved, on Windows 11, node v24.15.0, git 2.56.0.windows.4. Folders removed with node fs.rmSync afterwards. Raw lines below (ms as printed by node:test).
+
+base run 1: ignores a graft ... 7629 ms; ignores a forged commit-graph file or chain ... 7436 ms; suite "checkHandoff on throw-away git repos" 11029 ms; file duration_ms 12348
+head run 1: ignores a graft ... 8369 ms; ignores a forged commit-graph file or chain ... 10590 ms; suite 12105 ms; file duration_ms 13420
+base run 2: ignores a graft ... 7948 ms; ignores a forged commit-graph file or chain ... 8858 ms; suite 11250 ms; file duration_ms 12590
+head run 2: ignores a graft ... 8324 ms; ignores a forged commit-graph file or chain ... 10928 ms; suite 12192 ms; file duration_ms 13501
+base run 3: ignores a graft ... 8507 ms; ignores a forged commit-graph file or chain ... 9329 ms; suite 11270 ms; file duration_ms 12585
+head run 3: ignores a graft ... 9132 ms; ignores a forged commit-graph file or chain ... 11191 ms; suite 12466 ms; file duration_ms 13769
+
+Averages: file base 12508 ms, head 13563 ms, difference 1055 ms. Suite base 11183 ms, head 12254 ms, difference 1071 ms. Commit-graph test base 8541 ms, head 10903 ms, difference 2362 ms (it runs concurrently with the other suite tests, so about 1.07 s of it shows in the file time).
+
+Where the time goes: the lines added inside the T-034 commit-graph test. On win32 they run 2 names (GIT_TEST_COMMIT_GRAPH, git_test_commit_graph) x 3 values (1, true, yes) = 6 cases, each one plain-git liveness call and one checkHandoff. checkHandoff runs git with execFileSync, so it blocks the event loop of the whole concurrent suite while it runs; its time adds to the file time almost one for one. The 3 new gitEnv table tests take under 1 ms each. On Linux the fixture loop runs 3 cases (upper case only), so the cost there is about half (not measured; no Linux run in this task).
+
+Second whole-file measurement (time.txt, time.mjs, tap reporter): base 12646 ms, head 13735 ms, difference 1089 ms. Both measurements are over the 1000 ms limit; neither was dropped.

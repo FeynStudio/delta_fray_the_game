@@ -1,0 +1,9 @@
+time.mjs, platform win32, node v24.15.0, base 5c90a51 and head d0f0ada, both exported with git show and run outside any repo (the real-repo test skips in both), interleaved
+base run 1: tests 80, pass 79, fail 0, skipped 1, 12141 ms
+head run 1: tests 83, pass 82, fail 0, skipped 1, 12589 ms
+base run 2: tests 80, pass 79, fail 0, skipped 1, 12640 ms
+head run 2: tests 83, pass 82, fail 0, skipped 1, 12939 ms
+base run 3: tests 80, pass 79, fail 0, skipped 1, 12800 ms
+head run 3: tests 83, pass 82, fail 0, skipped 1, 13185 ms
+average base 12527 ms, head 12904 ms, difference 377 ms (limit 1000 ms): within the limit
+scratch folder removed: yes

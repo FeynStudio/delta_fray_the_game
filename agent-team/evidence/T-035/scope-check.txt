@@ -1,0 +1,23 @@
+scope check at 4b3308e, START e021c79, BASE 5c90a51, latest code commit d0f0ada
+$ git diff --stat e021c79 -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md agent-team/ROADMAP.md
+(prints nothing)
+$ git diff --name-only e021c79 -- scripts/ tests/
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git diff --name-only e021c79 -- agent-team/tasks/
+agent-team/tasks/T-035.md
+$ git diff --name-only e021c79 -- agent-team/ ":(exclude)agent-team/evidence/T-035"
+agent-team/FEATURE_MAP.md
+agent-team/tasks/T-035.md
+$ git diff --numstat e021c79 -- agent-team/FEATURE_MAP.md   (the one line "Stale-handoff check (T-016)")
+1	1	agent-team/FEATURE_MAP.md
+@@ -85 +85 @@ Comman
+$ git diff --numstat 5c90a51 -- scripts/handoff-check.mjs tests/handoff-check.test.js   (size limit 30)
+1	1	scripts/handoff-check.mjs
+16	4	tests/handoff-check.test.js
+$ git ls-files .gitignore
+(prints nothing)
+git config --list --show-origin checksum before and after one run of node --test tests/handoff-check.test.js (exit 0): same (output not saved)
+GIT_TEST_ names in the calling shell's environment before and after that run: 0 and 0 (the test sets them only through withEnv and repo.env, both restored; the evidence scripts each print that process.env holds the same GIT_ names at the end)
+handoff-* folders left in the OS temp dir: none
+evidence files or brief holding the user name or the session temp path: (nothing listed = none)
