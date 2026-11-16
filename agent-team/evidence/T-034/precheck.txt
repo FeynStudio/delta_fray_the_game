@@ -1,0 +1,22 @@
+BASE: 3cb76db01879f0df3bbf5d0fe7321e8954fe34dc (head of the approved T-033 branch task/T-033-handoff-check-last-gaps)
+START: 7b64dc5ae1d79412c85dbfa7aebf9648d94ad432 (BASE plus the brief and BACKLOG commit; head of task/T-034-commit-graph at build start)
+$ git diff --stat 3cb76db 7b64dc5
+ agent-team/BACKLOG.md     |   7 ++-
+ agent-team/tasks/T-034.md | 129 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 135 insertions(+), 1 deletion(-)
+$ git ls-files scripts/handoff-check.mjs tests/handoff-check.test.js   (on START)
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ grep -n "handoff-check" .claude/settings.json   (read only)
+(prints nothing, exit 1)
+$ grep -n "commitGraph" scripts/handoff-check.mjs
+(prints nothing, exit 1)
+$ git diff 3cb76db 7b64dc5 -- scripts/handoff-check.mjs tests/handoff-check.test.js | wc -l   (checker files on START identical to BASE)
+0
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+OS: Windows 11 (MINGW64_NT-10.0-26300)
+Line numbers on START: SAFE at scripts/handoff-check.mjs:23, FORCED_ENV at :22, git() call at :51; graft test at tests/handoff-check.test.js:392; grep -n SAFE tests/handoff-check.test.js prints: 0 lines
+verify before (label before, feature config) on START 7b64dc5, git status --porcelain empty at the start: yes; RESULT: PASS; unit tests 262, pass 261, fail 0, skipped 1 (the real-repo test, Handoff still the placeholder)
