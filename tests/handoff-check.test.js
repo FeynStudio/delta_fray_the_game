@@ -1,7 +1,8 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -89,6 +90,17 @@ async function live(repo, ...args) {
   assert.equal(existsSync(marker), true, 'the fixture does not run its marker command');
   rmSync(marker);
   return marker;
+}
+
+function forge(file, commit, parent) {
+  const data = readFileSync(file);
+  const chunk = (id) => Number(data.readBigUInt64BE(data.indexOf(id, 8, 'latin1') + 4));
+  const oids = data.subarray(chunk('OIDL'), chunk('OIDL') + 20 * data.readUInt32BE(chunk('OIDF') + 1020));
+  const position = (hash) => oids.indexOf(Buffer.from(hash, 'hex')) / 20;
+  data.writeUInt32BE(position(parent), chunk('CDAT') + 36 * position(commit) + 20);
+  createHash('sha1').update(data.subarray(0, -20)).digest().copy(data, data.length - 20);
+  rmSync(file);
+  return data;
 }
 
 function withCode(run) {
@@ -405,6 +417,29 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       }
       repo.write('.git/info/grafts', graft);
       assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow .git/info/grafts');
+      assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
+    });
+  });
+
+  test('ignores a forged commit-graph file or chain that hides the latest code commit', async () => {
+    await withCode(async (repo, code) => {
+      const handoff = await repo.commit('Handoff', { [BRIEF]: brief({ handoff: names(code) }) });
+      await repo.commit('Change the game', { 'src/game.js': 'export const a = 2;\n' });
+      const revert = await repo.commit('Revert the change', { 'src/game.js': 'export const a = 1;\n' });
+      const notes = await repo.commit('Notes', { 'agent-team/notes.md': 'Notes.\n' });
+      const graph = join(repo.root, '.git', 'objects', 'info', 'commit-graph');
+      await repo.git('commit-graph', 'write', '--reachable');
+      writeFileSync(graph, forge(graph, notes, handoff));
+      assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph file');
+      assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
+      rmSync(graph);
+      await repo.git('commit-graph', 'write', '--reachable', '--split');
+      const layer = (name) => join(graph + 's', name ? 'graph-' + name + '.graph' : 'commit-graph-chain');
+      const data = forge(layer(readFileSync(layer(), 'utf8').trim()), notes, handoff);
+      writeFileSync(layer(data.toString('hex', data.length - 20)), data);
+      rmSync(layer());
+      writeFileSync(layer(), data.toString('hex', data.length - 20) + '\n');
+      assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph chain');
       assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
     });
   });
