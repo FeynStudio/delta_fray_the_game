@@ -1,0 +1,117 @@
+T-026 Done-when 4: negative control on the committed change
+commit: c7ac78ee8c98ad6b81579db92614da7be2e51d13 (short c7ac78e), branch task/T-026-sim-syntax-check
+scratch change: the same stray closing bracket as in before-gap-scratch.txt (sim/balance.mjs line 70). Never committed; reverted with git restore sim/balance.mjs (end of this file).
+
+$ git diff -- sim/
+diff --git a/sim/balance.mjs b/sim/balance.mjs
+index d2b9f4f..9247bd4 100644
+--- a/sim/balance.mjs
++++ b/sim/balance.mjs
+@@ -67,6 +67,7 @@ for (let g = 1; g <= games; g++) {
+   }
+ }
+ 
++}
+ let fail = false;
+ const report = {};
+ for (const [name, t] of Object.entries(targets)) {
+
+$ node --test tests/syntax-check.test.js
+✖ every .js and .mjs file under sim/ passes node --check (58.5067ms)
+ℹ node --check ran on sim/balance.mjs
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (218.8764ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 348.3991
+
+✖ failing tests:
+
+test at tests\syntax-check.test.js:39:1
+✖ every .js and .mjs file under sim/ passes node --check (58.5067ms)
+  AssertionError [ERR_ASSERTION]: Fix the syntax error; node --check failed under sim/
+  sim/balance.mjs: C:\Projects\my_ai_agent_company\.worktrees\product-a\T-026\sim\balance.mjs:70
+  }
+  ^
+  
+  SyntaxError: Unexpected token '}'
+      at checkSyntax (node:internal/main/check_syntax:72:5)
+  
+  Node.js v24.15.0
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-026/tests/syntax-check.test.js:42:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exit status: 1
+
+$ ./scripts/verify.sh T-026 --feature config --label negative   (same scratch change; log: negative-config.log)
+1:commit: c7ac78e  branch: task/T-026-sim-syntax-check  2026-11-16T09:30:43Z
+2:dirty: yes
+3:PASS guards
+4:PASS lint
+372:FAIL unit tests
+373:PASS config: no magic numbers
+374:PASS config: override honored
+375:PASS config output
+376:RESULT: FAIL
+unit-test summary lines of negative-config.log:
+ℹ tests 327
+ℹ suites 1
+ℹ pass 325
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+lines of negative-config.log that name sim/balance.mjs:
+325:ℹ node --check ran on sim/balance.mjs
+349:  sim/balance.mjs: C:\Projects\my_ai_agent_company\.worktrees\product-a\T-026\sim\balance.mjs:70
+
+$ git restore sim/balance.mjs
+$ git status --short   (after the restore: only new evidence files)
+?? agent-team/evidence/T-026/after-all.log
+?? agent-team/evidence/T-026/after-config.log
+?? agent-team/evidence/T-026/after-syntax-check-test.txt
+?? agent-team/evidence/T-026/after-test-names.txt
+?? agent-team/evidence/T-026/balance.json
+?? agent-team/evidence/T-026/hits.json
+?? agent-team/evidence/T-026/input-smoke-direction-backward.png
+?? agent-team/evidence/T-026/input-smoke-direction.png
+?? agent-team/evidence/T-026/input-smoke-power.png
+?? agent-team/evidence/T-026/input-smoke.json
+?? agent-team/evidence/T-026/input-smoke.png
+?? agent-team/evidence/T-026/movement.json
+?? agent-team/evidence/T-026/negative-config.log
+?? agent-team/evidence/T-026/negative-syntax-check-test.txt
+?? agent-team/evidence/T-026/render-smoke.json
+?? agent-team/evidence/T-026/render-smoke.png
+?? agent-team/evidence/T-026/test-names-compare.txt
+?? agent-team/evidence/T-026/turns-smoke-backward-end.png
+?? agent-team/evidence/T-026/turns-smoke-backward-mid.png
+?? agent-team/evidence/T-026/turns-smoke-explosion.png
+?? agent-team/evidence/T-026/turns-smoke.json
+?? agent-team/evidence/T-026/turns-smoke.png
+?? agent-team/evidence/T-026/turns.json
+$ git diff --stat c7ac78e -- sim/ src/ tests/ scripts/   (prints nothing when clean)
+$ node --check sim/balance.mjs
+exit status: 0
+$ node --test tests/syntax-check.test.js   (after the restore; test lines only)
+✔ every .js and .mjs file under sim/ passes node --check (50.4594ms)
+ℹ node --check ran on sim/balance.mjs
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (210.7171ms)
+ℹ pass 2
+ℹ fail 0

@@ -1,0 +1,61 @@
+T-026 Done-when 6 (scope) and 5 (guards), on the committed change
+commit: c7ac78ee8c98ad6b81579db92614da7be2e51d13 (short c7ac78e), branch task/T-026-sim-syntax-check; BASE 0679cd2; code commit c7ac78e
+
+$ git diff --stat 0679cd2 -- scripts/ src/ sim/ index.html .github/ .claude/ scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md   (prints nothing)
+exit status: 0
+
+$ git diff --name-status 0679cd2 -- tests/
+A	tests/syntax-check.test.js
+
+$ git diff --name-status 0679cd2 -- . ":(exclude)agent-team/evidence/T-026"   (everything that differs from BASE outside this evidence folder, working tree included)
+M	agent-team/FEATURE_MAP.md
+A	tests/syntax-check.test.js
+
+$ git diff --stat 0679cd2 -- agent-team/FEATURE_MAP.md
+ agent-team/FEATURE_MAP.md | 1 +
+ 1 file changed, 1 insertion(+)
+$ git diff 0679cd2 -- agent-team/FEATURE_MAP.md | grep -c "^+- "   (added list lines)
+1
+$ git diff 0679cd2 -- agent-team/FEATURE_MAP.md | grep -c "^-[^-]"   (removed lines)
+0
+
+$ git status --short -- . ":(exclude)agent-team"   (prints nothing: no uncommitted change outside agent-team/)
+
+$ grep -nE 'exec\(|execSync\(|shell:|eval\(|new Function|fetch\(|https?:' tests/syntax-check.test.js   (prints nothing)
+exit status: 1 (1 = no match)
+
+$ grep -nE 'import |execFileSync|process\.' tests/syntax-check.test.js   (every import, and every use of the child process and of process)
+1:import { test } from 'node:test';
+2:import assert from 'node:assert/strict';
+3:import { execFileSync } from 'node:child_process';
+4:import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+5:import { tmpdir } from 'node:os';
+6:import { dirname, extname, join, relative, resolve, sep } from 'node:path';
+7:import { fileURLToPath } from 'node:url';
+31:      execFileSync(process.execPath, ['--check', file], { encoding: 'utf8', stdio: ['ignore', 'ignore', 'pipe'], windowsHide: true });
+
+$ grep -ncE 'nosemgrep|eslint-disable|semgrep' tests/syntax-check.test.js   (scanner directives: count)
+0
+
+$ ./scripts/guards.sh
+exit status: 0
+$ node scripts/no-comments.mjs
+exit status: 0
+$ node scripts/conflict-markers.mjs
+exit status: 0
+
+$ ls -a | grep -c "^\.gitignore$"   (no .gitignore in the worktree)
+0
+$ git ls-files .gitignore | wc -l   (not tracked on the branch)
+0
+
+throw-away folders left in the OS temp dir (node -p os.tmpdir(), names starting with syntax-check-; count):
+0
+
+main checkout (read only, not touched by this task):
+$ git -C C:/Projects/my_ai_agent_company/product-a status --short
+?? .gitignore
+$ git -C C:/Projects/my_ai_agent_company/product-a log --oneline -1 master
+c1da5e6 Record the decision to build T-018, T-026, T-028 and T-030
+$ git -C C:/Projects/my_ai_agent_company/product-a branch --show-current
+master
