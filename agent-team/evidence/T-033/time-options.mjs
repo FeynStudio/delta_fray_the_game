@@ -48,7 +48,7 @@ try {
       const i = rows.findIndex((r) => r.trim().endsWith(' - ' + SAME));
       const same = Math.round(Number(rows.slice(i).find((r) => r.trim().startsWith('duration_ms:')).trim().split(' ')[1]));
       results[name].push({ total, same, fail, tests });
-      console.log(name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
+      console.log('%s', name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
     }
   }
   const avg = (l, k) => Math.round(l.reduce((a, b) => a + b[k], 0) / l.length);
