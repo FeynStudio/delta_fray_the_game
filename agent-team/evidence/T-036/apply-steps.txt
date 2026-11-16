@@ -1,0 +1,25 @@
+apply-steps.txt for T-036 (route A). For the human only; agents do not edit the four protected files.
+
+When: after both reviews approve. On a branch of your own, cut from the T-036 branch head (task/T-036-handoff-followups-guards) or from master after the T-036 branch is merged. That branch must hold the sim/balance.mjs fix of T-036, or the new format-string guard fails on sim/balance.mjs:77.
+
+In product-a (Git Bash):
+
+cp agent-team/evidence/T-036/proposed/scripts/handoff-check.mjs scripts/handoff-check.mjs
+cp agent-team/evidence/T-036/proposed/tests/handoff-check.test.js tests/handoff-check.test.js
+cp agent-team/evidence/T-036/proposed/scripts/guards.sh scripts/guards.sh
+cp agent-team/evidence/T-036/proposed/scripts/verify.sh scripts/verify.sh
+git diff --stat
+git ls-files -s scripts/guards.sh scripts/verify.sh
+./scripts/verify.sh T-036-applied --feature all
+./scripts/guards.sh
+
+What you should see:
+- git diff --stat lists exactly the four files: scripts/guards.sh, scripts/handoff-check.mjs, scripts/verify.sh, tests/handoff-check.test.js.
+- git ls-files -s still shows mode 100755 for both .sh files.
+- verify.sh prints RESULT: PASS and guards.sh exits 0 with no output.
+- agent-team/evidence/T-036-applied/run-all.log shows `dirty: yes` on line 2, because the copies are not committed yet. That is the live check of item 4.
+- Line endings: the proposed files are LF in the repo (.gitattributes sets eol=lf for .sh, .js and .mjs), so cp copies LF files and no conversion step is needed.
+
+Then commit the four files and open the pull request with the checks-change label: the CI step "Block changes to the checks" watches all four files.
+
+These steps were run by the owner in a throw-away git repo made from the task head (apply-proof.txt); see that file for what differed, if anything.

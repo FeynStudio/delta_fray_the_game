@@ -1,0 +1,22 @@
+all tests/*.test.js with the TAP reporter, outside any repo
+before (export of START 60bd3df): exit 0, tests 266, pass 265, fail 0, skipped 1, 267 result lines
+after (scratch copy with the proposed files): exit 0, tests 280, pass 279, fail 0, skipped 1, 281 result lines
+before names missing after: 0
+before names that do not pass after: 0
+skipped before: 0:the Handoff of the brief for the current task branch names the latest code commit in this repo
+skipped after: 0:the Handoff of the brief for the current task branch names the latest code commit in this repo
+new names after (14), each passing: yes
+  ok 1:fails a stale Handoff and names the latest code commit when GIT_TEST_ASSUME_DIFFERENT_OWNER or GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE is 1
+  ok 0:gitEnv sets GIT_TEST_ASSUME_DIFFERENT_OWNER to 0 over any value
+  ok 0:gitEnv sets git_test_assume_different_owner to 0 over any value
+  ok 0:gitEnv sets Git_Test_Assume_Different_Owner to 0 over any value
+  ok 0:gitEnv sets GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE to 0 over any value
+  ok 0:gitEnv sets git_test_commit_graph_die_on_parse to 0 over any value
+  ok 0:gitEnv sets Git_Test_Commit_Graph_Die_On_Parse to 0 over any value
+  ok 0:gitEnv sets GIT_NO_LAZY_FETCH to 1 over any value
+  ok 0:gitEnv sets git_no_lazy_fetch to 1 over any value
+  ok 0:gitEnv sets Git_No_Lazy_Fetch to 1 over any value
+  ok 0:gitEnv sets GIT_NO_REPLACE_OBJECTS to 1 over any value
+  ok 0:gitEnv sets git_no_replace_objects to 1 over any value
+  ok 0:gitEnv sets Git_No_Replace_Objects to 1 over any value
+  ok 0:every name that gitEnv forces has a caseVariants table

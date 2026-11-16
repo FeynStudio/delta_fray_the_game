@@ -140,7 +140,7 @@ async function gitTest(which) {
 const PASS_SNIPPETS = [C + ".log('x')", C + '.log("a %s", v)', C + '.error(`plain`)', U + ".format('%s', v)", C + ".info( 'x', a + b )", C + '.log()'];
 const HIT_SNIPPETS = [C + '.log(v)', C + '.log(v, w)', C + ".warn('a' + v)", C + '.error(`a ${v}`)', U + '.format(fmt, v)', C + '.info(obj.msg)', C + "(\n  'x'\n);".replace('(', '.log(')];
 const EXTRA_HIT = [C + ".log('a'\n  + v);", C + '.log(`a\n${v}`);', C + ".log('a'.concat(v));", 'globalThis.' + C + '.log(v);', C + ".log('a' ? v : w);", C + '.log(1);', C + ".log(('a' + v));"];
-const EXTRA_PASS = [C + " .log('x')".replace(' ', ''), C + ".log ('x', v)", C + ".log('it\\'s %s', v)", C + '.log("say \\"%s\\"", v)', 'my' + C + '.log(v)', C + "[method]('[game]', ...args)"];
+const EXTRA_PASS = [C + ".log('%s', `a ${v}`)",C + ".log ('x', v)", C + ".log('it\\'s %s', v)", C + '.log("say \\"%s\\"", v)', 'my' + C + '.log(v)', C + "[method]('[game]', ...args)"];
 const show = (snippet) => snippet.split('\n').join('\\n');
 
 function guardCase(dir, env, file, snippet, expectHit) {
@@ -508,7 +508,58 @@ function time() {
   say('scratch folder removed: ' + (existsSync(base) ? 'no' : 'yes'));
 }
 
+function apply() {
+  const base = mkdtempSync(join(tmpdir(), 't036-apply-'));
+  try {
+    const env = cleanEnv(base);
+    const dir = exportRef('HEAD', join(base, 'repo'));
+    const git = fixtureGit(dir, env);
+    git(['init', '-q']);
+    git(['symbolic-ref', 'HEAD', 'refs/heads/human-apply']);
+    git(['add', '-A']);
+    const executable = execFileSync('git', ['ls-tree', '-r', 'HEAD'], { cwd: ROOT, encoding: 'utf8', windowsHide: true }).split('\n').filter((row) => row.startsWith('100755 ')).map((row) => row.split('\t')[1]);
+    for (const file of executable) git(['update-index', '--chmod=+x', file]);
+    git([...WHO, 'commit', '-q', '-m', 'Task head']);
+    say('throw-away git repo made from the task head (git archive HEAD), branch human-apply, the 100755 modes of HEAD set in its index: ' + executable.join(', '));
+    for (const file of FILES) {
+      const r = run('cp', [PROPOSED + '/' + file, file], dir, env);
+      say('$ cp ' + PROPOSED + '/' + file + ' ' + file + '   -> exit ' + r.code + (r.out ? ', ' + r.out.trim() : ''));
+    }
+    for (const args of [['diff', '--stat'], ['ls-files', '-s', 'scripts/guards.sh', 'scripts/verify.sh']]) {
+      const r = git(args);
+      say('$ git ' + args.join(' ') + '   -> exit ' + r.code);
+      for (const line of r.out.trimEnd().split('\n')) say('  ' + line);
+    }
+    const v = run('bash', ['scripts/verify.sh', 'T-036-applied', '--feature', 'all'], dir, env);
+    say('$ ./scripts/verify.sh T-036-applied --feature all   -> exit ' + v.code);
+    for (const line of v.stdout.trimEnd().split('\n')) say('  ' + line);
+    const log = readFileSync(join(dir, 'agent-team/evidence/T-036-applied/run-all.log'), 'utf8').split('\n');
+    say('log line 2: ' + log[1]);
+    const g = run('bash', ['scripts/guards.sh'], dir, env);
+    say('$ ./scripts/guards.sh   -> exit ' + g.code + ', output ' + JSON.stringify(g.stdout));
+  } finally {
+    rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+  }
+  say('scratch folder removed: ' + (existsSync(base) ? 'no' : 'yes'));
+}
+
+const READER_PATTERN = "commit: |branch: |RESULT|\\$LOG|[-.]log[\"'`)]|-(config|all|render|input|movement|hits|turns|balance)\\.log|head -(n ?)?[0-9]|tail -(n ?)?[0-9]|sed -n|lines\\[[0-9]\\]|split\\([^)]*\\)\\[[0-9]\\]|readline";
+
+function headerReaders() {
+  const code = ['--include=*.js', '--include=*.mjs', '--include=*.cjs', '--include=*.sh', '--include=*.py', '--include=*.ps1'];
+  const scopes = [[['scripts', 'tests', 'sim', 'src', 'agent-team/evidence'], code], [['agent-team/evals', '.claude'], []]];
+  say('$ grep -rnE --exclude-dir=node_modules [--include=*.js *.mjs *.cjs *.sh *.py *.ps1 for code folders; every file in agent-team/evals and .claude] -e <pattern> <folders>');
+  say('pattern: ' + READER_PATTERN);
+  for (const [folders, includes] of scopes) {
+    const r = run('grep', ['-rnE', '--exclude-dir=node_modules', ...includes, '-e', READER_PATTERN, ...folders], ROOT, process.env);
+    say('folders ' + folders.join(' ') + (includes.length ? ' (code files)' : ' (all files)') + ': grep exit ' + r.code + ', ' + (r.stdout.trim() ? r.stdout.trim().split('\n').length : 0) + ' lines');
+    for (const line of r.stdout.trimEnd().split('\n').filter(Boolean)) say('  ' + (line.length > 220 ? line.slice(0, 220) + ' ...' : line));
+  }
+}
+
 const STEPS = {
+  apply,
+  'header-readers': headerReaders,
   'git-test-before': () => gitTest('before'),
   'git-test-after': () => gitTest('after'),
   'format-guard': formatGuard,
