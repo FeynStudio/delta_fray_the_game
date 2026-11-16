@@ -10,6 +10,7 @@ import { moveFromGauge } from '../src/input.js';
 const listeners = {};
 let game;
 let loaded;
+let startup;
 
 before(async () => {
   const ctx = new Proxy({}, { get: () => () => {} });
@@ -20,7 +21,15 @@ before(async () => {
   };
   globalThis.location = { search: '?debug=1' };
   globalThis.requestAnimationFrame = () => 0;
-  await import('../src/game.js');
+  const info = console.info;
+  const calls = [];
+  console.info = (...args) => { calls.push(args); };
+  try {
+    await import('../src/game.js');
+  } finally {
+    console.info = info;
+  }
+  startup = { calls, before: info, after: console.info };
   game = window.__game;
   loaded = game.getState();
 });
@@ -449,4 +458,17 @@ test("after player 1's first move only player 2's ship is still protected (blink
   assert.equal(s.turn, 1);
   assert.equal(isSpawnProtected(s, 0), false, "player 1's ship moved: no longer protected");
   assert.equal(isSpawnProtected(s, 1), true, "player 2's ship has not moved: still protected");
+});
+
+test('loading the game logs one start-up line through the project logger; console.info is put back after', () => {
+  assert.equal(startup.calls.length, 1);
+  const args = startup.calls[0];
+  assert.equal(args.length, 3);
+  assert.equal(args[0], '[game]');
+  assert.equal(args[1], 'game started');
+  assert.equal(typeof args[2], 'object');
+  assert.ok(Array.isArray(args[2].ships), 'third argument has a ships array');
+  assert.equal(args[2].ships.length, 2);
+  assert.equal(startup.after, startup.before, 'console.info after the import is the function from before it');
+  assert.equal(console.info, startup.before);
 });
