@@ -1,0 +1,84 @@
+names.mjs names, platform win32, node v24.15.0
+test names of tests/handoff-check.test.js, base 8042468 (75 entries) and head 4c329b2 (80 entries), both run from exports outside any repo, so the real-repo test skips in both
+before pass, head pass: taskFromBranch gives T-016 for the branch name 'task/T-016-stale-handoff-check'
+before pass, head pass: taskFromBranch gives T-1234 for the branch name 'task/T-1234-x'
+before pass, head pass: taskFromBranch gives T-016 for the branch name 'task/T-016'
+before pass, head pass: taskFromBranch gives null for the branch name 'master'
+before pass, head pass: taskFromBranch gives null for the branch name ''
+before pass, head pass: taskFromBranch gives null for the branch name 'fix/master-conflict-markers'
+before pass, head pass: taskFromBranch gives null for the branch name 'task/adhoc'
+before pass, head pass: taskFromBranch gives null for the branch name 'task/T-01-x'
+before pass, head pass: taskFromBranch gives null for the branch name 'task/T-016x'
+before pass, head pass: taskFromBranch gives null for the branch name 'T-016'
+before pass, head pass: taskFromBranch gives null for the branch name 'undefined'
+before pass, head pass: skips when the task has no brief
+before pass, head pass: skips while the Handoff is the placeholder
+before pass, head pass: skips a brief whose Status is DONE, and fails the same brief while it is IN REVIEW
+before pass, head pass: skips when there is no task, and fails the same repo for its own branch name
+before pass, head pass: skips a folder that is not a git repo
+before pass, head pass: passes when the Handoff names the code commit, here the root commit
+before pass, head pass: fails on a code commit made after the Handoff and names that commit and its subject
+before pass, head pass: passes when only agent-team commits follow the code commit
+before pass, head pass: fails on a merge commit that brings in code until the Handoff names the merge
+before pass, head pass: uses brief T-900 for the task T-900-review
+before pass, head pass: reads the brief from the working tree, so a saved but uncommitted Handoff counts
+before pass, head pass: looks for the hash in the Handoff section only
+before pass, head pass: skips a subfolder of a git repo
+before pass, head pass: skips a repo whose commits touch agent-team/ only
+before pass, head pass: skips a repo that has no commit yet
+before pass, head pass: removes control characters from the subject and the reason
+before pass, head pass: removes U+001F and DEL from the subject and the reason, and keeps the space and U+00A0
+before pass, head pass: does not run the upload-pack command of a promisor remote when an object is missing
+before pass, head pass: does not run the fsmonitor command of the repo
+before pass, head pass: does not run the gpg program of the repo for a signed commit and names that commit
+before pass, head pass: walks first parents only, so a merged side branch that adds and removes code is not the latest code commit
+before pass, head pass: counts a name that only starts like agent-team/, a nested agent-team folder and a deleted code file as code
+before pass, head pass: ignores a replace ref that hides the latest code commit
+before pass, head pass: checkHandoff on throw-away git repos
+before pass, head pass: gitEnv removes GIT_DIR from the environment given to git
+before pass, head pass: gitEnv removes git_dir from the environment given to git
+before pass, head pass: gitEnv removes Git_Dir from the environment given to git
+before pass, head pass: gitEnv removes GIT_WORK_TREE from the environment given to git
+before pass, head pass: gitEnv removes git_work_tree from the environment given to git
+before pass, head pass: gitEnv removes Git_Work_Tree from the environment given to git
+before pass, head pass: gitEnv removes GIT_INDEX_FILE from the environment given to git
+before pass, head pass: gitEnv removes git_index_file from the environment given to git
+before pass, head pass: gitEnv removes Git_Index_File from the environment given to git
+before pass, head pass: gitEnv removes GIT_OBJECT_DIRECTORY from the environment given to git
+before pass, head pass: gitEnv removes git_object_directory from the environment given to git
+before pass, head pass: gitEnv removes Git_Object_Directory from the environment given to git
+before pass, head pass: gitEnv removes GIT_COMMON_DIR from the environment given to git
+before pass, head pass: gitEnv removes git_common_dir from the environment given to git
+before pass, head pass: gitEnv removes Git_Common_Dir from the environment given to git
+before pass, head pass: gitEnv removes GIT_NAMESPACE from the environment given to git
+before pass, head pass: gitEnv removes git_namespace from the environment given to git
+before pass, head pass: gitEnv removes Git_Namespace from the environment given to git
+before pass, head pass: gitEnv removes GIT_PREFIX from the environment given to git
+before pass, head pass: gitEnv removes git_prefix from the environment given to git
+before pass, head pass: gitEnv removes Git_Prefix from the environment given to git
+before pass, head pass: gitEnv removes GIT_LITERAL_PATHSPECS from the environment given to git
+before pass, head pass: gitEnv removes git_literal_pathspecs from the environment given to git
+before pass, head pass: gitEnv removes Git_Literal_Pathspecs from the environment given to git
+before pass, head pass: gitEnv removes GIT_GLOB_PATHSPECS from the environment given to git
+before pass, head pass: gitEnv removes git_glob_pathspecs from the environment given to git
+before pass, head pass: gitEnv removes Git_Glob_Pathspecs from the environment given to git
+before pass, head pass: gitEnv removes GIT_NOGLOB_PATHSPECS from the environment given to git
+before pass, head pass: gitEnv removes git_noglob_pathspecs from the environment given to git
+before pass, head pass: gitEnv removes Git_Noglob_Pathspecs from the environment given to git
+before pass, head pass: gitEnv removes GIT_ICASE_PATHSPECS from the environment given to git
+before pass, head pass: gitEnv removes git_icase_pathspecs from the environment given to git
+before pass, head pass: gitEnv removes Git_Icase_Pathspecs from the environment given to git
+before pass, head pass: gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1
+before pass, head pass: gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one
+before pass, head pass: checkHandoff and currentBranch answer for the repo at root when a lower-case git_dir points at another repo
+before pass, head pass: checkHandoff and currentBranch answer for the repo at root when GIT_DIR and GIT_WORK_TREE point at another repo
+before pass, head pass: skips when git cannot be run
+before pass, head pass: report gives the result lines and the exit code
+before skipped, head skipped: the Handoff of the brief for the current task branch names the latest code commit in this repo
+new, head pass: keeps U+007E and removes U+009F in the subject and the reason
+new, head pass: ignores a graft in .git/info/grafts or in GIT_GRAFT_FILE that hides the latest code commit
+new, head pass: gitEnv sets GIT_GRAFT_FILE to a file that cannot exist over any value
+new, head pass: gitEnv sets git_graft_file to a file that cannot exist over any value
+new, head pass: gitEnv sets Git_Graft_File to a file that cannot exist over any value
+every base test name is still there and passes as before: yes
+scratch folder removed: yes

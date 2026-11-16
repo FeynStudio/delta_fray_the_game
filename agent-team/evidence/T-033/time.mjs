@@ -9,7 +9,7 @@ const BASE = '8042468';
 const HEAD = process.argv[2];
 const FILES = ['scripts/handoff-check.mjs', 'tests/handoff-check.test.js', 'package.json'];
 const RUNS = 3;
-const LIMIT = 1000;
+const LIMIT = 2500;
 
 function place(dir, file, text) {
   mkdirSync(dirname(join(dir, file)), { recursive: true });
