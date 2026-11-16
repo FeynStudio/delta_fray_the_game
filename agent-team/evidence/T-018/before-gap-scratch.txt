@@ -1,0 +1,9 @@
+diff --git a/agent-team/REPEATS.md b/agent-team/REPEATS.md
+index 0757f08..e39e1da 100644
+--- a/agent-team/REPEATS.md
++++ b/agent-team/REPEATS.md
+@@ -22,3 +22,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
+ | fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
+ | rewrite meant to keep a rule unchanged differs from the old rule on an edge the owner's differential cases did not cover (pathspec `agent-team/` matches a gitlink named agent-team) | 1 | T-032 |
+ | Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) | 1 | T-036 |
++<<<<<<< scratch-T-018-gap

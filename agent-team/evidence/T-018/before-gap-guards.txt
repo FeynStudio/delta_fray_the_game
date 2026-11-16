@@ -1,0 +1,3 @@
+== scratch change in place: one opening marker line appended to agent-team/REPEATS.md (see before-gap-scratch.txt), commit c1da5e6
+== ./scripts/guards.sh
+guards exit: 0
