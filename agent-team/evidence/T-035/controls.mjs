@@ -22,7 +22,7 @@ const FORCED_SET = [T_GRAPH, ...T_GRAFT_TABLE, ...T_TABLE, T_KEEPS, T_FORCED];
 const CONTROLS = [
   { name: 'the GIT_TEST_COMMIT_GRAPH: \'0\' entry removed from FORCED_ENV', file: MODULE, find: ENTRY, put: ' };', fails: FORCED_SET, graph: true },
   { name: 'the FORCED_ENV value set to \'1\'', file: MODULE, find: ENTRY, put: ', GIT_TEST_COMMIT_GRAPH: \'1\' };', fails: FORCED_SET, graph: true },
-  { name: 'the liveness step runs without the variable (repo.env[name] = value removed)', file: TESTS, find: '          repo.env[name] = value;\n', put: '', fails: [T_GRAPH], message: 'plain git does not follow the forged commit-graph under GIT_TEST_COMMIT_GRAPH=1' },
+  { name: 'the liveness step runs without the variable (repo.env[name] = \'1\' removed)', file: TESTS, find: '        repo.env[name] = \'1\';\n', put: '', fails: [T_GRAPH], message: 'plain git does not follow the forged commit-graph under GIT_TEST_COMMIT_GRAPH=1' },
 ];
 
 const out = [];
