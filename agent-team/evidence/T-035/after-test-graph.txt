@@ -1,0 +1,25 @@
+graph.mjs, platform win32, node v24.15.0, git version 2.56.0.windows.4
+module scripts/handoff-check.mjs at cd0f6c9: const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
+fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ only, HEAD). True latest code commit: C
+no graph:
+  no GIT_TEST_COMMIT_GRAPH variable: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+case (i) single file .git/objects/info/commit-graph, D's first-parent index set to H, SHA-1 trailer recomputed:
+  no GIT_TEST_COMMIT_GRAPH variable: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  GIT_TEST_COMMIT_GRAPH=1: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  GIT_TEST_COMMIT_GRAPH=true: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  GIT_TEST_COMMIT_GRAPH=yes: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  GIT_TEST_COMMIT_GRAPH=0: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  git_test_commit_graph=1: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  git_test_commit_graph=true: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  git_test_commit_graph=yes: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  git_test_commit_graph=0: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  Git_Test_Commit_Graph=1: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  Git_Test_Commit_Graph=true: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  Git_Test_Commit_Graph=yes: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  Git_Test_Commit_Graph=0: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+case (ii) split chain .git/objects/info/commit-graphs/, the layer's D first-parent index set to H, trailer recomputed, layer renamed and the chain file updated; no single-file graph:
+  no GIT_TEST_COMMIT_GRAPH variable: git -c core.commitGraph=false parent of D = C; checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+  GIT_TEST_COMMIT_GRAPH=1: git -c core.commitGraph=false parent of D = H (live: yes); checkHandoff FAIL naming C (reason: Handoff does not name <C>; latest code commit is <C> (Revert the change)) = names the true latest code commit C
+summary: 10 cases with the variable set to a true value; live for plain git in 10; checkHandoff stale PASS naming A in 0, FAIL naming C in 10, other in 0
+process.env holds the same GIT_ names as at the start: yes
+scratch folder removed: yes
