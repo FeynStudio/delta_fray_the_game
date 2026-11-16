@@ -46,3 +46,39 @@ guards.sh after (f): exit 0, output ""
 scratch folder removed: yes
 process.env holds the same GIT_ names as at the start: yes
 Note: in (f) for src/ the path is named twice, once by the existing no-debug-prints guard (fires in src/ as on BASE) and once by the new format-string-literal guard.
+
+(g) verify.sh dirty line made to always print no (echo "dirty: $DIRTY" replaced by echo "dirty: no" in the scratch copy only), the yes cases of Done-when 11 rerun:
+  proof.mjs dirty-always-no, run from the worktree at 8195e95, platform win32, node v24.15.0, git version 2.56.0.windows.4
+  WRONG tracked src/game.js changed, unstaged: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run:  M src/game.js
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG tracked src/game.js changed, staged: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: M  src/game.js
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG tracked docs/ARCHITECTURE.md deleted: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run:  D docs/ARCHITECTURE.md
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG tracked docs/ARCHITECTURE.md deleted and staged: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: D  docs/ARCHITECTURE.md
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked src/extra.js: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? src/extra.js
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked tests/extra.mjs: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? tests/extra.mjs
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked scripts/extra.mjs: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? scripts/extra.mjs
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked sim/extra.mjs: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? sim/extra.mjs
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked scenarios/extra.json: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? scenarios/extra.json
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG new untracked expected/extra.json: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? expected/extra.json
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG untracked index.html (untracked in a commit, file left in place): expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? index.html
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG owner extra: new untracked src/node_modules/x.js: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? src/node_modules/
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG owner extra: new untracked top-level node_modules.js: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? node_modules.js
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  WRONG owner extra: agent-team/tasks/T-036.md moved to src/moved.md (staged rename): expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: D  agent-team/tasks/T-036.md | A  src/moved.md
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: FAIL, exit 1, FAIL guards
+  WRONG owner extra: new untracked docs/new.md: expected dirty: yes, log line 2 "dirty: no"; git status --porcelain before the run: ?? docs/new.md
+         log line 1 shape "commit: <hash>  branch: master  <time>"; terminal lines 1-2 match the log: yes; RESULT: PASS, exit 0
+  cases with the wrong dirty value: 15
+  scratch folder removed: yes
+  process.env holds the same GIT_ names as at the start: yes
