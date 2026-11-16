@@ -1,0 +1,21 @@
+BASE: 5c90a51cb3541c1bc0e519323bfd2ece3ab6bf4b (head of task/T-034-commit-graph with the semgrep fix)
+START: e021c7916624629bd75a8aaca4d0463957d07963 (BASE plus the brief and BACKLOG commit; head of task/T-035-test-commit-graph at build start)
+$ git diff --stat 5c90a51 e021c79
+ agent-team/BACKLOG.md     |   8 ++-
+ agent-team/tasks/T-035.md | 138 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 145 insertions(+), 1 deletion(-)
+$ git ls-files scripts/handoff-check.mjs tests/handoff-check.test.js   (on START)
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ grep -n "handoff-check" .claude/settings.json   (read only)
+(prints nothing, exit 1)
+$ grep -n "GIT_TEST" scripts/handoff-check.mjs
+(prints nothing, exit 1)
+$ git diff 5c90a51 e021c79 -- scripts/handoff-check.mjs tests/handoff-check.test.js | wc -l   (checker files on START identical to BASE)
+0
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+OS: Windows 11 (MINGW64_NT-10.0-26300)
+Line numbers on START: FORCED_ENV at scripts/handoff-check.mjs:22, SAFE at :23, gitEnv at :45; tests: withEnv at :72, forge at :95, commit-graph test at :424, caseVariants at :448, GIT_GRAFT_FILE table at :460
