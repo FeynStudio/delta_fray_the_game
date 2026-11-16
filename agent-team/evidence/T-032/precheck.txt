@@ -1,0 +1,17 @@
+T-032 preconditions (Done-when 1), recorded 2026-11-13 in the task worktree on branch task/T-032-handoff-check-followups
+BASE: 838a3ae0233c89cccdf28aa38d56681d3726a357 (short 838a3ae), master HEAD at build start
+
+$ git ls-files scripts/handoff-check.mjs tests/handoff-check.test.js   (on BASE)
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+
+$ grep -n "handoff-check" .claude/settings.json   (read only)
+(exit status 1: 1 means no line printed, the two files are not on the deny list)
+
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+
+git is 2.45 or later: yes (2.56.0)
+operating system of this run: Windows (Git for Windows, Git Bash for the shell scripts). No Linux run was made by the owner.

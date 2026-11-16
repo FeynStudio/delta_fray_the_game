@@ -1,0 +1,74 @@
+T-032 self-check by reading (Done-when 6), files as committed in e70a264
+
+Every git call of scripts/handoff-check.mjs. All go through the one helper git(root, args):
+  execFileSync('git', ['-c', 'core.fsmonitor=false', ...args], { cwd: root, env: gitEnv(process.env), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true })
+  1. rev-parse --show-prefix                                             (checkHandoff: is root the top folder)
+  2. rev-list --first-parent --parents -n 200 --skip=<done> HEAD         (latestCodeCommit: one page of the first-parent history)
+  3. diff-tree --quiet -r <parent> <commit> -- . :(exclude)agent-team/   (touchesCode: one per commit walked; the root commit: --root <commit> in place of the two hashes)
+     exit status 0: no path outside agent-team/ differs; exit status 1: one does; every other error is thrown on
+  4. log -1 --no-show-signature --format=%s <commit>                     (checkHandoff: the subject)
+  5. branch --show-current                                               (currentBranch)
+  All five are read-only. <parent> and <commit> are hashes printed by call 2. The pathspecs are the fixed literals '.' and ':(exclude)' + 'agent-team/'.
+
+The environment builder gitEnv(source), the module's fifth export:
+  removed: GIT_DIR, GIT_WORK_TREE, GIT_INDEX_FILE, GIT_OBJECT_DIRECTORY, GIT_COMMON_DIR, GIT_NAMESPACE, GIT_PREFIX (REPO_ENV),
+           GIT_LITERAL_PATHSPECS, GIT_GLOB_PATHSPECS, GIT_NOGLOB_PATHSPECS, GIT_ICASE_PATHSPECS (PATHSPEC_ENV)
+  added:   GIT_NO_LAZY_FETCH with the value '1', written after the copy of the source, so a GIT_NO_LAZY_FETCH of the source is replaced
+  every other name is kept with its value; the source object is not changed (a new object is returned)
+
+$ grep -n "GIT_NO_LAZY_FETCH" scripts/handoff-check.mjs
+46:  return { ...Object.fromEntries(Object.entries(source).filter(([key]) => !removed.includes(key))), GIT_NO_LAZY_FETCH: '1' };
+(exit status 0)
+
+$ grep -n "core.fsmonitor=false" scripts/handoff-check.mjs
+22:const SAFE = ['-c', 'core.fsmonitor=false'];
+(exit status 0)
+
+$ grep -n "no-show-signature" scripts/handoff-check.mjs
+112:    const subject = clean(git(root, ['log', '-1', '--no-show-signature', '--format=%s', commit])).trim();
+(exit status 0)
+
+$ grep -n "first-parent" scripts/handoff-check.mjs
+86:    const rows = git(root, ['rev-list', '--first-parent', '--parents', '-n', String(PAGE), '--skip=' + done, 'HEAD']).split(NEWLINE).filter(Boolean);
+(exit status 0)
+
+$ grep -n "maxBuffer\|name-only" scripts/handoff-check.mjs
+(exit status 1)
+
+$ grep -n "REPO_ENV\|PATHSPEC_ENV\|CODE_PATHS\|DIFFERS" scripts/handoff-check.mjs
+20:const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+21:const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
+23:const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE];
+24:const DIFFERS = 1;
+45:  const removed = [...REPO_ENV, ...PATHSPEC_ENV];
+76:    git(root, ['diff-tree', '--quiet', '-r', ...range, '--', ...CODE_PATHS]);
+79:    if (error.status === DIFFERS) return true;
+(exit status 0)
+
+$ grep -n -A3 "process.env.PATH" tests/handoff-check.test.js
+383:  const saved = process.env.PATH;
+384-  try {
+385-    mkdirSync(join(base, dirname(BRIEF)), { recursive: true });
+386-    writeFileSync(join(base, BRIEF), brief({ handoff: STALE }));
+387:    process.env.PATH = '';
+388-    assert.deepEqual(checkHandoff(base, 'T-900'), skipped('git cannot be run'));
+389-  } finally {
+390:    if (saved === undefined) delete process.env.PATH;
+391:    else process.env.PATH = saved;
+392-    rmSync(base, { recursive: true, force: true, maxRetries: 5 });
+393-  }
+394-});
+(exit status 0)
+
+$ node scripts/no-comments.mjs
+(exit status 0)
+
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' scripts/handoff-check.mjs tests/handoff-check.test.js
+(exit status 1)
+
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' agent-team/evidence/T-032/gaps.mjs agent-team/evidence/T-032/controls.mjs
+(exit status 1)
+
+Note on the last two greps: exit status 1 means no line matched. execFileSync( and execFile( do not match exec\( or execSync\(.
+
+Row 5: the finally of 'skips when git cannot be run' now deletes process.env.PATH when it was unset at the start and assigns the saved value otherwise (the grep -A3 above). No test covers the unset case; it is shown by this reading only.

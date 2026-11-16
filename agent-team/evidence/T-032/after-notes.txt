@@ -1,0 +1,18 @@
+T-032 run times and counts (Done-when 2 and 9), Windows 11, git 2.56.0.windows.4, Node v24.15.0, same machine, same session
+
+Before, on BASE 838a3ae: node --test tests/handoff-check.test.js
+  tests 31, pass 30, fail 0, skipped 1 (the real-repo test: handoff not filled in)
+  duration_ms: 6118.758, 6395.0698, 6302.1002   average 6272
+  verify.sh T-032 --feature config --label before: RESULT: PASS, unit tests 214 (213 pass, 1 skipped), before-config.log
+
+After, on e70a264: node --test tests/handoff-check.test.js
+  tests 49, pass 48, fail 0, skipped 1 at the time of the timing runs (Handoff not yet filled in); 49 pass, 0 skipped once the Handoff names e70a264
+  duration_ms: 8458.6959, 8698.3502, 8567.0659   average 8575
+  difference of the averages: 2303 ms (limit 3000 ms)
+  verify.sh T-032 --feature config --label after: RESULT: PASS, unit tests 232 (232 pass, 0 skipped), after-config.log
+  verify.sh T-032 --feature all --label after: RESULT: PASS, unit tests 232 (232 pass, 0 skipped), after-all.log
+  ./scripts/guards.sh: exit 0
+  unit-test count: 214 + 18 new = 232
+
+The suite runs its tests at the same time and checkHandoff blocks while git runs, so a single test's printed time is not its own cost. The new tests that start the most git processes are the first-parent test and the same-rule test (about 25 to 30 processes each).
+Large-commit unit test: not added (see the Handoff). The fast-import of the 20,000-file fixture took 599 to 1489 ms in the gaps.mjs runs.

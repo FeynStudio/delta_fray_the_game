@@ -19,4 +19,5 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte | 1 | T-021 |
 | brief or handoff cites a section that does not exist (dangling 'open question N' reference) | 1 | T-023 |
 | check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter) | 2 | T-016, T-017 |
-| fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 1 | T-029 |
+| fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
+| rewrite meant to keep a rule unchanged differs from the old rule on an edge the owner's differential cases did not cover (pathspec `agent-team/` matches a gitlink named agent-team) | 1 | T-032 |

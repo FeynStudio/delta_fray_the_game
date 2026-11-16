@@ -1,0 +1,23 @@
+controls.mjs before, platform win32, node v24.15.0
+scratch copy of the worktree in the OS temp dir (without .git, node_modules, .env files and secrets folders), nothing changed: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with `SAFE` dropped from the helper: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with `--no-show-signature` dropped: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with `--first-parent` dropped: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_WORK_TREE dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_INDEX_FILE dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_OBJECT_DIRECTORY dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_COMMON_DIR dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_NAMESPACE dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with GIT_PREFIX dropped from REPO_ENV: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with U+001F kept by `clean`: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+with DEL kept by `clean`: exit 0, tests 31, pass 30, fail 0, skipped 1 [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all controls as expected for before: yes
+
+Row 5 (Done-when 2d), on BASE:
+$ grep -n "process.env.PATH" tests/handoff-check.test.js
+257:  const saved = process.env.PATH;
+261:    process.env.PATH = '';
+264:    process.env.PATH = saved;
+line 264 assigns the saved value without a check: when PATH was unset at the start, the text "undefined" is assigned.

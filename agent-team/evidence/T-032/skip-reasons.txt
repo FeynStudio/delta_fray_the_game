@@ -1,0 +1,31 @@
+T-032 skip reasons (Done-when 7): the skip( calls of scripts/handoff-check.mjs on BASE 838a3ae and on e70a264
+
+BASE 838a3ae:
+84:  if (id === null) return skip('no task: not on a task branch');
+86:  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+88:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+90:  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+91:  let stage = 'not a git repo';
+93:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+94:    stage = 'git history cannot be read';
+96:    if (commit === null) return skip('no commit touches a path outside agent-team/');
+102:    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+
+e70a264:
+99:  if (id === null) return skip('no task: not on a task branch');
+101:  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+103:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+105:  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+106:  let stage = 'not a git repo';
+108:    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+109:    stage = 'git history cannot be read';
+111:    if (commit === null) return skip('no commit touches a path outside agent-team/');
+117:    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+
+Same lines with the line numbers removed (diff prints nothing when equal):
+diff exit status: 0
+
+report() on BASE and on e70a264 (diff prints nothing when equal):
+diff exit status: 0
+
+No SKIP reason is added, removed or reworded. The new catch in touchesCode throws every error on except exit status 1 of diff-tree --quiet, so the existing reasons keep their causes.

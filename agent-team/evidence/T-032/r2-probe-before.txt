@@ -1,0 +1,201 @@
+r2-probe.mjs, platform win32, node v24.15.0, git version 2.56.0.windows.4
+reference: BASE module (838a3ae)
+[1] round 1 module (e70a264), :(exclude)agent-team/
+[2] round 1 module with :(exclude)agent-team/*
+[3] round 1 module with :(exclude,glob)agent-team/**
+[4] round 1 module with :(exclude)agent-team (no slash)
+[5] worktree module (this branch, as checked out)
+worktree CODE_PATHS line: const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE];
+root commit with code, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+root commit with agent-team/ only, then agent-team/ only, ignorecase false, step 1: add agent-team/notes.md | BASE: SKIP (no commit touches a path outside agent-team/) | [1] same | [2] same | [3] same | [4] same | [5] same
+root commit with agent-team/ only, then agent-team/ only, ignorecase false, step 2: add agent-team/more.md | BASE: SKIP (no commit touches a path outside agent-team/) | [1] same | [2] same | [3] same | [4] same | [5] same
+rename into agent-team/, ignorecase false, step 1: add src/game.js, add src/move.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename into agent-team/, ignorecase false, step 2: rm src/move.js, add agent-team/move.js | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename out of agent-team/, ignorecase false, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename out of agent-team/, ignorecase false, step 2: rm agent-team/notes.md, add src/notes.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change inside agent-team/, ignorecase false, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change inside agent-team/, ignorecase false, step 2: chmod agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change outside agent-team/, ignorecase false, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change outside agent-team/, ignorecase false, step 2: chmod src/game.js | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase false, step 2: gitlink src/sub | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase false, step 3: gitlink src/sub | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase false, step 4: rm src/sub | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase false, step 2: gitlink agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase false, step 3: gitlink agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase false, step 4: rm agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team added, changed, removed, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team added, changed, removed, ignorecase false, step 2: gitlink agent-team | BASE: FAIL step 2 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+gitlink at agent-team added, changed, removed, ignorecase false, step 3: gitlink agent-team | BASE: FAIL step 3 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+gitlink at agent-team added, changed, removed, ignorecase false, step 4: rm agent-team | BASE: FAIL step 4 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase false, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase false, step 2: gitlink agent-team | BASE: FAIL step 2 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase false, step 3: add agent-team/notes.md | BASE: FAIL step 3 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+symlink src/link to agent-team/notes.md, ignorecase false, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink src/link to agent-team/notes.md, ignorecase false, step 2: link src/link | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink agent-team/link to ../src/game.js, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink agent-team/link to ../src/game.js, ignorecase false, step 2: link agent-team/link | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase false, step 2: link agent-team | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase false, step 3: link agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase false, step 4: rm agent-team | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level file named agent-team added, changed, removed, ignorecase false, step 2: add agent-team | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase false, step 3: add agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase false, step 4: rm agent-team | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase false, step 1: add src/game.js, add agent-team | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase false, step 2: add agent-team/notes.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase false, step 3: add agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+names with spaces, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with spaces, ignorecase false, step 2: add agent-team/a b.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with spaces, ignorecase false, step 3: add src/a b.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase false, step 2: add agent-team/-rf | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase false, step 3: add -rf | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase false, step 4: add agent-team/--quiet | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase false, step 5: add --quiet | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase false, step 2: add agent-team/:(exclude)x | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase false, step 3: add :(exclude)x | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase false, step 4: add :(top) | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase false, step 5: add :(exclude)agent-team/x | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase false, step 2: add agent-team/ü.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase false, step 3: add src/ü.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase false, step 4: add ägent-team/x | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 2: add agent-team/* | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 3: add agent-team/[a] | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 4: add agent-team/? | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 5: add * | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 6: add [a] | BASE: FAIL step 6 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 7: add ? | BASE: FAIL step 7 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 8: add agent-team./x | BASE: FAIL step 8 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 9: add agent-team*x | BASE: FAIL step 9 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase false, step 10: add agent-tea?/x | BASE: FAIL step 10 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase false, step 2: add agent-team/x/agent-team/y | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase false, step 3: add x/agent-team/y | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase false, step 2: add agent-team.txt | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase false, step 3: add agent-teams/n | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase false, step 4: add agent-team-x/n | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase false, step 2: add Agent-Team/x.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase false, step 3: add agent-team/X.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase false, step 4: add AGENT-TEAM/x.md | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase false, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase false, step 2 (empty commit) | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase false, step 3: add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase false, step 4 (empty commit) | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase false, step 1: add src/game.js, add agent-team/notes.md, add src/b.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase false, step 2: rm agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase false, step 3: rm src/b.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase false, step 1: add src/game.js, add src/dir/x | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase false, step 2: add src/dir | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase false, step 3: add src/dir/x | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase false, root code commit | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase false, side code commit on HEAD | BASE: FAIL side code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase false, agent-team/ only commit on the first parent | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase false, merge commit | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+root commit with code, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+root commit with agent-team/ only, then agent-team/ only, ignorecase true, step 1: add agent-team/notes.md | BASE: SKIP (no commit touches a path outside agent-team/) | [1] same | [2] same | [3] same | [4] same | [5] same
+root commit with agent-team/ only, then agent-team/ only, ignorecase true, step 2: add agent-team/more.md | BASE: SKIP (no commit touches a path outside agent-team/) | [1] same | [2] same | [3] same | [4] same | [5] same
+rename into agent-team/, ignorecase true, step 1: add src/game.js, add src/move.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename into agent-team/, ignorecase true, step 2: rm src/move.js, add agent-team/move.js | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename out of agent-team/, ignorecase true, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+rename out of agent-team/, ignorecase true, step 2: rm agent-team/notes.md, add src/notes.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change inside agent-team/, ignorecase true, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change inside agent-team/, ignorecase true, step 2: chmod agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change outside agent-team/, ignorecase true, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+mode-only change outside agent-team/, ignorecase true, step 2: chmod src/game.js | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase true, step 2: gitlink src/sub | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase true, step 3: gitlink src/sub | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at src/sub added, changed, removed, ignorecase true, step 4: rm src/sub | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase true, step 2: gitlink agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase true, step 3: gitlink agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team/sub added, changed, removed, ignorecase true, step 4: rm agent-team/sub | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team added, changed, removed, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+gitlink at agent-team added, changed, removed, ignorecase true, step 2: gitlink agent-team | BASE: FAIL step 2 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+gitlink at agent-team added, changed, removed, ignorecase true, step 3: gitlink agent-team | BASE: FAIL step 3 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+gitlink at agent-team added, changed, removed, ignorecase true, step 4: rm agent-team | BASE: FAIL step 4 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase true, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase true, step 2: gitlink agent-team | BASE: FAIL step 2 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+folder agent-team/ replaced by a gitlink agent-team and back, ignorecase true, step 3: add agent-team/notes.md | BASE: FAIL step 3 | [1] DIFFERS: FAIL step 1 | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] DIFFERS: FAIL step 1
+symlink src/link to agent-team/notes.md, ignorecase true, step 1: add src/game.js, add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink src/link to agent-team/notes.md, ignorecase true, step 2: link src/link | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink agent-team/link to ../src/game.js, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+symlink agent-team/link to ../src/game.js, ignorecase true, step 2: link agent-team/link | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase true, step 2: link agent-team | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase true, step 3: link agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level symlink named agent-team added, changed, removed, ignorecase true, step 4: rm agent-team | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+top-level file named agent-team added, changed, removed, ignorecase true, step 2: add agent-team | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase true, step 3: add agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+top-level file named agent-team added, changed, removed, ignorecase true, step 4: rm agent-team | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase true, step 1: add src/game.js, add agent-team | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase true, step 2: add agent-team/notes.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+file agent-team replaced by folder agent-team/ and back, ignorecase true, step 3: add agent-team | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] DIFFERS: FAIL step 1 | [5] same
+names with spaces, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with spaces, ignorecase true, step 2: add agent-team/a b.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with spaces, ignorecase true, step 3: add src/a b.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase true, step 2: add agent-team/-rf | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase true, step 3: add -rf | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase true, step 4: add agent-team/--quiet | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names with leading dashes, ignorecase true, step 5: add --quiet | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase true, step 2: add agent-team/:(exclude)x | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase true, step 3: add :(exclude)x | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase true, step 4: add :(top) | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that look like pathspec magic, ignorecase true, step 5: add :(exclude)agent-team/x | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase true, step 2: add agent-team/ü.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase true, step 3: add src/ü.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+non-ASCII names, ignorecase true, step 4: add ägent-team/x | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 2: add agent-team/* | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 3: add agent-team/[a] | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 4: add agent-team/? | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 5: add * | BASE: FAIL step 5 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 6: add [a] | BASE: FAIL step 6 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 7: add ? | BASE: FAIL step 7 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 8: add agent-team./x | BASE: FAIL step 8 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 9: add agent-team*x | BASE: FAIL step 9 | [1] same | [2] same | [3] same | [4] same | [5] same
+glob characters, ignorecase true, step 10: add agent-tea?/x | BASE: FAIL step 10 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase true, step 2: add agent-team/x/agent-team/y | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+nested agent-team folders, ignorecase true, step 3: add x/agent-team/y | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase true, step 2: add agent-team.txt | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase true, step 3: add agent-teams/n | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+names that only start like agent-team, ignorecase true, step 4: add agent-team-x/n | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase true, step 2: add Agent-Team/x.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase true, step 3: add agent-team/X.md | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+other case of agent-team, ignorecase true, step 4: add AGENT-TEAM/x.md | BASE: FAIL step 4 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase true, step 1: add src/game.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase true, step 2 (empty commit) | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase true, step 3: add agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+empty commits, ignorecase true, step 4 (empty commit) | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase true, step 1: add src/game.js, add agent-team/notes.md, add src/b.js | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase true, step 2: rm agent-team/notes.md | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+deletions, ignorecase true, step 3: rm src/b.js | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase true, step 1: add src/game.js, add src/dir/x | BASE: FAIL step 1 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase true, step 2: add src/dir | BASE: FAIL step 2 | [1] same | [2] same | [3] same | [4] same | [5] same
+folder src/dir replaced by a file and back, ignorecase true, step 3: add src/dir/x | BASE: FAIL step 3 | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase true, root code commit | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase true, side code commit on HEAD | BASE: FAIL side code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase true, agent-team/ only commit on the first parent | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+merge whose first-parent diff touches agent-team/ only while its second parent brought code, ignorecase true, merge commit | BASE: FAIL root code commit | [1] same | [2] same | [3] same | [4] same | [5] same
+checkpoints: 186
+divergences from BASE for [1] round 1 module (e70a264), :(exclude)agent-team/: 10
+divergences from BASE for [2] round 1 module with :(exclude)agent-team/*: 0
+divergences from BASE for [3] round 1 module with :(exclude,glob)agent-team/**: 0
+divergences from BASE for [4] round 1 module with :(exclude)agent-team (no slash): 26
+divergences from BASE for [5] worktree module (this branch, as checked out): 10
+probe folder removed: yes
