@@ -16,7 +16,11 @@ case $FEATURE in
 esac
 OUT=agent-team/evidence/$TASK; mkdir -p "$OUT"
 LOG="$OUT/$LABEL-$FEATURE.log"; FAIL=0
+DIRTY=unknown
+STATUS=$(git --no-optional-locks -c core.fsmonitor=false status --porcelain --no-renames --untracked-files=normal 2>/dev/null) && DIRTY=no
+[ "$DIRTY" = no ] && grep -qvE '^(.. agent-team/|\?\? node_modules/$|\?\? \.gitignore$|$)' <<< "$STATUS" && DIRTY=yes
 echo "commit: $(git rev-parse --short HEAD 2>/dev/null || echo none)  branch: $(git branch --show-current 2>/dev/null || echo none)  $(date -u +%FT%TZ)" | tee "$LOG"
+echo "dirty: $DIRTY" | tee -a "$LOG"
  
 check () {
   local name=$1; shift
