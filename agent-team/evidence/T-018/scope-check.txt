@@ -1,4 +1,4 @@
-Scope check (Done-when 9 and 13), working tree on commit ed70c14, master is c1da5e6
+Scope check (Done-when 9 and 13), working tree on commit 752a500 with the Handoff written and not yet committed; master is c1da5e6
 == git diff --stat master -- scripts/guards.sh scripts/verify.sh .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md (must be empty)
 == git diff --stat master -- scripts/no-comments.mjs tests/no-comments.test.js scripts/handoff-check.mjs tests/handoff-check.test.js (the other protected files; must be empty)
 == git diff --name-status master -- scripts/ tests/ (only the two new files)
@@ -8,16 +8,17 @@ A	tests/conflict-markers.test.js
 == git ls-files .gitignore (must be empty)
 == ls .gitignore in the worktree
 ls: cannot access '.gitignore': No such file or directory
-== git diff --name-status master (every path that differs from master, evidence folder summarised)
+== git diff --name-status master, without agent-team/evidence/T-018/ (every other path that differs from master, the uncommitted Handoff included)
 M	agent-team/FEATURE_MAP.md
+M	agent-team/tasks/T-018.md
 A	scripts/conflict-markers.mjs
 A	tests/conflict-markers.test.js
-agent-team/evidence/T-018/: 6 committed files, all added
 == git diff --numstat master -- scripts/ tests/ agent-team/FEATURE_MAP.md
 1	0	agent-team/FEATURE_MAP.md
 71	0	scripts/conflict-markers.mjs
 175	0	tests/conflict-markers.test.js
 total changed lines: 247 (limit 400)
 == git log --oneline master..HEAD
+752a500 T-018: after evidence on ed70c14 (verify config and all PASS, negative controls, hook-up check, self and scope checks)
 ed70c14 T-018: conflict-marker guard (scripts/conflict-markers.mjs, tests/conflict-markers.test.js, FEATURE_MAP line)
 396e7ea T-018: before evidence on BASE c1da5e6 (verify config PASS; scratch marker line in REPEATS.md still PASS, guards exit 0)
