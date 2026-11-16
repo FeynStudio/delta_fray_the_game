@@ -1,0 +1,21 @@
+scope check at 789bbb8, START 7b64dc5, BASE 3cb76db
+$ git diff --stat 7b64dc5 -- scripts/guards.sh scripts/verify.sh scripts/no-comments.mjs tests/no-comments.test.js .github/ .claude/ src/ sim/ index.html scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md .gitattributes agent-team/design/ agent-team/evals/ agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/BACKLOG.md agent-team/ROADMAP.md
+(prints nothing)
+$ git diff --name-only 7b64dc5 -- scripts/ tests/
+scripts/handoff-check.mjs
+tests/handoff-check.test.js
+$ git diff --name-only 7b64dc5 -- agent-team/tasks/
+agent-team/tasks/T-034.md
+$ git diff --name-only 7b64dc5 -- agent-team/ ":(exclude)agent-team/evidence/T-034"
+agent-team/FEATURE_MAP.md
+agent-team/tasks/T-034.md
+$ git diff --numstat 7b64dc5 -- agent-team/FEATURE_MAP.md   (the one line "Stale-handoff check (T-016)", removed and added; hunk header: @@ -85 +85 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar)
+1	1	agent-team/FEATURE_MAP.md
+$ git diff --numstat 3cb76db -- scripts/handoff-check.mjs tests/handoff-check.test.js   (size limit 40)
+1	1	scripts/handoff-check.mjs
+36	1	tests/handoff-check.test.js
+$ git ls-files .gitignore
+(prints nothing)
+git config --list --show-origin checksum before and after one run of node --test tests/handoff-check.test.js (exit 0): same (output not saved)
+handoff-* folders left in the OS temp dir: none
+evidence files or brief holding the user name or the session temp path: (nothing listed = none)
