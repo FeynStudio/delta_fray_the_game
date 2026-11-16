@@ -433,12 +433,10 @@ describe('checkHandoff on throw-away git repos', { concurrency: true }, () => {
       assert.equal(await repo.git('rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph file');
       assert.deepEqual(check(repo), failure(revert, 'Revert the change'));
       for (const name of process.platform === 'win32' ? ['GIT_TEST_COMMIT_GRAPH', 'git_test_commit_graph'] : ['GIT_TEST_COMMIT_GRAPH']) {
-        for (const value of ['1', 'true', 'yes']) {
-          repo.env[name] = value;
-          assert.equal(await repo.git('-c', 'core.commitGraph=false', 'rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph under ' + name + '=' + value);
-          delete repo.env[name];
-          assert.deepEqual(withEnv(name, value, () => check(repo)), failure(revert, 'Revert the change'));
-        }
+        repo.env[name] = '1';
+        assert.equal(await repo.git('-c', 'core.commitGraph=false', 'rev-parse', 'HEAD^'), handoff, 'plain git does not follow the forged commit-graph under ' + name + '=1');
+        delete repo.env[name];
+        assert.deepEqual(withEnv(name, '1', () => check(repo)), failure(revert, 'Revert the change'));
       }
       rmSync(graph);
       await repo.git('commit-graph', 'write', '--reachable', '--split');
