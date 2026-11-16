@@ -1,0 +1,62 @@
+T-026 Done-when 1: the gap, on BASE
+commit: 0679cd27deb23ee850b2cc9b834d811c9fe885ba (short 0679cd2), branch task/T-026-sim-syntax-check
+scratch change: one stray closing bracket on its own line in sim/balance.mjs (line 70). Never committed; reverted with git restore sim/balance.mjs (end of this file).
+
+$ git status --short   (with the scratch change in place)
+ M sim/balance.mjs
+?? agent-team/evidence/T-026/
+
+$ git diff -- sim/
+diff --git a/sim/balance.mjs b/sim/balance.mjs
+index d2b9f4f..9247bd4 100644
+--- a/sim/balance.mjs
++++ b/sim/balance.mjs
+@@ -67,6 +67,7 @@ for (let g = 1; g <= games; g++) {
+   }
+ }
+ 
++}
+ let fail = false;
+ const report = {};
+ for (const [name, t] of Object.entries(targets)) {
+
+$ node --check sim/balance.mjs
+C:\Projects\my_ai_agent_company\.worktrees\product-a\T-026\sim\balance.mjs:70
+}
+^
+
+SyntaxError: Unexpected token '}'
+    at checkSyntax (node:internal/main/check_syntax:72:5)
+
+Node.js v24.15.0
+exit status: 1
+
+$ ./scripts/verify.sh T-026 --feature config --label before-gap   (log: before-gap-config.log)
+1:commit: 0679cd2  branch: task/T-026-sim-syntax-check  2026-11-16T09:26:59Z
+2:dirty: yes
+3:PASS guards
+4:PASS lint
+340:PASS unit tests
+341:PASS config: no magic numbers
+342:PASS config: override honored
+343:PASS config output
+344:RESULT: PASS
+
+unit-test summary lines of before-gap-config.log:
+ℹ tests 325
+ℹ suites 1
+ℹ pass 324
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+
+lines of before-gap-config.log that name the sim folder or SyntaxError (grep -c, then the lines):
+0
+
+$ git restore sim/balance.mjs
+$ git status --short   (after the restore)
+?? agent-team/evidence/T-026/
+$ git diff --stat -- sim/ src/ tests/ scripts/   (prints nothing when clean)
+$ node --check sim/balance.mjs
+exit status: 0
