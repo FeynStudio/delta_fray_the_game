@@ -1,0 +1,107 @@
+proof.mjs header-readers, run from the worktree at d0058ec, platform win32, node v24.15.0, git version 2.56.0.windows.4
+$ grep -rnE --exclude-dir=node_modules [--include=*.js *.mjs *.cjs *.sh *.py *.ps1 for code folders; every file in agent-team/evals and .claude] -e <pattern> <folders>
+pattern: commit: |branch: |RESULT|\$LOG|[-.]log["'`)]|-(config|all|render|input|movement|hits|turns|balance)\.log|head -(n ?)?[0-9]|tail -(n ?)?[0-9]|sed -n|lines\[[0-9]\]|split\([^)]*\)\[[0-9]\]|readline
+folders scripts tests sim src agent-team/evidence (code files): grep exit 0, 90 lines
+  scripts/handoff-check.mjs:96:const skip = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+  scripts/handoff-check.mjs:104:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+  scripts/no-comments.mjs:36:const firstLine = (text) => text.split(NEWLINE)[0].trimEnd();
+  scripts/smoke.mjs:112:          url.split('?')[0],
+  scripts/verify.sh:18:LOG="$OUT/$LABEL-$FEATURE.log"; FAIL=0
+  scripts/verify.sh:19:echo "commit: $(git rev-parse --short HEAD 2>/dev/null || echo none)  branch: $(git branch --show-current 2>/dev/null || echo none)  $(date -u +%FT%TZ)" | tee "$LOG"
+  scripts/verify.sh:23:  if "$@" >>"$LOG" 2>&1; then echo "PASS $name" | tee -a "$LOG"
+  scripts/verify.sh:24:  else echo "FAIL $name" | tee -a "$LOG"; FAIL=1; fi
+  scripts/verify.sh:76:echo "RESULT: $([ $FAIL = 0 ] && echo PASS || echo FAIL)" | tee -a "$LOG"
+  tests/handoff-check.test.js:16:const STALE = '- Latest code commit: 0000000.';
+  tests/handoff-check.test.js:19:const NO_TASK = { result: 'SKIP', reason: 'no task: not on a task branch', commit: null, subject: null };
+  tests/handoff-check.test.js:55:const names = (hash) => '- Latest code commit: ' + hash.slice(0, 7) + '.';
+  tests/handoff-check.test.js:57:const skipped = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+  tests/handoff-check.test.js:127:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'no brief agent-team/tasks/T-900.md', commit: null, subject: null });
+  tests/handoff-check.test.js:133:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'handoff not filled in', commit: null, subject: null });
+  tests/handoff-check.test.js:142:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'brief T-900 is DONE', commit: null, subject: null });
+  tests/handoff-check.test.js:174:      assert.deepEqual(check(repo), { result: 'PASS', reason: 'Handoff names ' + code.slice(0, 7), commit: code, subject: 'Add the game' });
+  tests/handoff-check.test.js:184:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (Fix the wall bounce)', commit: later, subject: 'Fix the wall bounce',
+  tests/handoff-check.test.js:193:      await repo.commit('After evidence', { 'agent-team/evidence/T-900/after.log': 'RESULT: PASS\n' });
+  tests/handoff-check.test.js:276:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' ([31mFix the wall)', commit: code, subject: '[31mFix the wall',
+  tests/handoff-check.test.js:288:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (' + subject + ')', commit: code, subject,
+  tests/handoff-check.test.js:350:      assert.equal((await repo.git('rev-list', '--parents', '-n', '1', 'HEAD')).split(' ')[2], side);
+  tests/handoff-check.test.js:351:      assert.deepEqual(check(repo), { result: 'PASS', reason: 'Handoff names ' + code.slice(0, 7), commit: code, subject: 'Add the game' });
+  tests/handoff-check.test.js:399:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (Fix the wall bounce)', commit: later, subject: 'Fix the wall bounce',
+  agent-team/evidence/T-010/capture-blink.mjs:213:  return { png: sheet.toDataURL('image/png').split(',')[1], frames: out, crop, cols, stepMs };
+  agent-team/evidence/T-016/cli-check.mjs:56:  commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + code + '.') });
+  agent-team/evidence/T-016/cli-check.mjs:59:  commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + code + '.') });
+  agent-team/evidence/T-022/strip-comments.mjs:273:  process.stdout.write(`RESULT: ${bad === 0 && files.length > 0 ? 'COMMENT-ONLY' : 'NOT COMMENT-ONLY'}\n`);
+  agent-team/evidence/T-029/controls.mjs:63:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-029/gaps.mjs:15:const STALE = '- Latest code commit: 0000000.';
+  agent-team/evidence/T-029/gaps.mjs:31:const names = (hash) => '- Latest code commit: ' + hash.slice(0, 7) + '.';
+  agent-team/evidence/T-032/controls.mjs:101:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-032/gaps.mjs:15:const STALE = '- Latest code commit: 0000000.';
+  agent-team/evidence/T-032/gaps.mjs:48:const names = (hash) => '- Latest code commit: ' + hash.slice(0, 7) + '.';
+  agent-team/evidence/T-032/r2-controls.mjs:58:  const count = (key) => Number((trimmed.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-032/r2-probe.mjs:14:const BRIEF = ['# T-900 probe', 'Status: IN REVIEW', '', '## Handoff', '- Latest code commit: 0000000.', ''].join('\n');
+  agent-team/evidence/T-032/r2-time.mjs:25:  const value = (key) => Number((text.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-033/controls.mjs:73:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-033/gaps.mjs:68:  const handoff = commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + short(a) + '.') });
+  agent-team/evidence/T-033/gaps.mjs:103:      return 'none (git ' + args[0] + ' exit ' + error.status + (String(error.stderr).trim() ? ': ' + String(error.stderr).split('\n')[0].split(repo).join('<throw-away repo>') : '') ...
+  agent-team/evidence/T-033/gaps.mjs:139:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-033/time-options.mjs:45:      const total = Math.round(Number(rows.find((r) => r.startsWith('# duration_ms ')).split(' ')[2]));
+  agent-team/evidence/T-033/time-options.mjs:46:      const fail = rows.find((r) => r.startsWith('# fail ')).split(' ')[2];
+  agent-team/evidence/T-033/time-options.mjs:47:      const tests = rows.find((r) => r.startsWith('# tests ')).split(' ')[2];
+  agent-team/evidence/T-033/time-options.mjs:49:      const same = Math.round(Number(rows.slice(i).find((r) => r.trim().startsWith('duration_ms:')).trim().split(' ')[1]));
+  agent-team/evidence/T-033/time.mjs:26:  const value = (key) => Number((text.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-034/controls.mjs:43:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-034/graph.mjs:80:  const handoff = commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + short(a) + '.') });
+  agent-team/evidence/T-034/graph.mjs:127:  out.push('fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ onl ...
+  agent-team/evidence/T-034/time.mjs:26:  const value = (key) => Number((text.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-035/controls.mjs:47:  const count = (key) => Number((rows.find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-035/git-test-vars.mjs:86:  const handoff = commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + short(a) + '.') });
+  agent-team/evidence/T-035/graph.mjs:78:  const handoff = commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + short(a) + '.') });
+  agent-team/evidence/T-035/graph.mjs:142:    out.push('fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ o ...
+  agent-team/evidence/T-035/time.mjs:26:  const value = (key) => Number((text.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-036/proof.mjs:94:  commit('Handoff', { [BRIEF]: brief('- Latest code commit: ' + a.slice(0, 7) + '.') });
+  agent-team/evidence/T-036/proof.mjs:288:  const log = join(dir, 'agent-team/evidence', task, 'run-config.log');
+  agent-team/evidence/T-036/proof.mjs:290:  const result = lines.find((line) => line.startsWith('RESULT:')) || 'no RESULT line';
+  agent-team/evidence/T-036/proof.mjs:325:        const baseLog = readFileSync(join(dir, 'agent-team/evidence/T-036-base/run-config.log'), 'utf8').split('\n');
+  agent-team/evidence/T-036/proof.mjs:326:        say('       BASE verify.sh in the same repo: log line 1 shape "' + shape(baseLog[0]) + '", line 2 "' + baseLog[1] + '"; ' + (baseLog.find((line) => line.startsWith('RESULT: ...
+  agent-team/evidence/T-036/proof.mjs:356:  const value = (key) => (text.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2];
+  agent-team/evidence/T-036/proof.mjs:375:    const log = readFileSync(join(dir, 'agent-team/evidence/T-036-scratch/run-config.log'), 'utf8');
+  agent-team/evidence/T-036/proof.mjs:470:      say('(f) ' + C + '.log(v) planted in ' + file + ' line 2: guards.sh exit ' + g.code + ', format guard line: ' + (g.stdout.includes(FORMAT_FAIL) ? 'yes' : 'no') + ', names ' + ...
+  agent-team/evidence/T-036/proof.mjs:482:  const value = (key) => Number((t.stdout.split('\n').find((row) => row.startsWith('# ' + key + ' ')) || '').split(' ')[2]);
+  agent-team/evidence/T-036/proof.mjs:520:    const executable = execFileSync('git', ['ls-tree', '-r', 'HEAD'], { cwd: ROOT, encoding: 'utf8', windowsHide: true }).split('\n').filter((row) => row.startsWith('100755 ')).map ...
+  agent-team/evidence/T-036/proof.mjs:536:    const log = readFileSync(join(dir, 'agent-team/evidence/T-036-applied/run-all.log'), 'utf8').split('\n');
+  agent-team/evidence/T-036/proof.mjs:546:const READER_PATTERN = "commit: |branch: |RESULT|\\$LOG|[-.]log[\"'`)]|-(config|all|render|input|movement|hits|turns|balance)\\.log|head -(n ?)?[0-9]|tail -(n ?)?[0-9]|sed -n|lines ...
+  agent-team/evidence/T-036/proposed/scripts/handoff-check.mjs:96:const skip = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+  agent-team/evidence/T-036/proposed/scripts/handoff-check.mjs:104:  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:18:LOG="$OUT/$LABEL-$FEATURE.log"; FAIL=0
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:22:echo "commit: $(git rev-parse --short HEAD 2>/dev/null || echo none)  branch: $(git branch --show-current 2>/dev/null || echo none)  $(date -u +%FT%TZ)" | tee "$LOG ...
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:23:echo "dirty: $DIRTY" | tee -a "$LOG"
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:27:  if "$@" >>"$LOG" 2>&1; then echo "PASS $name" | tee -a "$LOG"
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:28:  else echo "FAIL $name" | tee -a "$LOG"; FAIL=1; fi
+  agent-team/evidence/T-036/proposed/scripts/verify.sh:80:echo "RESULT: $([ $FAIL = 0 ] && echo PASS || echo FAIL)" | tee -a "$LOG"
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:16:const STALE = '- Latest code commit: 0000000.';
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:20:const NO_TASK = { result: 'SKIP', reason: 'no task: not on a task branch', commit: null, subject: null };
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:56:const names = (hash) => '- Latest code commit: ' + hash.slice(0, 7) + '.';
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:58:const skipped = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:128:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'no brief agent-team/tasks/T-900.md', commit: null, subject: null });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:134:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'handoff not filled in', commit: null, subject: null });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:143:      assert.deepEqual(check(repo), { result: 'SKIP', reason: 'brief T-900 is DONE', commit: null, subject: null });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:175:      assert.deepEqual(check(repo), { result: 'PASS', reason: 'Handoff names ' + code.slice(0, 7), commit: code, subject: 'Add the game' });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:185:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (Fix the wall bounce)', commit: later, subject: ...
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:194:      await repo.commit('After evidence', { 'agent-team/evidence/T-900/after.log': 'RESULT: PASS\n' });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:277:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' ([31mFix the wall)', commit: code, subject: '[3 ...
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:289:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (' + subject + ')', commit: code, subject,
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:351:      assert.equal((await repo.git('rev-list', '--parents', '-n', '1', 'HEAD')).split(' ')[2], side);
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:352:      assert.deepEqual(check(repo), { result: 'PASS', reason: 'Handoff names ' + code.slice(0, 7), commit: code, subject: 'Add the game' });
+  agent-team/evidence/T-036/proposed/tests/handoff-check.test.js:400:        result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (Fix the wall bounce)', commit: later, subject: ...
+folders agent-team/evals .claude (all files): grep exit 2, 0 lines
+process.env holds the same GIT_ names as at the start: yes
+
+Note on the last scope: agent-team/evals does not exist in this repo (grep exit 2: "No such file or directory"). Re-run on .claude alone with the same pattern: grep -rnE -e <pattern> .claude -> exit 1, no lines (.claude holds settings.json only).
+
+Verdicts (does a second header line change the result?):
+- scripts/verify.sh:18-24, 76 and the proposed verify.sh: the writer of the log, not a reader. Every line after the header is appended with tee -a, so an added line 2 moves nothing that is read back.
+- scripts/handoff-check.mjs:96, 104 and the proposed copy: 'commit: null' is an object field and split(' ')[0] reads the brief's Status line. Not a log reader.
+- scripts/no-comments.mjs:36 (first line of a comment text) and scripts/smoke.mjs:112 (URL without query): not log readers.
+- tests/handoff-check.test.js (and the proposed copy): 'Latest code commit:' strings and 'commit:' fields of checkHandoff results; line 193 writes 'RESULT: PASS' into a fixture file named after.log inside a throw-away repo and never reads a real log; line 350/351 split rev-list output. Not log readers.
+- agent-team/evidence/T-010, T-016, T-022, T-029, T-032, T-033, T-034, T-035 scripts: they parse TAP output of node --test ('# tests', '# fail', duration_ms), git output or fixture briefs, or print their own RESULT line (T-022 strip-comments.mjs:273). None opens a verify.sh log.
+- agent-team/evidence/T-036/proof.mjs: reads verify.sh logs it writes itself in scratch copies (run-config.log, run-all.log): line 1 and line 2 by index for the dirty-header proof, the RESULT line by startsWith and FAIL lines by startsWith. It is written for the two-line header.
+- Result: no script, test or setting reads the first line or a line number of a verify.sh log, so there is nothing to run against a proposed-verify.sh log beyond proof.mjs itself, which does so in dirty-header.txt and after-scratch-verify.txt. Reviewers read the header by eye.

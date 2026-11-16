@@ -1,0 +1,30 @@
+self-check.txt, run in the worktree
+$ node scripts/no-comments.mjs
+exit 0
+
+$ grep -nE '//|/\*|\*/|<!--' agent-team/evidence/T-036/proposed/scripts/handoff-check.mjs agent-team/evidence/T-036/proposed/tests/handoff-check.test.js
+grep exit 1 (1 = no lines)
+
+lines holding # in the two proposed .sh files:
+agent-team/evidence/T-036/proposed/scripts/guards.sh:1:#!/usr/bin/env bash
+agent-team/evidence/T-036/proposed/scripts/verify.sh:1:#!/usr/bin/env bash
+agent-team/evidence/T-036/proposed/scripts/verify.sh:6:while [ $# -gt 0 ]; do
+agent-team/evidence/T-036/proposed/scripts/verify.sh:46:check "lint" bash -c 'shopt -s nullglob; files=(src/*.js tests/*.js scripts/*.mjs); [ ${#files[@]} -gt 0 ] || exit 1; for f in "${files[@]}"; do node --check "$f" || exit 1; done'
+agent-team/evidence/T-036/proposed/scripts/verify.sh:47:check "unit tests" bash -c 'shopt -s nullglob; files=(tests/*.test.js); [ ${#files[@]} -gt 0 ] || exit 1; node --test "${files[@]}"'
+verdict: guards.sh line 1 shebang; verify.sh line 1 shebang; verify.sh $# (line 6, parameter count) and ${#files[@]} (lines 46 and 47, array length) are shell expansions, not comments, and are on BASE unchanged; no added line holds #
+
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:' <the four proposed files> agent-team/evidence/T-036/proof.mjs
+grep exit 1 (1 = no lines)
+
+evidence scripts in agent-team/evidence/T-036: agent-team/evidence/T-036/proof.mjs 
+console or util.format call in proof.mjs:
+151:  const fmt = lines.includes(FORMAT_FAIL + ": First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it");
+249:      const label = text === null ? "console.log('x') appended to src/game.js" : 'TODO in a new src/planted.js';
+grep exit 0: two lines, both inside string literals, not calls (line 151 is the expected guard message, line 249 a label); proof.mjs makes no console or util.format call and writes with process.stdout.write of one string; the planted guard texts are built from parts such as C + ".log(v)", and the proposed guard passes proof.mjs (after-scratch-verify.txt: guards.sh exit 0 on the task head)
+
+module diff (proposed.diff): only the FORCED_ENV line changes:
+22c22
+< const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0' };
+---
+> const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0', GIT_TEST_ASSUME_DIFFERENT_OWNER: '0', GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE: '0' };
+export added to the module: none (Object.keys(gitEnv({})) is used; gitEnv spreads FORCED_ENV last and removes every name whose upper-case form is a FORCED_ENV key, so gitEnv({}) is exactly FORCED_ENV)
