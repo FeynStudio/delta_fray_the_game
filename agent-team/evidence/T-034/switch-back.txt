@@ -1,6 +1,7 @@
-switch-back routes (Done-when 4, Coordinator choices c and d), produced by agent-team/evidence/T-034/graph.mjs <ref> switch and <ref> alternates; Windows 11, git 2.56.0.windows.4, Node v24.15.0; lower-case environment names were run (Windows)
+switch-back routes (Done-when 4, Coordinator choices c and d), produced by agent-team/evidence/T-034/graph.mjs <ref> switch and <ref> alternates; Windows 11, git 2.56.0.windows.4, Node v24.15.0; the lower-case environment names were run (Windows)
+all outputs of this file come from one batch run from the worktree at be2c73f, git status --porcelain empty at the start: yes (agent-team/evidence/T-034/*.mjs as committed in be2c73f)
 
-Summary on the committed change eee9833 (one line per route; START gives still stale on every route, see the START section):
+Summary on the committed change eee9833 (START gives still stale on every route, see the START section):
   c1 core.commitGraph=true in the fixture .git/config: covered by the setting
   c2 GIT_CONFIG_PARAMETERS and git_config_parameters with 'core.commitGraph=true': covered by the setting
   c3 GIT_CONFIG_COUNT/KEY_0/VALUE_0 and the lower-case names, core.commitGraph=true: covered by the setting
@@ -8,10 +9,10 @@ Summary on the committed change eee9833 (one line per route; START gives still s
   c5 GIT_TEST_COMMIT_GRAPH=1 and git_test_commit_graph=1: still stale (git reads commit-graphs under this variable whatever core.commitGraph says; no config key turns it off, so it is not fixed here: Follow-up 1 in the Handoff)
   d1 objects/info/alternates naming an alternate with a forged info/commit-graph: covered by the setting
   d2 GIT_ALTERNATE_OBJECT_DIRECTORIES and git_alternate_object_directories naming that alternate: covered by the setting
-  d3 other parent data through an alternate: a forged loose commit object (parent line changed, stored under the true hash) in the alternate: still stale (not a commit-graph; Follow-up 2 in the Handoff)
+  d3 other parent data through an alternate, a forged loose commit object (parent line changed, stored under the true hash): still stale (not a commit-graph; Follow-up 2 in the Handoff)
   d4 for comparison, the same forged loose object written over the commit's own loose object in .git/objects (no alternate): still stale (Follow-up 2)
 
-=== committed change eee9833, run from the worktree at eee9833, git status --porcelain empty at the start: yes
+=== committed change, module at eee9833
 graph.mjs switch, platform win32, node v24.15.0, git version 2.56.0.windows.4
 module scripts/handoff-check.mjs at eee9833: const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.commitGraph=false'];
 fixture as in graph.mjs, case (i) forged single-file graph in place; a route is live when git reads it (git config --get core.commitGraph gives true under it with no -c), and the verdict is from checkHandoff of the module at eee9833
@@ -81,7 +82,7 @@ d4 the same forged loose object for C written over C's own loose object in the f
 process.env holds the same GIT_ names as at the start: yes
 scratch folder removed: yes
 
-=== START 7b64dc5 (module identical to BASE 3cb76db), for comparison; run from the worktree at b80aba4, git status --porcelain empty at the start: yes
+=== START 7b64dc5 (module identical to BASE 3cb76db), for comparison
 graph.mjs switch, platform win32, node v24.15.0, git version 2.56.0.windows.4
 module scripts/handoff-check.mjs at 7b64dc5: const SAFE = ['-c', 'core.fsmonitor=false'];
 fixture as in graph.mjs, case (i) forged single-file graph in place; a route is live when git reads it (git config --get core.commitGraph gives true under it with no -c), and the verdict is from checkHandoff of the module at 7b64dc5

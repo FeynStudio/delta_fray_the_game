@@ -1,4 +1,4 @@
-run from the worktree at b80aba4, git status --porcelain empty at the start: yes; module taken from START 7b64dc5, identical to BASE 3cb76db
+all outputs of this file come from one batch run from the worktree at be2c73f, git status --porcelain empty at the start: yes (agent-team/evidence/T-034/*.mjs as committed in be2c73f); module taken from START 7b64dc5, identical to BASE 3cb76db
 graph.mjs graph, platform win32, node v24.15.0, git version 2.56.0.windows.4
 module scripts/handoff-check.mjs at 7b64dc5: const SAFE = ['-c', 'core.fsmonitor=false'];
 fixture: A "Add the game" (code); H "Handoff" names A (agent-team/ only); B "Change the game" (code); C "Revert the change" (code back to A); D "Notes" (agent-team/ only, HEAD). True latest code commit: C
