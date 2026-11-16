@@ -7,11 +7,11 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | agent sandbox cannot run the browser smoke check; human run needed (handled, not promoted: smoke.mjs fix ef1704e; no recurrence in T-004, T-005) | 3 | T-001, T-002, T-003 |
 | evidence log header missing commit (git did not resolve in the runner's shell) | 2 | T-001, T-002 |
 | design doc left stale after a human design decision (logged to BACKLOG, not updated) | 1 | T-001 |
-| smoke screenshot cannot show the feature under review (taken in the wrong phase) | 3 | T-002, T-007, T-009 |
+| smoke screenshot cannot show the feature under review (taken in the wrong phase) (handled, marked 2026-11-16: per-phase gauge screenshots by T-008, merge 8743557; checked backward-launch and explosion screenshots by T-017, merge bf8eaaa) | 3 | T-002, T-007, T-009 |
 | task past ~400 changed lines with no recorded split decision | 1 | T-002 |
-| handoff text left stale after a later change or decision | 3 | T-002, T-006, T-009 |
+| handoff text left stale after a later change or decision (promoted to guard, marked 2026-11-16: stale-handoff check scripts/handoff-check.mjs and tests/handoff-check.test.js, T-016, merge 3df0266) | 3 | T-002, T-006, T-009 |
 | build started without a recorded human go-ahead (latest tagged decision says don't build) | 1 | T-006 |
-| evidence log header commit does not match the code that ran (uncommitted change at run time) | 4 | T-008, T-009, T-017, T-033 |
+| evidence log header commit does not match the code that ran (uncommitted change at run time) (promoted to guard, marked 2026-11-16: verify.sh writes a `dirty:` line (yes, no or unknown) as line 2 of every log, T-036, merge 794bf0c, applied d47fac1; information only, it never changes RESULT) | 4 | T-008, T-009, T-017, T-033 |
 | before evidence overwritten by the after run (verify.sh writes the same artifact file names for every label) | 1 | T-012 |
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 2 | T-014, T-009 |
 | owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 2 | T-013, T-029 |
