@@ -1,0 +1,18 @@
+gaps.mjs head all, platform win32, node v24.15.0, git version 2.56.0.windows.4
+item 1, grafts, head module (worktree files)
+fixture: A b4dc2bc "Add the game"; the Handoff commit 3711ba2 names A; B 70d7687 "Change the game"; C 9272bbb "Revert the change" (code back to A); D 1552f89 "Notes" (agent-team/ only)
+graft line used: "<D> <the Handoff commit>"
+GIT_GRAFT_FILE forced by gitEnv: the child "none" of the module file; exists: no
+no graft: plain git parent of D = C; checkHandoff FAIL (commit C; reason: Handoff does not name 9272bbb; latest code commit is 9272bbb (Revert the change))
+case (i) .git/info/grafts: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 9272bbb; latest code commit is 9272bbb (Revert the change))
+case (ii) GIT_GRAFT_FILE set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 9272bbb; latest code commit is 9272bbb (Revert the change))
+case (ii) git_graft_file set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 9272bbb; latest code commit is 9272bbb (Revert the change))
+case (ii) Git_Graft_File set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 9272bbb; latest code commit is 9272bbb (Revert the change))
+process.env holds no graft name after the cases: yes
+item 2, inRepo, head test file (worktree files)
+throw-away repo in the OS temp dir, before: HEAD is refs/heads/master at commit dd73e17, rev-list --all --count 1, status --porcelain empty
+node --test tests/handoff-check.test.js from a scratch copy (no .git, node_modules, .env files, secrets folders) with lower-case git_dir set to the throw-away .git folder: exit 0, tests 79, pass 78, fail 0, skipped 1
+failed (0): 
+throw-away repo, after: HEAD is refs/heads/master at commit dd73e17, rev-list --all --count 1, status --porcelain empty
+throw-away repo reached by the test run: no
+scratch folder removed: yes

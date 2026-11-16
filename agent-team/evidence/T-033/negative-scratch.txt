@@ -1,0 +1,47 @@
+controls.mjs after, platform win32, node v24.15.0, module and tests as in the worktree
+scratch copy of the worktree (without .git, node_modules, .env files and secrets folders), nothing changed: exit 0, tests 79, pass 78, fail 0, skipped 1 [as expected: yes]
+with GIT_GRAFT_FILE removed from FORCED_ENV (scripts/handoff-check.mjs): exit 1, tests 79, pass 72, fail 6, skipped 1; failed tests (6): "ignores a graft in .git/info/grafts or in GIT_GRAFT_FILE that hides the latest code commit", "gitEnv sets GIT_GRAFT_FILE to a file that cannot exist over any value", "gitEnv sets git_graft_file to a file that cannot exist over any value", "gitEnv sets Git_Graft_File to a file that cannot exist over any value", "gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1", "gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one" [as expected: yes]
+  the graft fixture of after-gaps 3a on this scratch copy:
+    gaps.mjs head grafts, platform win32, node v24.15.0, git version 2.56.0.windows.4
+    item 1, grafts, head module (worktree files)
+    fixture: A ff9e79c "Add the game"; the Handoff commit b78e6ec names A; B f766c3d "Change the game"; C 3174372 "Revert the change" (code back to A); D a1655d6 "Notes" (agent-team/ only)
+    graft line used: "<D> <the Handoff commit>"
+    GIT_GRAFT_FILE forced by gitEnv: not set
+    no graft: plain git parent of D = C; checkHandoff FAIL (commit C; reason: Handoff does not name 3174372; latest code commit is 3174372 (Revert the change))
+    case (i) .git/info/grafts: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = the Handoff commit; checkHandoff PASS (commit A; reason: Handoff names ff9e79c)
+    case (ii) GIT_GRAFT_FILE set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = the Handoff commit; checkHandoff PASS (commit A; reason: Handoff names ff9e79c)
+    case (ii) git_graft_file set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = the Handoff commit; checkHandoff PASS (commit A; reason: Handoff names ff9e79c)
+    case (ii) Git_Graft_File set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = the Handoff commit; checkHandoff PASS (commit A; reason: Handoff names ff9e79c)
+    process.env holds no graft name after the cases: yes
+    scratch folder removed: yes
+with GIT_GRAFT_FILE in FORCED_ENV set to the relative value .git/info/grafts (scripts/handoff-check.mjs): exit 1, tests 79, pass 72, fail 6, skipped 1; failed tests (6): "ignores a graft in .git/info/grafts or in GIT_GRAFT_FILE that hides the latest code commit", "gitEnv sets GIT_GRAFT_FILE to a file that cannot exist over any value", "gitEnv sets git_graft_file to a file that cannot exist over any value", "gitEnv sets Git_Graft_File to a file that cannot exist over any value", "gitEnv keeps the other names and always sets GIT_NO_LAZY_FETCH to 1", "gitEnv sets GIT_NO_LAZY_FETCH and GIT_NO_REPLACE_OBJECTS to 1 over any value or case of the name, and keeps names that only look like a removed one" [as expected: yes]
+  the graft fixture of after-gaps 3a on this scratch copy:
+    gaps.mjs head grafts, platform win32, node v24.15.0, git version 2.56.0.windows.4
+    item 1, grafts, head module (worktree files)
+    fixture: A f3975c2 "Add the game"; the Handoff commit 2a8117e names A; B d0bb510 "Change the game"; C 94f7539 "Revert the change" (code back to A); D 8e38534 "Notes" (agent-team/ only)
+    graft line used: "<D> <the Handoff commit>"
+    GIT_GRAFT_FILE forced by gitEnv: another value; exists: no
+    no graft: plain git parent of D = C; checkHandoff FAIL (commit C; reason: Handoff does not name 94f7539; latest code commit is 94f7539 (Revert the change))
+    case (i) .git/info/grafts: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = the Handoff commit; checkHandoff PASS (commit A; reason: Handoff names f3975c2)
+    case (ii) GIT_GRAFT_FILE set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 94f7539; latest code commit is 94f7539 (Revert the change))
+    case (ii) git_graft_file set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 94f7539; latest code commit is 94f7539 (Revert the change))
+    case (ii) Git_Graft_File set to a grafts file outside .git: plain git parent of D = the Handoff commit (live: yes); git with the environment gitEnv gives = C; checkHandoff FAIL (commit C; reason: Handoff does not name 94f7539; latest code commit is 94f7539 (Revert the change))
+    process.env holds no graft name after the cases: yes
+    scratch folder removed: yes
+with inRepo filter put back to exact case (tests/handoff-check.test.js): exit 0, tests 79, pass 78, fail 0, skipped 1; failed tests (0): none [as expected: yes]
+  no unit test pins the inRepo filter; the throw-away repo run of after-gaps 3b on this scratch copy:
+    gaps.mjs head reach, platform win32, node v24.15.0, git version 2.56.0.windows.4
+    item 2, inRepo, head test file (worktree files)
+    throw-away repo in the OS temp dir, before: HEAD is refs/heads/master at commit 9d910df, rev-list --all --count 1, status --porcelain empty
+    node --test tests/handoff-check.test.js from a scratch copy (no .git, node_modules, .env files, secrets folders) with lower-case git_dir set to the throw-away .git folder: exit 1, tests 79, pass 52, fail 26, skipped 1
+    throw-away repo, after: HEAD is refs/heads/task/T-900-fixture at commit none (git rev-parse exit 1), rev-list --all --count 1, status --porcelain 1 lines
+    throw-away repo reached by the test run: yes
+    scratch folder removed: yes
+with CODE_PATHS with :(exclude,icase) (scripts/handoff-check.mjs): exit 1, tests 79, pass 77, fail 1, skipped 1; failed tests (1): "counts a name that only starts like agent-team/, a nested agent-team folder and a deleted code file as code" [as expected: yes]
+with FIRST_C1 = 0x7e (scripts/handoff-check.mjs): exit 1, tests 79, pass 77, fail 1, skipped 1; failed tests (1): "keeps U+007E and removes U+009F in the subject and the reason" [as expected: yes]
+with LAST_C1 = 0x9e (scripts/handoff-check.mjs): exit 1, tests 79, pass 77, fail 1, skipped 1; failed tests (1): "keeps U+007E and removes U+009F in the subject and the reason" [as expected: yes]
+with FIRST_C1 = 0x80 (scripts/handoff-check.mjs): exit 1, tests 79, pass 77, fail 1, skipped 1; failed tests (1): "removes U+001F and DEL from the subject and the reason, and keeps the space and U+00A0" [as expected: yes]
+with LAST_C1 = 0xa0 (scripts/handoff-check.mjs): exit 1, tests 79, pass 77, fail 1, skipped 1; failed tests (1): "removes U+001F and DEL from the subject and the reason, and keeps the space and U+00A0" [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all as expected: yes

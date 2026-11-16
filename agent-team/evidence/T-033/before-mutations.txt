@@ -1,0 +1,9 @@
+controls.mjs before, platform win32, node v24.15.0, module and tests as in the worktree
+the two files in the scratch copy equal BASE 8042468: yes [as expected: yes]
+scratch copy of the worktree (without .git, node_modules, .env files and secrets folders), nothing changed: exit 0, tests 74, pass 73, fail 0, skipped 1 [as expected: yes]
+with CODE_PATHS with :(exclude,icase) (scripts/handoff-check.mjs): exit 0, tests 74, pass 73, fail 0, skipped 1; failed tests (0): none [as expected: yes]
+with FIRST_C1 = 0x7e (scripts/handoff-check.mjs): exit 0, tests 74, pass 73, fail 0, skipped 1; failed tests (0): none [as expected: yes]
+with LAST_C1 = 0x9e (scripts/handoff-check.mjs): exit 0, tests 74, pass 73, fail 0, skipped 1; failed tests (0): none [as expected: yes]
+every scratch change undone (the two files in the scratch copy equal the worktree files): yes [as expected: yes]
+scratch folder removed: yes [as expected: yes]
+all as expected: yes
