@@ -1,0 +1,41 @@
+Survey for Done-when 3, on START 60bd3df (run in the worktree before the sim fix; git grep on START gives the same lines, shown below)
+Scope: scripts/, tests/, sim/, src/ and agent-team/evidence/, files *.js and *.mjs, node_modules skipped
+
+Command 1, every console.log/error/warn/info call, every util.format call and every computed console[ call:
+$ git grep -nE 'console\.(log|error|warn|info)[[:space:]]*\(|util\.format[[:space:]]*\(|console\[' 60bd3df -- 'scripts/*.js' 'scripts/*.mjs' 'tests/*.js' 'tests/*.mjs' 'sim/*.js' 'sim/*.mjs' 'src/*.js' 'src/*.mjs' 'agent-team/evidence/*.js' 'agent-team/evidence/*.mjs'
+60bd3df:agent-team/evidence/T-006/probe.mjs:7:console.log('ships before:', JSON.stringify(s.ships));
+60bd3df:agent-team/evidence/T-006/probe.mjs:8:console.log('ships after resolveMove(150 at 0):', JSON.stringify(out.ships));
+60bd3df:agent-team/evidence/T-006/probe.mjs:9:console.log('player 2 on spawn alive after sweep:', out.ships[1].alive);
+60bd3df:agent-team/evidence/T-006/probe.mjs:10:console.log('isSpawnProtected exported:', typeof rules.isSpawnProtected === 'function');
+60bd3df:agent-team/evidence/T-033/time-options.mjs:51:      console.log('%s', name, 'run', run + 1, 'tests', tests, 'fail', fail, 'file', total, 'ms, same-rule test', same, 'ms');
+60bd3df:agent-team/evidence/T-033/time-options.mjs:55:  for (const [name, list] of Object.entries(results)) console.log('average', name, 'file', avg(list, 'total'), 'ms (vs base ' + (avg(list, 'total') - avg(results.base, 'total')) + ' ms), same-rule test', avg(list, 'same'), 'ms');
+60bd3df:sim/balance.mjs:77:  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: ${t.stat} = ${value} (target ${t.min ?? '-'} to ${t.max ?? '-'})`);
+60bd3df:src/log.js:4:  if (enabled) console[method]('[game]', ...args);
+
+Command 2, every such call whose ( ends the line:
+$ git grep -nE '(console\.(log|error|warn|info|debug)|util\.format|console\[[^]]*\])[[:space:]]*\([[:space:]]*$' 60bd3df -- <same paths>
+(no lines)
+
+Command 3, every import of format (or anything) from node:util or util, and every require( call:
+$ git grep -nE "node:util|from ['\"]util['\"]|require\(" 60bd3df -- <same paths>
+(no lines)
+
+git grep path globs match at any depth here (git pathspec * matches /), so nested folders are included. Untracked files: none on START (git status --porcelain was empty before the before run).
+
+Verdicts (rule of Coordinator choices item 3: the first argument must be a fixed string):
+- agent-team/evidence/T-006/probe.mjs:7  fixed string ('ships before:'), later arguments not checked. Not a hit.
+- agent-team/evidence/T-006/probe.mjs:8  fixed string. Not a hit.
+- agent-team/evidence/T-006/probe.mjs:9  fixed string. Not a hit.
+- agent-team/evidence/T-006/probe.mjs:10 fixed string. Not a hit.
+- agent-team/evidence/T-033/time-options.mjs:51 fixed string ('%s'). Not a hit.
+- agent-team/evidence/T-033/time-options.mjs:55 fixed string ('average'); the concatenation is in a later argument. Not a hit.
+- sim/balance.mjs:77 HIT: the first argument is a template literal holding ${...} expressions.
+- src/log.js:4 computed member console[method]; not one of the checked call forms (a known limit of the rule), and its first argument is the fixed string '[game]' anyway. Not a hit.
+- No call whose ( ends the line, no util.format call, no import from node:util or util, no require( call.
+
+Total hits: 1 (not more than 5), none in a protected file. No stop rule fires.
+
+Handling (Coordinator choices item 3, fixed, not allowlisted):
+- sim/balance.mjs:77 rewritten to console.log('%s', <the same template literal>). One line changed (1 added, 1 deleted), commit on this branch.
+- Output byte-identical before and after: stdout and the --out JSON of node sim/balance.mjs --games 2000, see survey-fix-compare.txt.
+- Cross-check: the proposed guards.sh on a scratch export of BASE c0f6d36 lists exactly sim/balance.mjs:77 and nothing else (guards-master.txt (a)), and exits 0 on the task head with the fix (guards-master.txt (b)).

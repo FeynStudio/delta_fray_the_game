@@ -1,0 +1,143 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
+
+const DIGITS = '0123456789';
+const NEWLINE = '\n';
+const BRANCH_PREFIX = 'task/';
+const TASK_PREFIX = 'T-';
+const MIN_DIGITS = 3;
+const SHORT = 7;
+const TASKS_DIR = ['agent-team', 'tasks'];
+const NOT_CODE = 'agent-team/';
+const HEADING = '## ';
+const HANDOFF_HEADING = '## Handoff';
+const STATUS = 'Status:';
+const CLOSED = 'DONE';
+const PLACEHOLDER = '(owner fills in)';
+const TITLE = 'handoff names the latest code commit';
+const REPO_ENV = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR', 'GIT_NAMESPACE', 'GIT_PREFIX'];
+const PATHSPEC_ENV = ['GIT_LITERAL_PATHSPECS', 'GIT_GLOB_PATHSPECS', 'GIT_NOGLOB_PATHSPECS', 'GIT_ICASE_PATHSPECS'];
+const FORCED_ENV = { GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_GRAFT_FILE: join(fileURLToPath(import.meta.url), 'none'), GIT_TEST_COMMIT_GRAPH: '0', GIT_TEST_ASSUME_DIFFERENT_OWNER: '0', GIT_TEST_COMMIT_GRAPH_DIE_ON_PARSE: '0' };
+const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.commitGraph=false'];
+const CODE_PATHS = ['.', ':(exclude)' + NOT_CODE + '*'];
+const DIFFERS = 1;
+const PAGE = 200;
+const LAST_C0 = 0x1f;
+const FIRST_C1 = 0x7f;
+const LAST_C1 = 0x9f;
+
+function taskId(text) {
+  if (typeof text !== 'string' || !text.startsWith(TASK_PREFIX)) return null;
+  let end = TASK_PREFIX.length;
+  while (end < text.length && DIGITS.includes(text[end])) end += 1;
+  if (end - TASK_PREFIX.length < MIN_DIGITS) return null;
+  if (end < text.length && text[end] !== '-') return null;
+  return text.slice(0, end);
+}
+
+export function taskFromBranch(name) {
+  if (typeof name !== 'string' || !name.startsWith(BRANCH_PREFIX)) return null;
+  return taskId(name.slice(BRANCH_PREFIX.length));
+}
+
+export function gitEnv(source) {
+  const removed = [...REPO_ENV, ...PATHSPEC_ENV, ...Object.keys(FORCED_ENV)];
+  return { ...Object.fromEntries(Object.entries(source).filter(([key]) => !removed.includes(key.toUpperCase()))), ...FORCED_ENV };
+}
+
+function git(root, args) {
+  return execFileSync('git', [...SAFE, ...args], { cwd: root, env: gitEnv(process.env), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true });
+}
+
+function clean(text) {
+  const keep = (code) => code > LAST_C0 && (code < FIRST_C1 || code > LAST_C1);
+  return Array.from(text).filter((ch) => keep(ch.codePointAt(0))).join('');
+}
+
+function briefStatus(lines) {
+  for (const line of lines) {
+    if (line.startsWith(HEADING)) return '';
+    if (line.startsWith(STATUS)) return line.slice(STATUS.length).trim();
+  }
+  return '';
+}
+
+function handoffSection(lines) {
+  const start = lines.findIndex((line) => line.trimEnd() === HANDOFF_HEADING);
+  if (start === -1) return '';
+  const rest = lines.slice(start + 1);
+  const next = rest.findIndex((line) => line.startsWith(HEADING));
+  return (next === -1 ? rest : rest.slice(0, next)).join(NEWLINE);
+}
+
+function touchesCode(root, range) {
+  try {
+    git(root, ['diff-tree', '--quiet', '-r', ...range, '--', ...CODE_PATHS]);
+    return false;
+  } catch (error) {
+    if (error.status === DIFFERS) return true;
+    throw error;
+  }
+}
+
+function latestCodeCommit(root) {
+  for (let done = 0; ; done += PAGE) {
+    const rows = git(root, ['rev-list', '--first-parent', '--parents', '-n', String(PAGE), '--skip=' + done, 'HEAD']).split(NEWLINE).filter(Boolean);
+    for (const row of rows) {
+      const [commit, parent] = row.trim().split(' ');
+      if (touchesCode(root, parent ? [parent, commit] : ['--root', commit])) return commit;
+    }
+    if (rows.length < PAGE) return null;
+  }
+}
+
+const skip = (reason) => ({ result: 'SKIP', reason, commit: null, subject: null });
+
+export function checkHandoff(root, task) {
+  const id = taskId(task);
+  if (id === null) return skip('no task: not on a task branch');
+  const file = join(resolve(root), ...TASKS_DIR, id + '.md');
+  if (!existsSync(file)) return skip('no brief agent-team/tasks/' + id + '.md');
+  const lines = readFileSync(file, 'utf8').split(NEWLINE).map((line) => line.trimEnd());
+  if (briefStatus(lines).split(' ')[0] === CLOSED) return skip('brief ' + id + ' is DONE');
+  const handoff = handoffSection(lines);
+  if (handoff.split(PLACEHOLDER).join('').trim() === '') return skip('handoff not filled in');
+  let stage = 'not a git repo';
+  try {
+    if (git(root, ['rev-parse', '--show-prefix']).trim() !== '') return skip('not the top folder of a git repo');
+    stage = 'git history cannot be read';
+    const commit = latestCodeCommit(root);
+    if (commit === null) return skip('no commit touches a path outside agent-team/');
+    const subject = clean(git(root, ['log', '-1', '--no-show-signature', '--format=%s', commit])).trim();
+    const short = commit.slice(0, SHORT);
+    if (handoff.toLowerCase().includes(short)) return { result: 'PASS', reason: 'Handoff names ' + short, commit, subject };
+    return { result: 'FAIL', reason: 'Handoff does not name ' + short + '; latest code commit is ' + short + ' (' + subject + ')', commit, subject };
+  } catch (error) {
+    return skip(error.code === 'ENOENT' ? 'git cannot be run' : stage);
+  }
+}
+
+export function report(outcome) {
+  if (outcome.result === 'SKIP') return { lines: ['SKIP handoff check (' + outcome.reason + ')'], code: 0 };
+  if (outcome.result === 'PASS') return { lines: ['PASS ' + TITLE], code: 0 };
+  return { lines: ['FAIL ' + TITLE, outcome.reason], code: 1 };
+}
+
+export function currentBranch(root) {
+  try {
+    return git(root, ['branch', '--show-current']).trim();
+  } catch {
+    return '';
+  }
+}
+
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+if (isMain) {
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const task = process.argv[2] || taskFromBranch(currentBranch(root));
+  const { lines, code } = report(checkHandoff(root, task));
+  for (const line of lines) process.stdout.write(line + NEWLINE);
+  process.exit(code);
+}
