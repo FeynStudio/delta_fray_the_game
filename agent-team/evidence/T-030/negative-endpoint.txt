@@ -1,0 +1,50 @@
+T-030 Done-when 5: independent end point. Code commit fbc2234.
+
+$ grep -nE "rules\.js|applyMove" scripts/smoke.mjs; echo "exit $?"   (prints no line)
+exit 1
+On BASE the same grep prints:
+266:  const { applyMove } = await import('/src/rules.js');
+282:  const to = applyMove(d, { distance: d.gauge.distance, angle }).ships[0];
+
+Scratch change in src/rules.js (the same one as Done-when 2c, byte for byte the same diff), never committed, undone with git restore src/rules.js:
+diff --git a/src/rules.js b/src/rules.js
+index e0c0e18..c8c4f63 100644
+--- a/src/rules.js
++++ b/src/rules.js
+@@ -35,7 +35,7 @@ export function applyMove(state, move) {
+   const moved = {
+     ...ship,
+     x: ship.x + Math.cos(a) * move.distance,
+-    y: ship.y + Math.sin(a) * move.distance,
++    y: ship.y - Math.sin(a) * move.distance,
+     heading: wrapDegrees(move.angle),
+     unmovedSinceSpawn: false,
+   };
+
+$ git rev-parse --short HEAD; git status --short -- src/ scripts/
+fbc2234
+ M src/rules.js
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/negE/turns-smoke.json
+smoke turns: turns-smoke-backward-mid.png: mover at (575.048094716167, 517.5) is not strictly between its start and end points before the capture
+exit 1
+result file:
+{
+  "error": "turns-smoke-backward-mid.png: mover at (575.048094716167, 517.5) is not strictly between its start and end points before the capture"
+}
+files written by the run: turns-smoke.json turns-smoke.png 
+$ git restore src/rules.js; git status --short -- src/   (prints nothing)
+$ git diff --stat fbc2234 -- src/ scripts/   (prints nothing)
+$ git status --short
+?? agent-team/evidence/T-030/after-pages.txt
+?? agent-team/evidence/T-030/negative-timeout-turns-smoke.json
+?? agent-team/evidence/T-030/negative-timeout-turns.log
+?? agent-team/evidence/T-030/negative-timeout.txt
+?? agent-team/evidence/T-030/scratch-negative-a.patch
+?? agent-team/evidence/T-030/scratch-negative-b.patch
+?? agent-team/evidence/T-030/turns-smoke.json
+?? agent-team/evidence/T-030/turns-smoke.png
+?? agent-team/evidence/T-030/turns.json
+
+Reading of the numbers: the launch starts at (640, 480) with travel angle 210 and distance 150. Half-way the mover should be at (575.048, 442.5); with the y sign flipped in applyMove the game puts it at (575.048, 517.5), on the other side of the start point, and the probe's own end point (510.096, 405) no longer agrees with it. On BASE the same fault passed (before-gaps.txt, part c).
+The run stops at the first capture, turns-smoke-backward-mid.png, so with this scratch change the check behind turns-smoke-backward-end.png and its changed message ('the expected end point') are not reached; that message was checked by reading only.
+A first run of this control wrote to <scratch folder>/negE-turns-smoke.json and so named the file negE-turns-smoke-backward-mid.png (the script builds the name from --out); it gave the same error and exit 1 and was repeated with the usual file name, shown above.

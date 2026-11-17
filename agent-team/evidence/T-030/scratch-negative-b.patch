@@ -1,0 +1,14 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..11d67d0 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -209,8 +209,7 @@ function phaseSetupProbe(keys) {
+ }
+ 
+ function gaugeAfterFrameProbe() {
+-  return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
+-    () => done(window.__game.getState().gauge))));
++  return new Promise(() => {});
+ }
+ 
+ function gaugeProbe() {

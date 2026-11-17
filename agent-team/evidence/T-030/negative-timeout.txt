@@ -1,0 +1,152 @@
+T-030 Done-when 3: the time limit works. Code commit fbc2234 (EVAL_TIMEOUT_MS = 15000). Every scratch change below was made in the working tree on top of fbc2234, never committed, and undone with git restore scripts/smoke.mjs. No run here was made without the time limit in place.
+Browser: Google Chrome 157.0.8103.78 (C:\Program Files\Google\Chrome\Application\chrome.exe, headless), Windows 11, Node v24.15.0.
+
+== Pre-check (owner's own extra step, not asked for by the brief): a probe that answers late, not never
+Before running a probe that never answers, freezeLoopProbe was changed to answer after 25 s, so that the run would end by itself even if the limit did not work:
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..50e4c22 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -250,16 +250,7 @@ async function turnsProbe() {
+ }
+ 
+ function freezeLoopProbe() {
+-  return new Promise((done) => {
+-    window.requestAnimationFrame = (loop) => {
+-      window.requestAnimationFrame = () => 0;
+-      const now = performance.now();
+-      window.__redraw = () => loop(now);
+-      window.__redraw();
+-      done(true);
+-      return 0;
+-    };
+-  });
++  return new Promise((done) => setTimeout(() => done(true), 25000));
+ }
+ 
+ function drawnStateProbe() {
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/precheck-turns-smoke.json
+smoke turns: page evaluation timed out after 15000 ms in freezeLoopProbe
+exit 1 after 16127 ms
+{
+  "error": "page evaluation timed out after 15000 ms in freezeLoopProbe"
+}
+(this run was made with the change of fbc2234 staged, just before it was committed; leftover count 10 s later: 0 processes, 0 folders)
+
+== A. freezeLoopProbe never answers (scratch-negative-a.patch)
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..efd935d 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -250,16 +250,7 @@ async function turnsProbe() {
+ }
+ 
+ function freezeLoopProbe() {
+-  return new Promise((done) => {
+-    window.requestAnimationFrame = (loop) => {
+-      window.requestAnimationFrame = () => 0;
+-      const now = performance.now();
+-      window.__redraw = () => loop(now);
+-      window.__redraw();
+-      done(true);
+-      return 0;
+-    };
+-  });
++  return new Promise(() => {});
+ }
+ 
+ function drawnStateProbe() {
+
+$ git rev-parse --short HEAD; git status --short
+fbc2234
+ M scripts/smoke.mjs
+?? agent-team/evidence/T-030/scratch-negative-a.patch
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/negA-turns-smoke.json
+start 2026-11-16T14:11:10.163Z
+smoke turns: page evaluation timed out after 15000 ms in freezeLoopProbe
+end   2026-11-16T14:11:26.350Z
+exit 1, 16151 ms after its start
+result file:
+{
+  "error": "page evaluation timed out after 15000 ms in freezeLoopProbe"
+}
+screenshots written by this run: 1
+counted at 2026-11-16T14:11:41.811Z after waiting 15 s; 259 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+
+$ ./scripts/verify.sh T-030 --feature turns --label negative-timeout   (same scratch change still in place)
+commit: fbc2234  branch: task/T-030-smoke-timeout-close  2026-11-16T14:11:52Z
+dirty: yes
+PASS guards
+PASS lint
+PASS unit tests
+PASS turns scenario runs
+PASS turns output
+FAIL turns browser runs
+FAIL turns browser output
+RESULT: FAIL
+exit 1, 31602 ms after its start
+agent-team/evidence/T-030/turns-smoke.json as that run wrote it (kept as negative-timeout-turns-smoke.json):
+{
+  "error": "page evaluation timed out after 15000 ms in freezeLoopProbe"
+}
+$ git restore scripts/smoke.mjs; git status --short; git diff --stat fbc2234 -- scripts/ src/
+?? agent-team/evidence/T-030/negative-timeout-turns-smoke.json
+?? agent-team/evidence/T-030/negative-timeout-turns.log
+?? agent-team/evidence/T-030/scratch-negative-a.patch
+?? agent-team/evidence/T-030/turns-smoke.json
+?? agent-team/evidence/T-030/turns-smoke.png
+?? agent-team/evidence/T-030/turns.json
+counted at 2026-11-16T14:12:38.989Z after waiting 15 s; 259 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+negative-timeout-turns.log, the lines that matter:
+1:commit: fbc2234  branch: task/T-030-smoke-timeout-close  2026-11-16T14:11:52Z
+2:dirty: yes
+3:PASS guards
+4:PASS lint
+343:PASS unit tests
+344:PASS turns scenario runs
+345:PASS turns output
+346:smoke turns: page evaluation timed out after 15000 ms in freezeLoopProbe
+347:FAIL turns browser runs
+357:+  "error": "page evaluation timed out after 15000 ms in freezeLoopProbe"
+359:FAIL turns browser output
+360:RESULT: FAIL
+
+== B. gaugeAfterFrameProbe never answers (scratch-negative-b.patch)
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..11d67d0 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -209,8 +209,7 @@ function phaseSetupProbe(keys) {
+ }
+ 
+ function gaugeAfterFrameProbe() {
+-  return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
+-    () => done(window.__game.getState().gauge))));
++  return new Promise(() => {});
+ }
+ 
+ function gaugeProbe() {
+
+$ git rev-parse --short HEAD; git status --short -- scripts/ src/
+fbc2234
+ M scripts/smoke.mjs
+$ node scripts/smoke.mjs --feature input --out <scratch folder outside the repo>/negB-input-smoke.json
+start 2026-11-16T14:12:49.519Z
+smoke input: page evaluation timed out after 15000 ms in gaugeAfterFrameProbe
+end   2026-11-16T14:13:06.359Z
+exit 1, 16803 ms after its start
+result file:
+{
+  "error": "page evaluation timed out after 15000 ms in gaugeAfterFrameProbe"
+}
+$ git restore scripts/smoke.mjs; git status --short -- scripts/ src/; git diff --stat fbc2234 -- scripts/ src/
+counted at 2026-11-16T14:13:21.886Z after waiting 15 s; 259 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+
+Summary: A exit 1 after 16151 ms (limit 60 s), message names freezeLoopProbe; through verify.sh FAIL turns browser runs and RESULT: FAIL; B exit 1 after 16803 ms, message names gaugeAfterFrameProbe. After each of the three runs, counted 15 s after the run (after the restore): 0 processes with the profile name in the command line, 0 profile folders in the OS temp dir.
+The one screenshot of run A is turns-smoke.png of the checked turns page, taken before the first capture page is opened; the script writes the screenshots it already has when a run fails, as on BASE.

@@ -1,0 +1,14 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..839a9d8 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -117,6 +117,9 @@ async function launchBrowser(exe, profile) {
+       }
+     },
+     async close() {
++      const { targetInfos } = await cdp.send('Target.getTargets');
++      const pages = targetInfos.filter((t) => t.type === 'page');
++      process.stderr.write(`PAGE TARGETS just before Browser.close: ${pages.length} (${pages.map((t) => t.url.replace(/^http:\/\/127\.0\.0\.1:\d+/, '')).join(', ')})\n`);
+       const closing = cdp.send('Browser.close').then(() => null, (err) => err);
+       const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
+       if (closeErr) process.stderr.write(`Browser.close failed: ${closeErr.message}\n`);

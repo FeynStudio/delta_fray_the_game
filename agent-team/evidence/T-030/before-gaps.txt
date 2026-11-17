@@ -1,0 +1,220 @@
+T-030 Done-when 2: the three gaps on BASE b8fc518 (branch task/T-030-smoke-timeout-close before any change; git status clean apart from this evidence folder before and after each scratch change).
+Line numbers are those of scripts/smoke.mjs at b8fc518 (git show b8fc518:scripts/smoke.mjs). The brief's numbers came from an older copy; they were re-checked and are the same on BASE for every part named.
+
+== a. Time limit: by reading
+
+page.eval, lines 90 to 98: it awaits Runtime.evaluate with awaitPromise: true; no timer, no race.
+  90          async eval(fn, ...fnArgs) {
+  91            const r = await send('Runtime.evaluate', {
+  92              expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+  93            });
+  94            if (r.exceptionDetails) {
+  95              throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+  96            }
+  97            return r.result.value;
+  98          },
+
+gaugeAfterFrameProbe, lines 201 to 204: resolves only inside the page's second requestAnimationFrame callback.
+ 201  function gaugeAfterFrameProbe() {
+ 202    return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
+ 203      () => done(window.__game.getState().gauge))));
+ 204  }
+
+freezeLoopProbe, lines 242 to 253: resolves only when the page next calls requestAnimationFrame.
+ 242  function freezeLoopProbe() {
+ 243    return new Promise((done) => {
+ 244      window.requestAnimationFrame = (loop) => {
+ 245        window.requestAnimationFrame = () => 0;
+ 246        const now = performance.now();
+ 247        window.__redraw = () => loop(now);
+ 248        window.__redraw();
+ 249        done(true);
+ 250        return 0;
+ 251      };
+ 252    });
+ 253  }
+
+Every timer in the file (grep -nE 'setTimeout|setInterval|clearTimeout|clearInterval|Promise.race' on the BASE copy):
+62:      settled = true; clearTimeout(timer); clearInterval(poll); fn(value);
+64:    const timer = setTimeout(() => finish(fail, new Error('browser did not start within 20s')), 20000);
+65:    const poll = setInterval(() => {
+116:        await new Promise((r) => setTimeout(r, 100));
+121:      const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
+127:        await new Promise((r) => setTimeout(r, 100));
+130:      await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
+Lines 62 to 65: the 20 s browser start. Line 116: the 100 ms pause of the page-ready loop (its deadline, lines 108 and 115, is checked only between evaluations, so it cannot end an evaluation that is still waiting). Lines 121 to 130: browser.close. None is in page.eval or in a probe.
+So when the page never renders a frame, the promise of either probe never resolves, page.eval never returns, the main block (lines 458 to 472) never reaches its finally, and the browser and the local server stay up. scripts/verify.sh line 41 calls the smoke with no time limit either (read only).
+Not reproduced on purpose (brief, Coordinator choices, last point).
+
+== b. Open pages just before browser.close()
+
+Scratch change, never committed: scratch-page-count.patch (three lines at the top of the browser object's close(): Target.getTargets, keep type 'page', write the count and the page addresses without the server origin to stderr). Undone with git restore scripts/smoke.mjs.
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/pages-turns-smoke.json
+PAGE TARGETS just before Browser.close: 5 (/index.html?debug=1, about:blank, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature input --out <scratch folder outside the repo>/pages-input-smoke.json
+PAGE TARGETS just before Browser.close: 7 (/index.html?debug=1, /index.html?debug=1, about:blank, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature render --out <scratch folder outside the repo>/pages-render-smoke.json
+PAGE TARGETS just before Browser.close: 3 (/index.html?debug=1, about:blank, /index.html?debug=1)
+exit 0
+turns: 5 = the about:blank page the browser starts with + the checked turns page + 3 stateShot pages (the brief's 4, which does not count the start page).
+input: 7 = the start page + 3 pages behind the checked results + 3 phaseShot pages (the brief's 6).
+render (not asked for, for completeness): 3 = the start page + 2 checked pages; no capture page.
+
+== c. End point taken from the game's own applyMove
+
+Scratch change in src/rules.js, never committed, undone with git restore src/rules.js:
+diff --git a/src/rules.js b/src/rules.js
+index e0c0e18..c8c4f63 100644
+--- a/src/rules.js
++++ b/src/rules.js
+@@ -35,7 +35,7 @@ export function applyMove(state, move) {
+   const moved = {
+     ...ship,
+     x: ship.x + Math.cos(a) * move.distance,
+-    y: ship.y + Math.sin(a) * move.distance,
++    y: ship.y - Math.sin(a) * move.distance,
+     heading: wrapDegrees(move.angle),
+     unmovedSinceSpawn: false,
+   };
+
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/gap-turns-smoke.json
+smoke exit 0
+(no output on stderr; the result file is identical to expected/turns-smoke.json:)
+{
+  "destroyed enemy respawns at its spawn point": true,
+  "attacker survives at the end of its move": true,
+  "turn passes to player 2": true,
+  "next move starts on the power gauge": true,
+  "no turn timer": true
+}
+SHA-256 of the screenshots of that run: the two backward pictures differ from before-png-sha256.txt (the ship flew to the wrong side) and the run still exited 0; the explosion picture is the same (its move is at angle 0).
+218b93f63f4b63b18cf870fc7900ad5f440cc190594a74bc4448c3a812b08aa8 *gap-turns-smoke-backward-mid.png
+cad872ea1ef1cab5149449f1e14ad84d8ff5da0d7e36c297ae25fcce5f1090d8 *gap-turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *gap-turns-smoke-explosion.png
+
+$ node --test tests/rules.test.js
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.3162ms)
+✔ createInitialState reads config at call time (0.8661ms)
+✔ createInitialState does not share objects with config (0.1713ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65.2921
+rules test exit 0
+
+NOTE, differs from the brief: Done-when 2c expects this command to fail. It passes: tests/rules.test.js holds three createInitialState tests and none for applyMove. The applyMove tests are in tests/movement.test.js, which fails with the same scratch change:
+
+$ node --test tests/movement.test.js
+✖ forward moves at 0, 90, 180 and 270 go right, down, left and up and turn the heading (1.9813ms)
+✖ 45 degrees uses degrees, not radians (3.1836ms)
+✔ forward heading is kept within 0 to 360 (0.205ms)
+✖ a backward move travels along the angle and turns the heading to the travel angle (1.0229ms)
+✔ only the ship whose turn it is moves; every other field is carried over (0.4159ms)
+✔ works without a gauge field (scenario states have none) (0.244ms)
+✖ a move longer than maxMove is refused; exactly maxMove is made (human decision 2026-11-08) (0.6376ms)
+✔ distance comes from the move and the limit from config at call time (maxMove 200) (0.1896ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 4
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.5949
+
+✖ failing tests:
+
+test at tests\movement.test.js:21:1
+✖ forward moves at 0, 90, 180 and 270 go right, down, left and up and turn the heading (1.9813ms)
+  AssertionError [ERR_ASSERTION]: angle 90: (400, 325)
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-030/tests/movement.test.js:27:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\movement.test.js:33:1
+✖ 45 degrees uses degrees, not radians (3.1836ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(near(ship.x, 200 + 100 * Math.SQRT1_2) && near(ship.y, 480 + 100 * Math.SQRT1_2))
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-030/tests/movement.test.js:35:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\movement.test.js:45:1
+✖ a backward move travels along the angle and turns the heading to the travel angle (1.0229ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(near(ship.y, 400 + 100 * Math.sin((210 * Math.PI) / 180)))
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-030/tests/movement.test.js:48:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\movement.test.js:69:1
+✖ a move longer than maxMove is refused; exactly maxMove is made (human decision 2026-11-08) (0.6376ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(near(full.y, 480 + config.maxMove))
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-030/tests/movement.test.js:74:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+movement test exit 1
+
+$ node --test tests/*.test.js   (summary lines only)
+ℹ tests 327
+ℹ pass 319
+ℹ fail 7
+ℹ skipped 1
+all tests exit 1
+
+After git restore src/rules.js: git status --short printed only '?? agent-team/evidence/T-030/' and git diff --stat printed nothing.

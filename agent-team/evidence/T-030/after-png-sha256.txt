@@ -1,0 +1,40 @@
+T-030 Done-when 6: same pictures and same results. Code commit fbc2234.
+
+Before (BASE b8fc518, before-png-sha256.txt):
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-030 --feature turns --label after (fbc2234, dirty: no, RESULT: PASS, after-turns.log):
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-030 --feature all --label after (fbc2234, dirty: no, RESULT: PASS, after-all.log); these are the files now in this folder:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+Compared with the before files kept in this folder (sha256sum of both, same value = byte for byte the same):
+  SAME      turns-smoke-backward-mid.png = before-turns-smoke-backward-mid.png
+  SAME      turns-smoke-backward-end.png = before-turns-smoke-backward-end.png
+  SAME      turns-smoke-explosion.png = before-turns-smoke-explosion.png
+
+Result files (cmp, byte for byte):
+  after the turns run: turns-smoke.json identical to before-turns-smoke.json; turns.json identical to before-turns.json
+  after the all run: render-smoke.json identical to before-render-smoke.json
+  after the all run: input-smoke.json identical to before-input-smoke.json
+  after the all run: turns-smoke.json identical to before-turns-smoke.json
+  after the all run: turns.json identical to before-turns.json
+  render-smoke.json identical to expected/render-smoke.json
+  input-smoke.json identical to expected/input-smoke.json
+  turns-smoke.json identical to expected/turns-smoke.json
+
+Not required to be the same (taken with the loop running, T-027); recorded so nobody has to wonder:
+  different turns-smoke.png
+  different render-smoke.png
+  different input-smoke.png
+  different input-smoke-power.png
+  different input-smoke-direction.png
+  different input-smoke-direction-backward.png
+That these six differ between two runs of the same script was checked on files already in the repo: the six in agent-team/evidence/T-026/ (written on c7ac78e, where scripts/smoke.mjs is the BASE copy) all differ from the before-* files in this folder, which were written by the same script.

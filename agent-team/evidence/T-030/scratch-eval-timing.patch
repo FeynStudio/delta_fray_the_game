@@ -1,0 +1,16 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..8b85595 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -88,9 +88,11 @@ async function launchBrowser(exe, profile) {
+ 
+       const page = {
+         async eval(fn, ...fnArgs) {
++          const t0 = performance.now();
+           const r = await send('Runtime.evaluate', {
+             expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+           });
++          process.stderr.write(`EVAL ${fn.name || 'page-ready-check'} ${(performance.now() - t0).toFixed(1)} ms\n`);
+           if (r.exceptionDetails) {
+             throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+           }

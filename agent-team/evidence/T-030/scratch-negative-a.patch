@@ -1,0 +1,22 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..efd935d 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -250,16 +250,7 @@ async function turnsProbe() {
+ }
+ 
+ function freezeLoopProbe() {
+-  return new Promise((done) => {
+-    window.requestAnimationFrame = (loop) => {
+-      window.requestAnimationFrame = () => 0;
+-      const now = performance.now();
+-      window.__redraw = () => loop(now);
+-      window.__redraw();
+-      done(true);
+-      return 0;
+-    };
+-  });
++  return new Promise(() => {});
+ }
+ 
+ function drawnStateProbe() {

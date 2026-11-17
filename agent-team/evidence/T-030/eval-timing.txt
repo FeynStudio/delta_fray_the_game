@@ -1,0 +1,201 @@
+Longest single page evaluation, measured on BASE b8fc518 before choosing the limit (brief, Change 1 and Stop rule line 2).
+Scratch change, never committed: scratch-eval-timing.patch (two lines in page.eval that write the probe name and the time of each Runtime.evaluate call to stderr). Undone with git restore scripts/smoke.mjs; git status afterwards showed only the untracked evidence folder.
+Runs: the three smoke commands that ./scripts/verify.sh --feature all runs (render, input, turns), in that order, three rounds, each run by hand as node scripts/smoke.mjs --feature <name> --out <a file in the session scratch folder outside the repo>. All nine exited 0.
+The unnamed function of the page-ready loop in open() is printed as page-ready-check.
+
+Evaluations timed: 156
+Longest: EVAL gaugeAfterFrameProbe 34.5 ms
+Stop rule limit: 3000 ms. Not triggered.
+Not timed: an evaluation whose Runtime.evaluate call the browser rejects (the scratch line sits after the await); the page-ready loop swallows such an error. None of the nine runs printed an error.
+
+Longest per probe (ms), over the three rounds:
+  gaugeAfterFrameProbe   max   34.5  calls 9
+  page-ready-check       max   15.9  calls 72
+  freezeLoopProbe        max   13.9  calls 9
+  backwardLaunchProbe    max    4.8  calls 6
+  inputProbe             max    4.0  calls 3
+  explosionProbe         max    3.9  calls 3
+  phaseSetupProbe        max    2.6  calls 9
+  turnsProbe             max    2.3  calls 3
+  gaugeProbe             max    2.0  calls 9
+  stateProbe             max    1.9  calls 9
+  renderProbe            max    1.7  calls 6
+  phaseProbe             max    1.6  calls 6
+  drawnStateProbe        max    1.4  calls 9
+  shiftFlipProbe         max    1.1  calls 3
+
+Raw output:
+== round 1, node scripts/smoke.mjs --feature render
+EVAL page-ready-check 13.9 ms
+EVAL page-ready-check 1.0 ms
+EVAL renderProbe 1.3 ms
+EVAL page-ready-check 9.9 ms
+EVAL page-ready-check 1.1 ms
+EVAL renderProbe 1.4 ms
+exit 0
+== round 1, node scripts/smoke.mjs --feature input
+EVAL page-ready-check 12.6 ms
+EVAL page-ready-check 1.6 ms
+EVAL inputProbe 4.0 ms
+EVAL page-ready-check 10.3 ms
+EVAL page-ready-check 4.3 ms
+EVAL shiftFlipProbe 1.1 ms
+EVAL page-ready-check 11.6 ms
+EVAL page-ready-check 1.0 ms
+EVAL phaseProbe 0.7 ms
+EVAL phaseProbe 0.6 ms
+EVAL page-ready-check 9.4 ms
+EVAL page-ready-check 0.9 ms
+EVAL phaseSetupProbe 0.6 ms
+EVAL gaugeAfterFrameProbe 25.7 ms
+EVAL gaugeProbe 1.3 ms
+EVAL page-ready-check 8.3 ms
+EVAL page-ready-check 0.9 ms
+EVAL phaseSetupProbe 0.6 ms
+EVAL gaugeAfterFrameProbe 31.6 ms
+EVAL gaugeProbe 1.5 ms
+EVAL page-ready-check 8.4 ms
+EVAL page-ready-check 2.0 ms
+EVAL phaseSetupProbe 0.7 ms
+EVAL gaugeAfterFrameProbe 27.5 ms
+EVAL gaugeProbe 1.7 ms
+exit 0
+== round 1, node scripts/smoke.mjs --feature turns
+EVAL page-ready-check 13.0 ms
+EVAL page-ready-check 1.4 ms
+EVAL turnsProbe 2.0 ms
+EVAL page-ready-check 11.4 ms
+EVAL page-ready-check 1.1 ms
+EVAL freezeLoopProbe 5.8 ms
+EVAL backwardLaunchProbe 3.2 ms
+EVAL drawnStateProbe 0.9 ms
+EVAL stateProbe 1.9 ms
+EVAL page-ready-check 9.0 ms
+EVAL page-ready-check 1.6 ms
+EVAL freezeLoopProbe 13.0 ms
+EVAL backwardLaunchProbe 3.1 ms
+EVAL drawnStateProbe 1.1 ms
+EVAL stateProbe 1.8 ms
+EVAL page-ready-check 9.2 ms
+EVAL page-ready-check 1.4 ms
+EVAL freezeLoopProbe 9.0 ms
+EVAL explosionProbe 2.3 ms
+EVAL drawnStateProbe 1.3 ms
+EVAL stateProbe 1.3 ms
+exit 0
+== round 2, node scripts/smoke.mjs --feature render
+EVAL page-ready-check 14.1 ms
+EVAL page-ready-check 1.1 ms
+EVAL renderProbe 1.4 ms
+EVAL page-ready-check 9.1 ms
+EVAL page-ready-check 1.1 ms
+EVAL renderProbe 1.7 ms
+exit 0
+== round 2, node scripts/smoke.mjs --feature input
+EVAL page-ready-check 12.4 ms
+EVAL page-ready-check 3.4 ms
+EVAL inputProbe 1.7 ms
+EVAL page-ready-check 7.7 ms
+EVAL page-ready-check 2.8 ms
+EVAL shiftFlipProbe 0.8 ms
+EVAL page-ready-check 8.9 ms
+EVAL page-ready-check 2.4 ms
+EVAL phaseProbe 0.6 ms
+EVAL phaseProbe 0.5 ms
+EVAL page-ready-check 9.2 ms
+EVAL page-ready-check 2.5 ms
+EVAL phaseSetupProbe 1.0 ms
+EVAL gaugeAfterFrameProbe 32.0 ms
+EVAL gaugeProbe 1.8 ms
+EVAL page-ready-check 9.3 ms
+EVAL page-ready-check 1.4 ms
+EVAL phaseSetupProbe 2.6 ms
+EVAL gaugeAfterFrameProbe 33.1 ms
+EVAL gaugeProbe 1.9 ms
+EVAL page-ready-check 11.3 ms
+EVAL page-ready-check 1.1 ms
+EVAL phaseSetupProbe 0.7 ms
+EVAL gaugeAfterFrameProbe 26.6 ms
+EVAL gaugeProbe 1.7 ms
+exit 0
+== round 2, node scripts/smoke.mjs --feature turns
+EVAL page-ready-check 15.9 ms
+EVAL page-ready-check 1.3 ms
+EVAL turnsProbe 2.1 ms
+EVAL page-ready-check 9.6 ms
+EVAL page-ready-check 1.7 ms
+EVAL freezeLoopProbe 13.9 ms
+EVAL backwardLaunchProbe 4.5 ms
+EVAL drawnStateProbe 1.4 ms
+EVAL stateProbe 1.7 ms
+EVAL page-ready-check 9.4 ms
+EVAL page-ready-check 1.0 ms
+EVAL freezeLoopProbe 12.0 ms
+EVAL backwardLaunchProbe 4.8 ms
+EVAL drawnStateProbe 1.0 ms
+EVAL stateProbe 1.7 ms
+EVAL page-ready-check 10.3 ms
+EVAL page-ready-check 1.3 ms
+EVAL freezeLoopProbe 10.8 ms
+EVAL explosionProbe 3.9 ms
+EVAL drawnStateProbe 1.3 ms
+EVAL stateProbe 1.4 ms
+exit 0
+== round 3, node scripts/smoke.mjs --feature render
+EVAL page-ready-check 11.9 ms
+EVAL page-ready-check 1.3 ms
+EVAL renderProbe 1.6 ms
+EVAL page-ready-check 11.6 ms
+EVAL page-ready-check 1.3 ms
+EVAL renderProbe 1.2 ms
+exit 0
+== round 3, node scripts/smoke.mjs --feature input
+EVAL page-ready-check 12.0 ms
+EVAL page-ready-check 1.2 ms
+EVAL inputProbe 1.5 ms
+EVAL page-ready-check 11.7 ms
+EVAL page-ready-check 1.3 ms
+EVAL shiftFlipProbe 0.8 ms
+EVAL page-ready-check 9.5 ms
+EVAL page-ready-check 0.8 ms
+EVAL phaseProbe 1.6 ms
+EVAL phaseProbe 0.5 ms
+EVAL page-ready-check 9.3 ms
+EVAL page-ready-check 1.0 ms
+EVAL phaseSetupProbe 0.6 ms
+EVAL gaugeAfterFrameProbe 25.3 ms
+EVAL gaugeProbe 1.8 ms
+EVAL page-ready-check 8.9 ms
+EVAL page-ready-check 1.0 ms
+EVAL phaseSetupProbe 0.7 ms
+EVAL gaugeAfterFrameProbe 24.4 ms
+EVAL gaugeProbe 1.8 ms
+EVAL page-ready-check 8.8 ms
+EVAL page-ready-check 1.5 ms
+EVAL phaseSetupProbe 1.8 ms
+EVAL gaugeAfterFrameProbe 34.5 ms
+EVAL gaugeProbe 2.0 ms
+exit 0
+== round 3, node scripts/smoke.mjs --feature turns
+EVAL page-ready-check 12.7 ms
+EVAL page-ready-check 1.8 ms
+EVAL turnsProbe 2.3 ms
+EVAL page-ready-check 10.1 ms
+EVAL page-ready-check 1.5 ms
+EVAL freezeLoopProbe 1.8 ms
+EVAL backwardLaunchProbe 3.5 ms
+EVAL drawnStateProbe 1.1 ms
+EVAL stateProbe 1.9 ms
+EVAL page-ready-check 8.6 ms
+EVAL page-ready-check 0.8 ms
+EVAL freezeLoopProbe 3.1 ms
+EVAL backwardLaunchProbe 4.7 ms
+EVAL drawnStateProbe 1.2 ms
+EVAL stateProbe 1.8 ms
+EVAL page-ready-check 9.6 ms
+EVAL page-ready-check 1.2 ms
+EVAL freezeLoopProbe 2.5 ms
+EVAL explosionProbe 3.7 ms
+EVAL drawnStateProbe 1.3 ms
+EVAL stateProbe 1.7 ms
+exit 0

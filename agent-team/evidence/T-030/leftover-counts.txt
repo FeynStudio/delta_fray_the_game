@@ -1,0 +1,19 @@
+Baseline, before the first smoke run of this task (worktree at BASE b8fc518, nothing run yet):
+counted at 2026-11-16T14:05:18.635Z after waiting 0 s; 255 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+
+After the before runs on BASE (1 verify.sh turns run, 2 before smoke runs, 9 timing runs, 3 page-count runs, 1 run with the applyMove scratch change; 16 smoke runs, all exit 0):
+counted at 2026-11-16T14:08:49.421Z after waiting 0 s; 259 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+
+After the runs on the code commit fbc2234 with scratch changes (pre-check with a late answer, negative A by hand and through verify.sh, negative B, 7 page-count runs, 2 runs with the applyMove scratch change) and 3 plain runs; the counts taken 15 s after each timed-out run are in negative-timeout.txt:
+counted at 2026-11-16T14:14:47.580Z after waiting 0 s; 258 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0
+
+After the after runs on fbc2234 (verify.sh turns and all, both RESULT: PASS; 4 smoke runs):
+counted at 2026-11-16T14:17:00.000Z after waiting 0 s; 258 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0

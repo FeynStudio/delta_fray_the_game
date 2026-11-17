@@ -1,0 +1,133 @@
+T-030 scope check (Done-when 7, 8, 9, 10, 12). BASE b8fc518, code commit fbc2234. Run in the worktree after the after runs.
+
+== Done-when 7
+$ git diff --stat b8fc518 -- expected/ scenarios/ src/ sim/ tests/ index.html scripts/serve.mjs   (prints nothing)
+exit 0
+
+== Done-when 8
+$ git diff --name-only b8fc518 | grep -v '^agent-team/'   (working tree against BASE; only scripts/smoke.mjs)
+scripts/smoke.mjs
+$ git status --short | grep -v ' agent-team/'   (prints nothing: no untracked or changed file outside agent-team/)
+$ git diff --name-only b8fc518 -- agent-team/ | grep -v '^agent-team/evidence/T-030/'
+agent-team/FEATURE_MAP.md
+agent-team/tasks/T-030.md
+(agent-team/DECISIONS.md and agent-team/BACKLOG.md are not in the list: the owner wrote nothing there)
+
+$ git diff -U0 b8fc518 -- scripts/smoke.mjs   (every changed line, with the function git names for each hunk)
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 59afd22..813d5d9 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -13,0 +14 @@ const out = opt('--out');
++const EVAL_TIMEOUT_MS = 15000;
+@@ -91,2 +92,5 @@ async function launchBrowser(exe, profile) {
+-          const r = await send('Runtime.evaluate', {
+-            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
++          let timer;
++          const timedOut = new Promise((_, fail) => {
++            timer = setTimeout(() => fail(new Error(
++              `page evaluation timed out after ${EVAL_TIMEOUT_MS} ms in ${fn.name || 'an unnamed function'}`,
++            )), EVAL_TIMEOUT_MS);
+@@ -93,0 +98,3 @@ async function launchBrowser(exe, profile) {
++          const r = await Promise.race([send('Runtime.evaluate', {
++            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
++          }), timedOut]).finally(() => clearTimeout(timer));
+@@ -105,0 +113,3 @@ async function launchBrowser(exe, profile) {
++        async close() {
++          await cdp.send('Target.closeTarget', { targetId });
++        },
+@@ -266 +275,0 @@ async function backwardLaunchProbe(flight) {
+-  const { applyMove } = await import('/src/rules.js');
+@@ -282 +291,2 @@ async function backwardLaunchProbe(flight) {
+-  const to = applyMove(d, { distance: d.gauge.distance, angle }).ships[0];
++  const rad = angle * Math.PI / 180;
++  const to = { x: from.x + d.gauge.distance * Math.cos(rad), y: from.y + d.gauge.distance * Math.sin(rad) };
+@@ -328 +338 @@ function backwardEndWrong(s, want) {
+-    return `wanted the mover on the rules end point (${want.to.x}, ${want.to.y}), got (${ship.x}, ${ship.y})`;
++    return `wanted the mover on the expected end point (${want.to.x}, ${want.to.y}), got (${ship.x}, ${ship.y})`;
+@@ -355,0 +366 @@ async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
++  await p.close();
+@@ -369,0 +381 @@ async function phaseShot(browser, url, shots, suffix, keys, want) {
++  await p.close();
+
+Hunk by hunk against the parts the brief allows:
+  line 14: the one new constant, EVAL_TIMEOUT_MS.
+  lines 92 to 100: page.eval inside open (the time limit). The expression line is the same text as on BASE; it shows as removed and added only because of where it sits in the hunk (see the byte check below).
+  lines 113 to 115: the new close() of the page object inside open.
+  lines 276 and 291 to 292: backwardLaunchProbe (no import of /src/rules.js, no applyMove; end point worked out in the probe).
+  line 338: the one message in backwardEndWrong.
+  line 366: stateShot calls p.close() after its second state reading.
+  line 381: phaseShot calls p.close() after its second state reading.
+  Nothing in findBrowser, connect, the spawn call, the port file and websocket address code, browser.close, the other probes, FEATURES or the main block.
+
+The expression line of page.eval, BASE against HEAD (same text):
+92:            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+99:            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+identical
+
+Import block, lines 1 to 7, BASE against HEAD:
+bbe5e2f1ca60e594280c9f1e078625911fe9797876e5e06688864ef19b159d75 *-
+bbe5e2f1ca60e594280c9f1e078625911fe9797876e5e06688864ef19b159d75 *-
+#!/usr/bin/env node
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { basename, dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { startServer } from './serve.mjs';
+$ grep -cE '^import |import\(' on BASE and on HEAD   (four numbers: import lines at the top on BASE and on HEAD, 6 and 6; page-side import() calls on BASE and on HEAD, 6 and 5: the /src/rules.js one is gone)
+6
+6
+6
+5
+
+Scanner directive: lines holding nosemgrep on BASE and on HEAD, then their SHA-256 (the line moved from 68 to 69 because of the new constant):
+68:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+69:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+8f031c58cb7690e817a025f83293887bc8073ec385bd633293df22ffb120b9ec *-
+8f031c58cb7690e817a025f83293887bc8073ec385bd633293df22ffb120b9ec *-
+count on HEAD: 1
+
+$ git diff b8fc518 -- scripts/smoke.mjs | grep -E '^\+' | grep -nEi 'http|ws:|fetch|WebSocket|spawn|127\.0\.0\.1|localhost|host'   (added lines only; prints nothing)
+exit 1
+$ the same for 'import|require|exec|eval\(|process\.env|nosemgrep'   (added lines only; prints nothing)
+exit 1
+
+== Done-when 9
+$ node scripts/no-comments.mjs; echo exit
+exit 0
+The one one-off script, agent-team/evidence/T-030/count-leftovers.mjs, is inside the checker's walk (.mjs under agent-team/evidence/), so the silent run above covers it; its only line starting with # is the shebang on line 1. The four scratch-*.patch files are saved diffs, not scripts.
+$ node scripts/conflict-markers.mjs; echo exit
+exit 0
+$ ./scripts/guards.sh; echo exit
+exit 0
+
+== Done-when 12
+$ git diff --numstat b8fc518 -- scripts/smoke.mjs agent-team/FEATURE_MAP.md
+2	1	agent-team/FEATURE_MAP.md
+17	5	scripts/smoke.mjs
+added plus deleted: 25 (limit 80)
+
+== Done-when 10: FEATURE_MAP
+$ git diff -U0 b8fc518 -- agent-team/FEATURE_MAP.md | grep -E '^(@@|[+-]  - )' | cut -c1-150
+@@ -93 +93,2 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+-  - turns also saves three checked screenshots (T-017): turns-smoke-backward-mid.png (a backward launch with needle 30 half-way through its flight: p
++  - turns also saves three checked screenshots (T-017): turns-smoke-backward-mid.png (a backward launch with needle 30 half-way through its flight: p
++  - Time limit and closed capture pages (T-030): every page evaluation of scripts/smoke.mjs (page.eval, which every probe and the page-ready loop of 
+One hunk: the T-017 line (line 93) changed, one line added after it (line 94). Words changed inside the T-017 line (git diff --word-diff):
+[-on-]
+{+within 0.001 of+}
+[-rules.applyMove-]
+[-within 0.001,-]
+{+that backwardLaunchProbe works out itself from the start point, the locked distance and the travel angle, start + distance × (cos, sin) of the angle in radians, not from rules.applyMove, so a fault inside applyMove fails the capture instead of agreeing with it (T-030);+}
+
+== Main checkout and other worktrees
+$ git -C C:/Projects/my_ai_agent_company/product-a status --short; git -C ... rev-parse --short HEAD; git -C ... branch --show-current
+?? .gitignore
+c1da5e6
+master
+$ ls -a | grep gitignore   (no .gitignore in this worktree; prints nothing)
+$ git ls-files | grep -c gitignore
+0
+$ git rev-parse --short task/T-026-sim-syntax-check   (BASE branch not moved)
+b8fc518

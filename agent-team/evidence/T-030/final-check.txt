@@ -1,0 +1,61 @@
+T-030 final check, run in the worktree with the Handoff filled in, just before the last commit. HEAD 1df741b, code commit fbc2234, BASE b8fc518.
+
+$ ./scripts/verify.sh T-030 --feature turns --label final   (final-turns.log)
+1:commit: 1df741b  branch: task/T-030-smoke-timeout-close  2026-11-16T14:19:35Z
+2:dirty: no
+3:PASS guards
+4:PASS lint
+335:ℹ tests 327
+337:ℹ pass 327
+338:ℹ fail 0
+340:ℹ skipped 0
+343:PASS unit tests
+344:PASS turns scenario runs
+345:PASS turns output
+346:PASS turns browser runs
+347:PASS turns browser output
+348:RESULT: PASS
+
+$ node scripts/handoff-check.mjs; echo exit
+PASS handoff names the latest code commit
+exit 0
+$ ./scripts/guards.sh; echo exit
+exit 0
+$ node scripts/no-comments.mjs; echo exit
+exit 0
+$ node scripts/conflict-markers.mjs; echo exit
+exit 0
+
+The three T-017 screenshots written by the final run, against before-png-sha256.txt:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+  SAME      turns-smoke-backward-mid.png = before-turns-smoke-backward-mid.png
+  SAME      turns-smoke-backward-end.png = before-turns-smoke-backward-end.png
+  SAME      turns-smoke-explosion.png = before-turns-smoke-explosion.png
+  turns-smoke.json identical to before-turns-smoke.json
+  turns.json identical to before-turns.json
+
+$ git status --short   (only agent-team/ paths)
+ M agent-team/evidence/T-030/after-png-sha256.txt
+ M agent-team/evidence/T-030/turns-smoke.png
+ M agent-team/tasks/T-030.md
+?? agent-team/evidence/T-030/final-check.txt
+?? agent-team/evidence/T-030/final-turns.log
+$ git diff --stat b8fc518 -- expected/ scenarios/ src/ sim/ tests/ index.html scripts/serve.mjs docs/ AGENTS.md package.json package-lock.json .github/ .claude/ scripts/verify.sh scripts/guards.sh scripts/no-comments.mjs scripts/handoff-check.mjs scripts/conflict-markers.mjs scripts/run-scenario.mjs agent-team/DECISIONS.md agent-team/BACKLOG.md   (prints nothing)
+exit 0
+$ git diff --name-only b8fc518 | grep -v '^agent-team/'
+scripts/smoke.mjs
+$ git diff --numstat b8fc518 -- scripts/smoke.mjs agent-team/FEATURE_MAP.md
+2	1	agent-team/FEATURE_MAP.md
+17	5	scripts/smoke.mjs
+
+Main checkout: $ git -C C:/Projects/my_ai_agent_company/product-a status --short; rev-parse --short HEAD; branch --show-current
+?? .gitignore
+c1da5e6
+master
+
+Leftovers after the final run:
+counted at 2026-11-16T14:20:23.599Z after waiting 15 s; 257 processes listed; temp dir <OS temp dir>
+processes with galaxy-smoke- in the command line: 0
+folders named galaxy-smoke-* in the temp dir: 0

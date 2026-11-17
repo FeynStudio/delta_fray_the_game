@@ -1,0 +1,34 @@
+T-030 Done-when 4: capture pages are closed. Page targets (Target.getTargets, type 'page') just before Browser.close, printed by the same scratch change in both cases (scratch-page-count.patch, applied with git apply, never committed, undone with git restore scripts/smoke.mjs).
+
+== Before, BASE b8fc518 (copied from before-gaps.txt, part b)
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/pages-turns-smoke.json
+PAGE TARGETS just before Browser.close: 5 (/index.html?debug=1, about:blank, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature input --out <scratch folder outside the repo>/pages-input-smoke.json
+PAGE TARGETS just before Browser.close: 7 (/index.html?debug=1, /index.html?debug=1, about:blank, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature render --out <scratch folder outside the repo>/pages-render-smoke.json
+PAGE TARGETS just before Browser.close: 3 (/index.html?debug=1, about:blank, /index.html?debug=1)
+exit 0
+
+== After, code commit fbc2234
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/pages-after-turns-smoke.json
+PAGE TARGETS just before Browser.close: 2 (about:blank, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature input --out <scratch folder outside the repo>/pages-after-input-smoke.json
+PAGE TARGETS just before Browser.close: 4 (/index.html?debug=1, about:blank, /index.html?debug=1, /index.html?debug=1)
+exit 0
+$ node scripts/smoke.mjs --feature render --out <scratch folder outside the repo>/pages-after-render-smoke.json
+PAGE TARGETS just before Browser.close: 3 (/index.html?debug=1, about:blank, /index.html?debug=1)
+exit 0
+
+Two more rounds on fbc2234, to see that the count does not depend on how fast the browser removes a closed target (first 48 characters of the line):
+round 2, turns: PAGE TARGETS just before Browser.close: 2 (about
+round 2, input: PAGE TARGETS just before Browser.close: 4 (/inde
+round 3, turns: PAGE TARGETS just before Browser.close: 2 (about
+round 3, input: PAGE TARGETS just before Browser.close: 4 (about
+
+turns: 5 before, 2 after (the start page and the checked turns page): lower by 3, the three stateShot pages.
+input: 7 before, 4 after (the start page and the three pages behind the checked results): lower by 3, the three phaseShot pages.
+render: 3 before, 3 after: it has no capture page.
+All runs exited 0, so no later page and no browser close failed after a page was closed (Stop rule line 4: not triggered); the result files of the first round are identical to expected/, and its three T-017 screenshots have the before SHA-256 values.

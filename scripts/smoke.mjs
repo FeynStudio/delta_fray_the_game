@@ -11,6 +11,7 @@ const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const feature = opt('--feature');
 const out = opt('--out');
+const EVAL_TIMEOUT_MS = 15000;
 
 
 function findBrowser() {
@@ -88,9 +89,15 @@ async function launchBrowser(exe, profile) {
 
       const page = {
         async eval(fn, ...fnArgs) {
-          const r = await send('Runtime.evaluate', {
-            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+          let timer;
+          const timedOut = new Promise((_, fail) => {
+            timer = setTimeout(() => fail(new Error(
+              `page evaluation timed out after ${EVAL_TIMEOUT_MS} ms in ${fn.name || 'an unnamed function'}`,
+            )), EVAL_TIMEOUT_MS);
           });
+          const r = await Promise.race([send('Runtime.evaluate', {
+            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+          }), timedOut]).finally(() => clearTimeout(timer));
           if (r.exceptionDetails) {
             throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
           }
@@ -102,6 +109,9 @@ async function launchBrowser(exe, profile) {
         },
         async screenshot() {
           return Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64');
+        },
+        async close() {
+          await cdp.send('Target.closeTarget', { targetId });
         },
       };
 
@@ -263,7 +273,6 @@ function stateProbe() {
 
 async function backwardLaunchProbe(flight) {
   const cfg = (await import('/src/config.js')).default;
-  const { applyMove } = await import('/src/rules.js');
   const g = window.__game;
   const needle = 30;
   const s = g.getState();
@@ -279,7 +288,8 @@ async function backwardLaunchProbe(flight) {
   g.setState(d);
   const from = d.ships[0];
   const angle = (((from.heading + 180 + needle) % 360) + 360) % 360;
-  const to = applyMove(d, { distance: d.gauge.distance, angle }).ships[0];
+  const rad = angle * Math.PI / 180;
+  const to = { x: from.x + d.gauge.distance * Math.cos(rad), y: from.y + d.gauge.distance * Math.sin(rad) };
   g.press('Space');
   g.step(cfg.moveAnimMs * flight);
   return { from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y }, angle };
@@ -325,7 +335,7 @@ function backwardEndWrong(s, want) {
   const ship = s.ships[0];
   if (s.gauge.phase !== 'power' || s.turn !== 1) return `wanted the move ended (phase 'power', turn 1), got phase '${s.gauge.phase}' turn ${s.turn}`;
   if (Math.abs(ship.x - want.to.x) > 0.001 || Math.abs(ship.y - want.to.y) > 0.001) {
-    return `wanted the mover on the rules end point (${want.to.x}, ${want.to.y}), got (${ship.x}, ${ship.y})`;
+    return `wanted the mover on the expected end point (${want.to.x}, ${want.to.y}), got (${ship.x}, ${ship.y})`;
   }
   if (headingOff(s, want)) return `wanted heading ${want.angle} (heading before launch + 180 + needle), got ${ship.heading}`;
   return null;
@@ -353,6 +363,7 @@ async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
   const before = await p.eval(drawnStateProbe);
   const png = await p.screenshot();
   const after = await p.eval(stateProbe);
+  await p.close();
   for (const [when, s] of [['before', before], ['after', after]]) {
     const problem = wrong(s, want);
     if (problem) throw new Error(`${file}: ${problem} ${when} the capture`);
@@ -367,6 +378,7 @@ async function phaseShot(browser, url, shots, suffix, keys, want) {
   const before = await p.eval(gaugeAfterFrameProbe);
   const png = await p.screenshot();
   const after = await p.eval(gaugeProbe);
+  await p.close();
   for (const g of [before, after]) {
     if (g.phase !== want.phase || g.backward !== want.backward) {
       throw new Error(`${file}: wanted gauge phase '${want.phase}' backward ${want.backward}, `

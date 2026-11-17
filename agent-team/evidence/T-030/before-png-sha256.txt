@@ -1,0 +1,13 @@
+SHA-256 of the three T-017 screenshots written by ./scripts/verify.sh T-030 --feature turns --label before (commit b8fc518 = BASE, dirty: no, RESULT: PASS, see before-turns.log)
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+Not required to stay the same (the loop is not frozen for this one, T-027):
+73e460d0eebc814d470fe94f9c029130e7eec7b473c4c2a235a4e038c3310f5f *turns-smoke.png
+
+For comparison, the values T-017 recorded (agent-team/evidence/T-017/after-turns-png-sha256.txt):
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+57b4c161ef57a29f54d79d9afacbd73d5685b9fade9b92bc777fefda438872d8 *turns-smoke.png
