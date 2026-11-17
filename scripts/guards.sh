@@ -47,4 +47,5 @@ if [ -n "$fmt_hits" ]; then
   echo "GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it"
   echo "$fmt_hits"; FAIL=1
 fi
+node scripts/conflict-markers.mjs || FAIL=1
 exit $FAIL
