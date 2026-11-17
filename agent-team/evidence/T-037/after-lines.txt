@@ -1,0 +1,35 @@
+T-037 after lines (Done-when 4): check commands A and B on the committed change, HEAD 90cd344, read from git, 2026-11-16T20:53:14Z.
+
+== A
+$ git show 90cd344:agent-team/tasks/T-030.md | grep -n '^  - c\. End point:'
+52:  - c. End point: with the y sign of the move flipped in src/rules.js applyMove as a scratch change (never committed, undone with git restore), `node scripts/smoke.mjs --feature turns --out <a file outside the repo's evidence>` exits 0, and `node --test tests/movement.test.js` fails.
+exit 0
+$ ... | grep -c '^  - c\. End point:'   (number of lines)
+1
+
+== B
+$ git show 90cd344:agent-team/tasks/T-030.md | grep -n '^    - Corrected '
+53:    - Corrected 2026-11-16 by T-037 (coordinator's correction, written after the human's instruction of 2026-11-16; see agent-team/DECISIONS.md and agent-team/tasks/T-037.md, Decisions): until then this item ended "exits 0, and `node --test tests/rules.test.js` fails." That file holds three createInitialState tests and no applyMove test, so it passes with the flipped sign. The applyMove tests are in tests/movement.test.js, which fails 4 of 8 tests with the same scratch change: the owner's saved output is agent-team/evidence/T-030/before-gaps.txt, part c, and the reviewer repeated it on BASE b8fc518 (Review round 1, item 2c). The Handoff and the two review records in this brief were written against the first wording and are left unchanged.
+exit 0
+$ ... | grep -c '^    - Corrected '   (number of lines)
+1
+
+== the two lines against the text in the brief
+The expected text is taken from the brief as it was on START (git show 5106845:agent-team/tasks/T-037.md): line 59 (the 2c line) and line 63 (the note), each without the four spaces of the code block, the note with YYYY-MM-DD replaced by 2026-11-16.
+$ git show 5106845:agent-team/tasks/T-037.md | sed -n '59p;63p' | cut -c5- | sed 's/YYYY-MM-DD/2026-11-16/' | sha256sum
+714cf96c37b7ce0297d88f0f8d68723eed7a180ab31ce84082b9d8061c59cf23 *-
+$ git show 90cd344:agent-team/tasks/T-030.md | sed -n '52,53p' | sha256sum
+714cf96c37b7ce0297d88f0f8d68723eed7a180ab31ce84082b9d8061c59cf23 *-
+$ cmp <(expected, as above) <(git show 90cd344:agent-team/tasks/T-030.md | sed -n '52,53p'); echo exit $?   (0 and no output means the same bytes)
+exit 0
+$ git show 5106845:agent-team/tasks/T-037.md | sed -n '59p;63p' | cut -c1-24   (the start of the two brief lines, to show which lines were taken)
+      - c. End point: wi
+        - Corrected YYYY
+
+== the first wording quoted in the note against the 2c line on START
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '52p' | grep -c -F 'exits 0, and `node --test tests/rules.test.js` fails.'   (1: the quoted words are in the START line)
+1
+$ git show 90cd344:agent-team/tasks/T-030.md | sed -n '53p' | grep -c -F 'until then this item ended "exits 0, and `node --test tests/rules.test.js` fails."'   (1: the note quotes the same words)
+1
+$ git show 90cd344:agent-team/tasks/T-030.md | sed -n '53p' | grep -c 'Decided by human'   (0: the note carries no human-decision tag)
+0

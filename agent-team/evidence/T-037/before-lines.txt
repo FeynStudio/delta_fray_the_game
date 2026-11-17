@@ -1,0 +1,37 @@
+T-037 before lines (Done-when 2): check commands A, B, D, E and F on START 5106845, read from git, 2026-11-16T20:52:06Z.
+The verify run of this item is before-movement.log (commit 5106845, dirty: no, RESULT: PASS; unit tests: 327 tests, 326 pass, 0 fail, 1 skipped, the handoff test, with the reason 'handoff not filled in'). Its movement.json is kept as before-movement.json.
+
+== A
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^  - c\. End point:'
+52:  - c. End point: with the y sign of the move flipped in src/rules.js applyMove as a scratch change (never committed, undone with git restore), `node scripts/smoke.mjs --feature turns --out <a file outside the repo's evidence>` exits 0, and `node --test tests/rules.test.js` fails.
+exit 0
+
+== B
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^    - Corrected '
+exit 1
+
+== D
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | sha256sum
+65422690da0edc8cc60b7e7064dc2787c0bdcccd06a5b1f23e29bf50a7f7931d *-
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | wc -l   (lines covered by D)
+242
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^## Out of scope'
+69:## Out of scope
+
+== E
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c 'Decided by human in session'
+6
+
+== F
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c '^- \[ \]'
+14
+
+== whole file, for the after comparison
+$ git show 5106845:agent-team/tasks/T-030.md | wc -l
+310
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c $'\r'   (lines with a carriage return in the committed file)
+0
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '1,51p' | sha256sum   (lines 1 to 51, everything above the 2c line)
+1ad22110c90e2868a597ff5386b1949b45068abc75125ccb5cb12019a17eabc9 *-
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '53,$p' | sha256sum   (line 53 to the end, everything below the 2c line)
+06619fff07d818d38653f043ca6f5b1bda1203da839e793666b51219f6dc874a *-

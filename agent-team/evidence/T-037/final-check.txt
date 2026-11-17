@@ -1,0 +1,111 @@
+T-037 final check (Done-when 6, 7 and 10), taken just before the last commit. HEAD 82b9fc1, 2026-11-16T23:54:56Z. The working tree holds the last commit's files: the final Handoff text and the Status line in agent-team/tasks/T-037.md, after-movement.log, and this file once it is written (the output was collected first, so this file is not in the status below).
+
+== the after run (after-movement.log) was made on a clean tree with the Handoff committed
+$ sed -n '1,2p' agent-team/evidence/T-037/after-movement.log
+commit: 82b9fc1  branch: task/T-037-t030-brief-2c  2026-11-16T20:56:14Z
+dirty: no
+$ grep -E '^(PASS|FAIL|RESULT)' agent-team/evidence/T-037/after-movement.log
+PASS guards
+PASS lint
+PASS unit tests
+PASS movement scenario runs
+PASS movement output
+RESULT: PASS
+$ grep -nE '^[^ ]+ (tests|pass|fail|cancelled|skipped|todo) [0-9]+$' agent-team/evidence/T-037/after-movement.log
+335:ℹ tests 327
+337:ℹ pass 327
+338:ℹ fail 0
+339:ℹ cancelled 0
+340:ℹ skipped 0
+341:ℹ todo 0
+$ grep -n 'the Handoff of the brief for the current task branch' agent-team/evidence/T-037/after-movement.log | cut -c1-110
+180:✔ the Handoff of the brief for the current task branch names the latest code commit in this repo (573.96
+$ grep -nE '^[^ ]+ (tests|pass|fail|cancelled|skipped|todo) [0-9]+$' agent-team/evidence/T-037/before-movement.log   (the before counts)
+335:ℹ tests 327
+337:ℹ pass 326
+338:ℹ fail 0
+339:ℹ cancelled 0
+340:ℹ skipped 1
+341:ℹ todo 0
+$ git log --format='%h %s' -1 f79f821 | cut -c1-70   (the commit that holds the first Handoff text)
+f79f821 T-037: handoff naming fbc2234, the latest code commit the stal
+$ git merge-base --is-ancestor f79f821 82b9fc1; echo exit $?   (0: it is an ancestor of 82b9fc1, the commit of the after run)
+exit 0
+$ git show 82b9fc1:agent-team/tasks/T-037.md | sed -n '/^## Handoff/,/^## Review/p' | grep -c fbc2234   (lines of the Handoff on 82b9fc1 that name the latest code commit)
+1
+
+== guards, no-comments and the stale-handoff check, with the final Handoff text in the working tree
+$ ./scripts/guards.sh; echo exit $?
+exit 0
+$ node scripts/no-comments.mjs; echo exit $?
+exit 0
+$ node scripts/handoff-check.mjs; echo exit $?
+PASS handoff names the latest code commit
+exit 0
+$ node --test tests/handoff-check.test.js 2>&1 | grep -E 'the Handoff of the brief for the current task branch|^[^ ]+ (tests|pass|fail|cancelled|skipped|todo) [0-9]+$' | cut -c1-110
+✔ the Handoff of the brief for the current task branch names the latest code commit in this repo (585.781ms)
+ℹ tests 97
+ℹ pass 97
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+
+== the before outputs are kept
+$ git status --short -- agent-team/evidence/T-037/before-movement.log agent-team/evidence/T-037/before-movement.json agent-team/evidence/T-037/before-lines.txt agent-team/evidence/T-037/precheck.txt agent-team/evidence/T-037/proof-check.txt; echo exit $?   (prints nothing: they are the committed files of c0efdaa)
+exit 0
+$ git log --format=%h -- agent-team/evidence/T-037/before-movement.log agent-team/evidence/T-037/before-movement.json   (the only commit that touches them)
+c0efdaa
+$ cmp agent-team/evidence/T-037/movement.json agent-team/evidence/T-037/before-movement.json; echo exit $?   (movement.json written again by the after run: same bytes)
+exit 0
+
+== scope, repeated: START against the working tree
+$ git status --short; echo exit $?
+ M agent-team/tasks/T-037.md
+?? agent-team/evidence/T-037/after-movement.log
+exit 0
+$ git diff --name-only 5106845   (tracked files that differ from START, working tree included)
+agent-team/evidence/T-037/after-lines.txt
+agent-team/evidence/T-037/before-lines.txt
+agent-team/evidence/T-037/before-movement.json
+agent-team/evidence/T-037/before-movement.log
+agent-team/evidence/T-037/diff-check.txt
+agent-team/evidence/T-037/handoff-check.txt
+agent-team/evidence/T-037/movement.json
+agent-team/evidence/T-037/precheck.txt
+agent-team/evidence/T-037/proof-check.txt
+agent-team/evidence/T-037/scope-check.txt
+agent-team/tasks/T-030.md
+agent-team/tasks/T-037.md
+$ git diff --stat 5106845 -- . ':(exclude)agent-team/*'; echo exit $?   (prints nothing)
+exit 0
+$ git status --short -- . ':(exclude)agent-team/*'; echo exit $?   (prints nothing: no untracked or changed file outside agent-team/)
+exit 0
+$ git diff --stat 5106845 -- agent-team/evidence/T-030/ agent-team/FEATURE_MAP.md agent-team/BACKLOG.md agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/ROADMAP.md agent-team/design/ agent-team/evals/; echo exit $?   (prints nothing)
+exit 0
+$ git ls-files .gitignore; echo exit $?   (prints nothing)
+exit 0
+$ git diff --numstat 5106845 -- agent-team/tasks/T-030.md   (the T-030 brief, working tree against START)
+2	1	agent-team/tasks/T-030.md
+$ git diff --numstat 90cd344 -- agent-team/tasks/T-030.md; echo exit $?   (prints nothing: the file has not changed since the commit of the correction)
+exit 0
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | sha256sum; git show 82b9fc1:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | sha256sum   (check command D, START then HEAD)
+65422690da0edc8cc60b7e7064dc2787c0bdcccd06a5b1f23e29bf50a7f7931d *-
+65422690da0edc8cc60b7e7064dc2787c0bdcccd06a5b1f23e29bf50a7f7931d *-
+$ git rev-parse --short task/T-030-smoke-timeout-close   (the T-030 branch head has not moved; it is BASE)
+3a3ad95
+
+== no user name, home-directory path or session temp folder (pattern list P as in scope-check.txt)
+$ grep -rnI P agent-team/evidence/T-037/; echo exit $?   (prints nothing; this file is searched after it is written, see the last line)
+exit 1
+$ sed -n '/^## Handoff/,/^## Review/p' agent-team/tasks/T-037.md | grep -n P; echo exit $?   (the final Handoff text; prints nothing)
+exit 1
+$ grep -n P agent-team/tasks/T-037.md; echo exit $?   (the whole brief; prints nothing)
+exit 1
+$ sed -n '/^## Handoff/,/^## Review/p' agent-team/tasks/T-037.md | grep -c 'Decided by human'   (0: the Handoff holds no human-decision tag)
+0
+$ grep -c 'Decided by human in session' agent-team/tasks/T-037.md; git show 5106845:agent-team/tasks/T-037.md | grep -c 'Decided by human in session'   (the brief: working tree, then START; the same number)
+4
+4
+$ grep -c P agent-team/evidence/T-037/final-check.txt   (this file itself, searched after it was written and before this line was added)
+0

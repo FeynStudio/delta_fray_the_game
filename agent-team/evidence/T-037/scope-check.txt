@@ -1,0 +1,79 @@
+T-037 scope check (Done-when 6). START 5106845, HEAD f79f821 (the commit that holds the first Handoff text), 2026-11-16T20:56:05Z. The output was collected first and written to this file afterwards, so the git status lines below are from before this file existed.
+Two commits come after this file: the one that adds this file, and the last one (after-run evidence and the final Handoff text). final-check.txt repeats these commands just before the last commit.
+
+== files that differ from START
+$ git diff --name-only 5106845 f79f821
+agent-team/evidence/T-037/after-lines.txt
+agent-team/evidence/T-037/before-lines.txt
+agent-team/evidence/T-037/before-movement.json
+agent-team/evidence/T-037/before-movement.log
+agent-team/evidence/T-037/diff-check.txt
+agent-team/evidence/T-037/handoff-check.txt
+agent-team/evidence/T-037/movement.json
+agent-team/evidence/T-037/precheck.txt
+agent-team/evidence/T-037/proof-check.txt
+agent-team/tasks/T-030.md
+agent-team/tasks/T-037.md
+
+== nothing outside agent-team/
+$ git diff --stat 5106845 f79f821 -- . ':(exclude)agent-team/*'; echo exit $?   (prints nothing)
+exit 0
+$ git diff --quiet 5106845 f79f821 -- . ':(exclude)agent-team/*'; echo exit $?   (0 means no difference)
+exit 0
+
+== nothing in the agent-team/ paths this task must leave alone
+$ git diff --stat 5106845 f79f821 -- agent-team/evidence/T-030/ agent-team/FEATURE_MAP.md agent-team/BACKLOG.md agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/ROADMAP.md agent-team/design/ agent-team/evals/; echo exit $?   (prints nothing)
+exit 0
+$ git diff --name-only 5106845 f79f821 | grep -v '^agent-team/tasks/T-030\.md$\|^agent-team/tasks/T-037\.md$\|^agent-team/evidence/T-037/'; echo exit $?   (prints nothing; grep exit 1 means every changed path is one of the three allowed)
+exit 1
+
+== working tree and .gitignore
+$ git status --short; echo exit $?   (prints nothing)
+exit 0
+$ git ls-files .gitignore; echo exit $?   (prints nothing: .gitignore is not tracked)
+exit 0
+$ ls -a | grep -c '^\.gitignore$'   (0: there is no .gitignore file in this worktree either)
+0
+
+== commits from START to HEAD and the paths each one touches
+$ git log --reverse --format='%h %s' --name-status 5106845..f79f821 | cut -c1-110
+c0efdaa T-037: before evidence on 5106845 (precheck, verify movement PASS with 327 tests, check lines on START
+
+A	agent-team/evidence/T-037/before-lines.txt
+A	agent-team/evidence/T-037/before-movement.json
+A	agent-team/evidence/T-037/before-movement.log
+A	agent-team/evidence/T-037/movement.json
+A	agent-team/evidence/T-037/precheck.txt
+A	agent-team/evidence/T-037/proof-check.txt
+90cd344 T-037: T-030 Done-when 2c names tests/movement.test.js, with a dated correction note under it
+
+M	agent-team/tasks/T-030.md
+df9db7c T-037: evidence for the correction on 90cd344 (check lines A and B match the brief text byte for byte;
+
+A	agent-team/evidence/T-037/after-lines.txt
+A	agent-team/evidence/T-037/diff-check.txt
+f79f821 T-037: handoff naming fbc2234, the latest code commit the stale-handoff check reports (first text, bef
+
+A	agent-team/evidence/T-037/handoff-check.txt
+M	agent-team/tasks/T-037.md
+
+== no user name, home-directory path or session temp folder
+The pattern list P: -i, the value of the USERNAME environment variable (not written here), 'User[s][\/]', 'App[D]ata', '[\/]t[e]mp[\/]', '[\/]t[m]p[\/]', '/hom[e]/', '~[/\]'. The brackets keep this file from matching its own pattern list.
+$ grep -rnI P agent-team/evidence/T-037/; echo exit $?   (prints nothing; grep exit 1 means no match; working tree files, which are the committed ones)
+exit 1
+$ ls agent-team/evidence/T-037/   (the files searched)
+after-lines.txt
+before-lines.txt
+before-movement.json
+before-movement.log
+diff-check.txt
+handoff-check.txt
+movement.json
+precheck.txt
+proof-check.txt
+$ git show f79f821:agent-team/tasks/T-037.md | sed -n '/^## Handoff/,/^## Review/p' | grep -n P; echo exit $?   (the Handoff of this brief; prints nothing)
+exit 1
+$ git show f79f821:agent-team/tasks/T-037.md | grep -n P; echo exit $?   (the whole brief; prints nothing)
+exit 1
+$ git diff 5106845 f79f821 -- agent-team/tasks/T-030.md | grep '^[+-]' | grep -n P; echo exit $?   (the changed lines of the T-030 brief; prints nothing)
+exit 1

@@ -1,0 +1,53 @@
+T-037 precheck (Done-when 1). Run in the T-037 worktree on branch task/T-037-t030-brief-2c, 2026-11-16T20:51:29Z.
+
+== hashes
+$ git rev-parse 3a3ad95   (BASE)
+3a3ad959cffac0522b92ebd853b61e22ed4dd715
+$ git rev-parse 5106845   (START)
+5106845d14c528734a4d0b2706ae08d055b02333
+$ git rev-parse HEAD
+5106845d14c528734a4d0b2706ae08d055b02333
+$ git rev-parse task/T-030-smoke-timeout-close   (the branch BASE was read from; its head is BASE, so it has not moved since this branch was cut)
+3a3ad959cffac0522b92ebd853b61e22ed4dd715
+$ git rev-parse START^   (the parent of START is BASE)
+3a3ad959cffac0522b92ebd853b61e22ed4dd715
+$ git merge-base --is-ancestor 3a3ad95 master; echo exit $?   (1 means T-030 is not merged to master, so BASE is the T-030 branch head)
+exit 1
+$ git log --oneline -1 5106845
+5106845 T-037: bring the brief in from master
+
+== git diff --stat BASE START
+$ git diff --stat 3a3ad95 5106845
+ agent-team/tasks/T-037.md | 187 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 187 insertions(+)
+$ git diff --name-only 3a3ad95 5106845
+agent-team/tasks/T-037.md
+
+== agent-team/tasks/T-030.md on START is the copy with the records
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^## Handoff\|^### Review round 1\|^### Security review round 1'
+93:## Handoff
+163:### Review round 1 (2026-11-16)
+239:### Security review round 1 (2026-11-16)
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n -A1 '^## Handoff' | cut -c1-120   (the line after the heading, first 120 characters; it is not the placeholder)
+93:## Handoff
+94-- Status: PARTIAL (brief Status is IN REVIEW). Every Done-when item is met except the second half of 2c as it is writ
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c '^(owner fills in)'
+0
+
+== check command A on START
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^  - c\. End point:'
+52:  - c. End point: with the y sign of the move flipped in src/rules.js applyMove as a scratch change (never committed, undone with git restore), `node scripts/smoke.mjs --feature turns --out <a file outside the repo's evidence>` exits 0, and `node --test tests/rules.test.js` fails.
+$ ... | grep -c '^  - c\. End point:'   (number of lines)
+1
+$ ... | grep '^  - c\. End point:' | grep -c 'and `node --test tests/rules.test.js` fails\.$'   (1 means the line ends as the brief quotes it)
+1
+
+== check command B on START
+$ git show 5106845:agent-team/tasks/T-030.md | grep -n '^    - Corrected '; echo exit $?   (prints nothing; grep exit 1 means no line)
+exit 1
+
+== versions
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0

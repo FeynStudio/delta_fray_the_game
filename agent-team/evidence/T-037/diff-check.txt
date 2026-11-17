@@ -1,0 +1,57 @@
+T-037 diff check (Done-when 5): nothing else in agent-team/tasks/T-030.md changed. START 5106845, HEAD 90cd344 (the commit that changed the file), read from git, 2026-11-16T20:53:30Z.
+
+== numstat
+$ git diff --numstat 5106845 90cd344 -- agent-team/tasks/T-030.md
+2	1	agent-team/tasks/T-030.md
+
+== hunks
+$ git diff -U0 5106845 90cd344 -- agent-team/tasks/T-030.md | grep -c '^@@'
+1
+$ git diff -U0 5106845 90cd344 -- agent-team/tasks/T-030.md
+diff --git a/agent-team/tasks/T-030.md b/agent-team/tasks/T-030.md
+index 045d302..5f70134 100644
+--- a/agent-team/tasks/T-030.md
++++ b/agent-team/tasks/T-030.md
+@@ -52 +52,2 @@ Files read by the coordinator on 2026-11-13 (scripts/smoke.mjs in the T-017 work
+-  - c. End point: with the y sign of the move flipped in src/rules.js applyMove as a scratch change (never committed, undone with git restore), `node scripts/smoke.mjs --feature turns --out <a file outside the repo's evidence>` exits 0, and `node --test tests/rules.test.js` fails.
++  - c. End point: with the y sign of the move flipped in src/rules.js applyMove as a scratch change (never committed, undone with git restore), `node scripts/smoke.mjs --feature turns --out <a file outside the repo's evidence>` exits 0, and `node --test tests/movement.test.js` fails.
++    - Corrected 2026-11-16 by T-037 (coordinator's correction, written after the human's instruction of 2026-11-16; see agent-team/DECISIONS.md and agent-team/tasks/T-037.md, Decisions): until then this item ended "exits 0, and `node --test tests/rules.test.js` fails." That file holds three createInitialState tests and no applyMove test, so it passes with the flipped sign. The applyMove tests are in tests/movement.test.js, which fails 4 of 8 tests with the same scratch change: the owner's saved output is agent-team/evidence/T-030/before-gaps.txt, part c, and the reviewer repeated it on BASE b8fc518 (Review round 1, item 2c). The Handoff and the two review records in this brief were written against the first wording and are left unchanged.
+
+== D on START and on HEAD
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | sha256sum
+65422690da0edc8cc60b7e7064dc2787c0bdcccd06a5b1f23e29bf50a7f7931d *-
+$ git show 90cd344:agent-team/tasks/T-030.md | sed -n '/^## Out of scope/,$p' | sha256sum
+65422690da0edc8cc60b7e7064dc2787c0bdcccd06a5b1f23e29bf50a7f7931d *-
+$ ... | wc -l   (lines covered by D: START, then HEAD)
+242
+242
+
+== E on START and on HEAD
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c 'Decided by human in session'
+6
+$ git show 90cd344:agent-team/tasks/T-030.md | grep -c 'Decided by human in session'
+6
+
+== F on START and on HEAD
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c '^- \[ \]'
+14
+$ git show 90cd344:agent-team/tasks/T-030.md | grep -c '^- \[ \]'
+14
+
+== beyond what the item asks: the rest of the file, above and below the two lines
+$ git show 5106845:agent-team/tasks/T-030.md | wc -l; git show 90cd344:agent-team/tasks/T-030.md | wc -l
+310
+311
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '1,51p' | sha256sum; git show 90cd344:agent-team/tasks/T-030.md | sed -n '1,51p' | sha256sum   (lines 1 to 51)
+1ad22110c90e2868a597ff5386b1949b45068abc75125ccb5cb12019a17eabc9 *-
+1ad22110c90e2868a597ff5386b1949b45068abc75125ccb5cb12019a17eabc9 *-
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '53,$p' | sha256sum; git show 90cd344:agent-team/tasks/T-030.md | sed -n '54,$p' | sha256sum   (START line 53 to the end, HEAD line 54 to the end)
+06619fff07d818d38653f043ca6f5b1bda1203da839e793666b51219f6dc874a *-
+06619fff07d818d38653f043ca6f5b1bda1203da839e793666b51219f6dc874a *-
+$ git show 5106845:agent-team/tasks/T-030.md | grep -c $'\r'; git show 90cd344:agent-team/tasks/T-030.md | grep -c $'\r'   (lines with a carriage return in the committed file: none before, none after)
+0
+0
+$ cmp <(git show 5106845:agent-team/tasks/T-030.md | sed -n '52p' | sed 's#tests/rules\.test\.js#tests/movement.test.js#') <(git show 90cd344:agent-team/tasks/T-030.md | sed -n '52p'); echo exit $?   (0 and no output: the START 2c line with the one file name replaced is the HEAD 2c line, byte for byte)
+exit 0
+$ git show 5106845:agent-team/tasks/T-030.md | sed -n '52p' | grep -o 'tests/rules\.test\.js' | wc -l   (the file name is in the START line once)
+1

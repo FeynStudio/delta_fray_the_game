@@ -1,0 +1,16 @@
+T-037 handoff check (Done-when 7 and 8): the latest code commit, taken from the check's own message. 2026-11-16T20:54:34Z, HEAD df9db7c.
+
+== 1. with a Handoff in the working tree that is filled in but names no commit yet
+$ node scripts/handoff-check.mjs; echo exit $?
+FAIL handoff names the latest code commit
+Handoff does not name fbc2234; latest code commit is fbc2234 (T-030: smoke page evaluations fail after 15000 ms with an error naming the probe, capture pages are closed after their screenshot, backwardLaunchProbe works out the end point itself; FEATURE_MAP section 9)
+exit 1
+
+== 2. with the Handoff naming the commit that message gives (still in the working tree, before its commit)
+$ node scripts/handoff-check.mjs; echo exit $?
+PASS handoff names the latest code commit
+exit 0
+$ git log -1 --format='%h %s' fbc2234 | cut -c1-60
+fbc2234 T-030: smoke page evaluations fail after 15000 ms wi
+$ git diff --stat fbc2234 HEAD -- . ':(exclude)agent-team/*'; echo exit $?   (prints nothing: no path outside agent-team/ changed after that commit)
+exit 0

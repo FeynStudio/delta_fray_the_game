@@ -24,3 +24,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) | 1 | T-036 |
 | evidence line written down from an earlier run instead of saved output | 2 | T-018, T-030 |
 | brief Done-when names the wrong file or command for its proof (2c names tests/rules.test.js, applyMove tests are in tests/movement.test.js) | 1 | T-030 |
+| brief Done-when asks for evidence a committed file cannot hold (git status after the commit that adds the file) | 1 | T-037 |

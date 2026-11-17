@@ -1,0 +1,74 @@
+T-037 proof check (Done-when 3): the facts the correction rests on. No file is changed for this item. 2026-11-16T20:52:20Z, HEAD 5106845, working tree with no change outside agent-team/.
+
+== a. the three files are the same as on b8fc518
+$ git rev-parse b8fc518
+b8fc518740a907655a60cbfeee0198e8f32840ec
+$ git diff --stat b8fc518 5106845 -- src/rules.js tests/rules.test.js tests/movement.test.js; echo exit $?   (prints nothing)
+exit 0
+$ git diff --quiet b8fc518 5106845 -- src/rules.js tests/rules.test.js tests/movement.test.js; echo exit $?   (0 means no difference)
+exit 0
+$ git status --short -- src/ tests/   (the working tree copies are the committed ones; prints nothing)
+
+== b. check command C on START
+$ git show 5106845:agent-team/evidence/T-030/before-gaps.txt | sed -n '/^== c\./,$p' | grep -E 'exit [01]$|(tests|pass|fail) [0-9]+$'
+smoke exit 0
+ℹ tests 3
+ℹ pass 3
+ℹ fail 0
+rules test exit 0
+ℹ tests 8
+ℹ pass 4
+ℹ fail 4
+movement test exit 1
+ℹ tests 327
+ℹ pass 319
+ℹ fail 7
+all tests exit 1
+$ ... | wc -l
+13
+
+== c. applyMove lines in the two test files
+$ grep -c applyMove tests/rules.test.js
+0
+$ grep -c applyMove tests/movement.test.js
+15
+$ git show 5106845:tests/rules.test.js | grep -c applyMove
+0
+$ git show 5106845:tests/movement.test.js | grep -c applyMove
+15
+
+== d. both files pass on the unchanged tree
+$ node --test tests/rules.test.js; echo exit $?
+✔ createInitialState starts on turn 0 with both ships alive at their spawns (1.3074ms)
+✔ createInitialState reads config at call time (0.7819ms)
+✔ createInitialState does not share objects with config (0.1743ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.6714
+exit 0
+
+$ node --test tests/movement.test.js; echo exit $?
+✔ forward moves at 0, 90, 180 and 270 go right, down, left and up and turn the heading (1.8794ms)
+✔ 45 degrees uses degrees, not radians (0.2037ms)
+✔ forward heading is kept within 0 to 360 (0.2069ms)
+✔ a backward move travels along the angle and turns the heading to the travel angle (0.209ms)
+✔ only the ship whose turn it is moves; every other field is carried over (0.4364ms)
+✔ works without a gauge field (scenario states have none) (0.208ms)
+✔ a move longer than maxMove is refused; exactly maxMove is made (human decision 2026-11-08) (0.5657ms)
+✔ distance comes from the move and the limit from config at call time (maxMove 200) (0.2026ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 73.3739
+exit 0
+
+$ git status --short -- . ':(exclude)agent-team/*'   (after the runs; prints nothing)
