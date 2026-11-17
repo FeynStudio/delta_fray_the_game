@@ -1,0 +1,41 @@
+T-026 Done-when 1: before, on BASE
+commit: 0679cd27deb23ee850b2cc9b834d811c9fe885ba (short 0679cd2), branch task/T-026-sim-syntax-check
+BASE is the head of task/T-028-quiet-game-tests (holds T-018 and T-028), used where the brief says master HEAD (session orchestrator process choice, agent-team/DECISIONS.md, 2026-11-16).
+tree before the run: clean (log header line 2: dirty: no)
+command: ./scripts/verify.sh T-026 --feature config --label before
+
+$ grep -nE "^(commit:|dirty:|PASS |FAIL |RESULT:)" agent-team/evidence/T-026/before-config.log
+1:commit: 0679cd2  branch: task/T-026-sim-syntax-check  2026-11-16T09:26:25Z
+2:dirty: no
+3:PASS guards
+4:PASS lint
+340:PASS unit tests
+341:PASS config: no magic numbers
+342:PASS config: override honored
+343:PASS config output
+344:RESULT: PASS
+
+unit-test summary lines of the log:
+ℹ tests 325
+ℹ suites 1
+ℹ pass 324
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 12918.0941
+
+the one skipped test:
+180:﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo (35.4532ms) # handoff not filled in
+
+before-test-names.txt: the reporter lines of the log without the time; lines:
+326
+(325 tests plus the closing line of the one suite, checkHandoff on throw-away git repos)
+
+$ ls sim
+balance.mjs
+$ node --check sim/balance.mjs   (Stop rule, second line: no error on BASE)
+exit status: 0
+
+before-config.json is a copy of the config.json the before run wrote, kept because later runs write config.json again.
+node v24.15.0, git version 2.56.0.windows.4

@@ -1,0 +1,55 @@
+T-026 final check, run just before the last commit (the Handoff is filled in in the working tree)
+commit: 0a8499184ab92a8e30cbc2751974cb20cd8c30b1 (short 0a84991), branch task/T-026-sim-syntax-check; BASE 0679cd2; code commit c7ac78e
+
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit status: 0
+
+$ ./scripts/verify.sh T-026 --feature config --label handoff   (log: handoff-config.log)
+1:commit: 0a84991  branch: task/T-026-sim-syntax-check  2026-11-16T09:33:17Z
+2:dirty: no
+3:PASS guards
+4:PASS lint
+343:PASS unit tests
+344:PASS config: no magic numbers
+345:PASS config: override honored
+346:PASS config output
+347:RESULT: PASS
+ℹ tests 327
+ℹ suites 1
+ℹ pass 327
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+180:✔ the Handoff of the brief for the current task branch names the latest code commit in this repo (235.9195ms)
+324:✔ every .js and .mjs file under sim/ passes node --check (87.3136ms)
+325:ℹ node --check ran on sim/balance.mjs
+326:✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (715.7645ms)
+
+$ ./scripts/guards.sh
+exit status: 0
+$ node scripts/no-comments.mjs
+exit status: 0
+$ node scripts/conflict-markers.mjs
+exit status: 0
+
+$ git diff --stat 0679cd2 -- scripts/ src/ sim/ index.html .github/ .claude/ scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md   (prints nothing)
+exit status: 0
+$ git diff --name-status 0679cd2 -- . ":(exclude)agent-team/evidence/T-026"
+M	agent-team/FEATURE_MAP.md
+M	agent-team/tasks/T-026.md
+A	tests/syntax-check.test.js
+$ git diff --stat 0679cd2 -- agent-team/DECISIONS.md agent-team/BACKLOG.md   (prints nothing)
+
+$ git log --oneline 0679cd2..HEAD
+0a84991 T-026: after evidence on c7ac78e (verify config and all PASS, 327 tests; negative control FAIL unit tests naming sim/balance.mjs; test time, name compare, scope check)
+c7ac78e T-026: tests/syntax-check.test.js runs node --check on every .js and .mjs file under sim/ in every verify.sh run; FEATURE_MAP section 9 line
+4ec5726 T-026: before evidence on BASE 0679cd2 (verify config PASS, 325 tests; scratch syntax error in sim/balance.mjs still PASS, reverted)
+$ git log --format=%h 0679cd2..HEAD -- sim/ src/ scripts/   (commits on this branch that touch sim/, src/ or scripts/: none)
+$ git status --short
+ M agent-team/tasks/T-026.md
+?? agent-team/evidence/T-026/final-check.txt
+?? agent-team/evidence/T-026/handoff-config.log
+$ ls -a | grep -c "^\.gitignore$"
+0

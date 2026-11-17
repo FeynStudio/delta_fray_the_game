@@ -1,0 +1,55 @@
+T-026 Done-when 2, 3 and 5 (time): the new test file alone, on the committed tree
+commit: c7ac78ee8c98ad6b81579db92614da7be2e51d13 (short c7ac78e), branch task/T-026-sim-syntax-check
+$ git status --short -- . ":(exclude)agent-team"   (prints nothing: no change outside agent-team/)
+
+$ node --test tests/syntax-check.test.js
+✔ every .js and .mjs file under sim/ passes node --check (52.2153ms)
+ℹ node --check ran on sim/balance.mjs
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (211.444ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 327.043
+exit status: 0
+
+How long it takes: the same command 5 more times, the two test lines and duration_ms of each run
+run 1:
+✔ every .js and .mjs file under sim/ passes node --check (57.5716ms)
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (227.1116ms)
+ℹ duration_ms 351.8854
+run 2:
+✔ every .js and .mjs file under sim/ passes node --check (56.7654ms)
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (221.6344ms)
+ℹ duration_ms 342.7852
+run 3:
+✔ every .js and .mjs file under sim/ passes node --check (59.1756ms)
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (217.2293ms)
+ℹ duration_ms 338.1274
+run 4:
+✔ every .js and .mjs file under sim/ passes node --check (52.8929ms)
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (224.2329ms)
+ℹ duration_ms 342.7866
+run 5:
+✔ every .js and .mjs file under sim/ passes node --check (59.5095ms)
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (211.1629ms)
+ℹ duration_ms 333.5116
+
+The two tests inside the verify.sh runs (all test files run side by side there):
+after-config.log:
+324:✔ every .js and .mjs file under sim/ passes node --check (98.1972ms)
+325:ℹ node --check ran on sim/balance.mjs
+326:✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (712.5249ms)
+342:ℹ duration_ms 13121.9247
+after-all.log:
+324:✔ every .js and .mjs file under sim/ passes node --check (94.5383ms)
+325:ℹ node --check ran on sim/balance.mjs
+326:✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file (561.8633ms)
+342:ℹ duration_ms 13467.8357
+before-config.log, for comparison (325 tests, no syntax-check file):
+339:ℹ duration_ms 12918.0941
+
+node v24.15.0, git version 2.56.0.windows.4, Windows 11, Git Bash

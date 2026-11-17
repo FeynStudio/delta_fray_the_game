@@ -1,0 +1,53 @@
+T-026 Done-when 5: test count and names, before (0679cd2) against after (c7ac78e)
+
+unit-test summary lines:
+before-config.log:
+ℹ tests 325
+ℹ suites 1
+ℹ pass 324
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+after-config.log:
+ℹ tests 327
+ℹ suites 1
+ℹ pass 326
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+after-all.log:
+ℹ tests 327
+ℹ suites 1
+ℹ pass 326
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+
+before-test-names.txt and after-test-names.txt hold the reporter lines of before-config.log and after-config.log without the time.
+$ wc -l < before-test-names.txt ; wc -l < after-test-names.txt   (each: the tests plus the closing line of the one suite)
+326
+328
+
+names in before that are missing in after (sorted lists, comm -23; prints nothing when none is dropped or renamed):
+count:
+0
+
+names in after that are not in before (comm -13):
+✔ every .js and .mjs file under sim/ passes node --check
+✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
+count:
+2
+
+the names of after-all.log against after-test-names.txt (diff of the sorted lists; prints nothing when equal):
+diff exit status: 0
+
+the one skipped test in each after log (Handoff not filled in at the time of the run):
+agent-team/evidence/T-026/after-config.log:180:﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo (37.8153ms) # handoff not filled in
+agent-team/evidence/T-026/after-all.log:180:﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo (36.4342ms) # handoff not filled in
+
+$ git diff --stat 0679cd2 c7ac78e -- tests/
+ tests/syntax-check.test.js | 74 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
