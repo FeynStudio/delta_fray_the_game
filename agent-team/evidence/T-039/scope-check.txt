@@ -1,9 +1,9 @@
-T-039 Done-when 11: scope check in the worktree <worktree>, HEAD 71d269a, run just before the last commit, 2026-11-17T06:12:47Z; written outside the repo and moved in afterwards, so the greps below do not read their own output
+T-039 Done-when 11: scope check in the worktree <worktree>, HEAD 83f1d8e, run just before the last commit, 2026-11-17T06:13:29Z; the previous scope-check.txt was removed first and this one is written outside the repo and moved in afterwards, so the greps below do not read a scope check
 
 $ git diff --stat 5638864 -- scripts/ tests/ src/ sim/ index.html scenarios/ expected/ docs/ .github/ .claude/ package.json package-lock.json AGENTS.md agent-team/FEATURE_MAP.md agent-team/BACKLOG.md agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/ROADMAP.md
 (exit 0, output above this line)
 
-$ { git diff --name-only 5638864; git ls-files --others --exclude-standard; } | sort -u   (committed and working-tree changes against BASE plus untracked files; scope-check.txt itself is added after this run)
+$ { git diff --name-only 5638864; git ls-files --others --exclude-standard; } | sort -u   (committed and working-tree changes against BASE plus untracked files; scope-check.txt shows because it is tracked since 83f1d8e and removed for this run)
 agent-team/evidence/T-039/after-checks.txt
 agent-team/evidence/T-039/after-config.log
 agent-team/evidence/T-039/after-scratch.txt
