@@ -1,0 +1,21 @@
+After checks on commit ed70c14 (Done-when 10), working tree: committed code plus this task's evidence files
+== ./scripts/guards.sh
+guards exit: 0
+== node scripts/conflict-markers.mjs
+checker exit: 0 (no output and 0 = no marker in any checked file, evidence of this task included)
+== node scripts/no-comments.mjs
+no-comments exit: 0
+== git diff --stat master -- expected/ (must be empty)
+== node --test tests/conflict-markers.test.js (summary lines and the tree test line)
+✔ no file in this repo holds a conflict marker (73.5737ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 192.4425
+== files and bytes the tree check walks in this worktree (counted with the checker's own walk rules by find: no .git, node_modules, secrets, .env files, links)
+998
+13M

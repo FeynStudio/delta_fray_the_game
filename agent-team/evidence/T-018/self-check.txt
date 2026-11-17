@@ -1,0 +1,20 @@
+Self-check on commit ed70c14 (Done-when 8)
+== node scripts/no-comments.mjs
+exit: 0 (no output and 0 = no comment)
+== grep -nE '//|/\*|\*/|<!--' scripts/conflict-markers.mjs tests/conflict-markers.test.js
+grep exit: 1 (1 = no match)
+== grep -nE '<{7}|>{7}|\|{7}' scripts/conflict-markers.mjs tests/conflict-markers.test.js
+grep exit: 1 (1 = no match)
+== grep -nE 'child_process|eval\(|new Function|new RegExp|fetch\(|https?:' scripts/conflict-markers.mjs tests/conflict-markers.test.js
+grep exit: 1 (1 = no match)
+== grep -nE '^import ' scripts/conflict-markers.mjs tests/conflict-markers.test.js (modules used)
+scripts/conflict-markers.mjs:1:import { readdirSync, readFileSync } from 'node:fs';
+scripts/conflict-markers.mjs:2:import { dirname, join, relative, resolve, sep } from 'node:path';
+scripts/conflict-markers.mjs:3:import { fileURLToPath, pathToFileURL } from 'node:url';
+tests/conflict-markers.test.js:1:import { test } from 'node:test';
+tests/conflict-markers.test.js:2:import assert from 'node:assert/strict';
+tests/conflict-markers.test.js:3:import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+tests/conflict-markers.test.js:4:import { tmpdir } from 'node:os';
+tests/conflict-markers.test.js:5:import { dirname, join, resolve } from 'node:path';
+tests/conflict-markers.test.js:6:import { fileURLToPath } from 'node:url';
+tests/conflict-markers.test.js:7:import { checkTree, findMarkers } from '../scripts/conflict-markers.mjs';

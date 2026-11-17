@@ -1,0 +1,30 @@
+Hook-up check (Done-when 12), files copied from commit ed70c14
+Scratch folder outside the worktree, in the OS temp dir: a copy of scripts/, src/ and index.html. Only the copy of scripts/guards.sh is edited; scripts/guards.sh in the worktree is untouched (see the last block).
+== ls of the scratch folder
+guards.orig.sh
+index.html
+scripts
+src
+== diff -u <guards.sh as copied> <guards.sh copy with the one line added>
+--- guards.orig.sh
++++ guards.sh
+@@ -47,4 +47,5 @@
+   echo "GUARD FAIL [format-string-literal]: First argument of console.* and util.format must be a fixed string; use '%s' and pass the value after it"
+   echo "$fmt_hits"; FAIL=1
+ fi
++node scripts/conflict-markers.mjs || FAIL=1
+ exit $FAIL
+\ No newline at end of file
+== clean copy: bash scripts/guards.sh (copy with the line)
+exit: 0
+== one opening marker line appended to src/config.js in the scratch copy: tail -n 2 with line numbers, each line shown after a two-space indent
+  43	export default config;
+  44	<<<<<<< scratch-T-018-hookup
+== marker in place: bash scripts/guards.sh (copy with the line)
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+src/config.js:44: <<<<<<< scratch-T-018-hookup
+exit: 1
+== marker in place: bash guards.orig.sh content run from the same folder without the line (shows the line is what fails)
+exit: 0
+== worktree: git status --short -- scripts/ src/ index.html (must be empty)
+== worktree: git diff --stat master -- scripts/guards.sh (must be empty)

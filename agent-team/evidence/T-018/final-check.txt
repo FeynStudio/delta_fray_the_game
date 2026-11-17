@@ -1,0 +1,32 @@
+Final checks (Done-when 10: the checker after the evidence is committed)
+== run 1, seen at 752a500 right after that commit, git status clean (all evidence up to then committed): node scripts/conflict-markers.mjs printed nothing, exit 0. Written down here from that run; node scripts/handoff-check.mjs then printed SKIP handoff check (handoff not filled in).
+== run 2, live, on 752a500 with the Handoff written, handoff-config.log and the regenerated scope-check.txt on disk, just before the last commit (this file is written outside the worktree and copied in afterwards)
+-- git status --short
+ M agent-team/evidence/T-018/scope-check.txt
+ M agent-team/tasks/T-018.md
+?? agent-team/evidence/T-018/handoff-config.log
+-- node scripts/conflict-markers.mjs
+checker exit: 0
+-- ./scripts/guards.sh
+guards exit: 0
+-- node scripts/no-comments.mjs
+no-comments exit: 0
+-- node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+handoff-check exit: 0
+-- grep -rnE for a marker at a line start in agent-team/evidence/T-018/ and agent-team/tasks/T-018.md (pattern: line start, seven of one marker character)
+grep exit: 1 (1 = no match)
+-- handoff-config.log: result lines
+commit: 752a500  branch: task/T-018-guard-conflict-markers  2026-11-16T09:07:53Z
+dirty: no
+PASS guards
+PASS lint
+ℹ tests 324
+ℹ pass 324
+ℹ fail 0
+ℹ skipped 0
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS

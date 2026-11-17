@@ -1,0 +1,95 @@
+== negative control 1 on commit ed70c14: one opening marker line appended to agent-team/REPEATS.md (scratch, never committed, reverted afterwards)
+== git diff -- agent-team/REPEATS.md
+diff --git a/agent-team/REPEATS.md b/agent-team/REPEATS.md
+index 0757f08..754c589 100644
+--- a/agent-team/REPEATS.md
++++ b/agent-team/REPEATS.md
+@@ -22,3 +22,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
+ | fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
+ | rewrite meant to keep a rule unchanged differs from the old rule on an edge the owner's differential cases did not cover (pathspec `agent-team/` matches a gitlink named agent-team) | 1 | T-032 |
+ | Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) | 1 | T-036 |
++<<<<<<< scratch-T-018-negative
+== node --test tests/conflict-markers.test.js
+✔ findMarkers flags an opening marker followed by a space and text (1.4138ms)
+✔ findMarkers flags a closing marker followed by a space and text (0.104ms)
+✔ findMarkers flags a closing marker alone in the text, with no opening marker (0.0916ms)
+✔ findMarkers flags a base marker of a diff3-style conflict (0.0954ms)
+✔ findMarkers flags an opening marker that is the whole line (0.1033ms)
+✔ findMarkers flags a closing marker that is the whole line (0.0923ms)
+✔ findMarkers flags a base marker that is the whole line (0.0988ms)
+✔ findMarkers flags a marker on line 1 (0.1002ms)
+✔ findMarkers flags a marker on the last line with no line feed after it (0.0817ms)
+✔ findMarkers flags a marker that is the whole text (0.1535ms)
+✔ findMarkers flags a marker followed by a space only (0.0675ms)
+✔ findMarkers flags a whole-line marker that ends with a carriage return and a line feed (0.1304ms)
+✔ findMarkers flags a marker with text that ends with a carriage return and a line feed (0.0466ms)
+✔ findMarkers flags two markers in one text (0.0385ms)
+✔ findMarkers flags all three markers of a diff3-style conflict (0.0363ms)
+✔ findMarkers flags the same marker twice (0.0324ms)
+✔ findMarkers does not flag a marker with a space before it (0.0548ms)
+✔ findMarkers does not flag a marker with a tab before it (0.0336ms)
+✔ findMarkers does not flag a marker with other text before it (0.0289ms)
+✔ findMarkers does not flag a marker later on a line that starts with the same character (0.027ms)
+✔ findMarkers does not flag a bare line of seven equals signs (0.0264ms)
+✔ findMarkers does not flag seven of the character followed by a tab (0.0281ms)
+✔ findMarkers does not flag a carriage return that is not before the line feed (0.0315ms)
+✔ findMarkers does not flag a clean text (0.0326ms)
+✔ findMarkers does not flag an empty text (0.0344ms)
+✔ findMarkers does not flag a text of line feeds only (0.03ms)
+✔ findMarkers does not flag eight of the opening character in a row (0.029ms)
+✔ findMarkers does not flag six of the opening character in a row (0.0258ms)
+✔ findMarkers does not flag seven of the opening character followed directly by a letter (0.029ms)
+✔ findMarkers does not flag eight of the closing character in a row (0.027ms)
+✔ findMarkers does not flag six of the closing character in a row (0.0272ms)
+✔ findMarkers does not flag seven of the closing character followed directly by a letter (0.0378ms)
+✔ findMarkers does not flag eight of the base character in a row (0.0267ms)
+✔ findMarkers does not flag six of the base character in a row (0.0252ms)
+✔ findMarkers does not flag seven of the base character followed directly by a letter (0.0396ms)
+✔ findMarkers returns the marker line without control characters (0.0745ms)
+✔ checkTree reports a marker in every checked place with file and line, in sorted order (13.0784ms)
+✔ checkTree returns file, line and text for each finding (1.6019ms)
+✔ checkTree reports nothing on a clean tree (3.8002ms)
+✔ checkTree does not open .git, node_modules, .env files, secrets folders or binary files (8.5291ms)
+✔ checkTree reads a file whose first zero byte comes after the first 8000 bytes (1.3041ms)
+✔ checkTree does not follow a link to a folder (2.6763ms)
+✔ checkTree fails on a folder that does not exist (0.8309ms)
+✖ no file in this repo holds a conflict marker (78.7401ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 43
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 192.5823
+
+✖ failing tests:
+
+test at tests\conflict-markers.test.js:172:1
+✖ no file in this repo holds a conflict marker (78.7401ms)
+  AssertionError [ERR_ASSERTION]: Resolve the merge conflict; never commit conflict markers
+  agent-team/REPEATS.md:25: <<<<<<< scratch-T-018-negative
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-018/tests/conflict-markers.test.js:174:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+node --test exit: 1
+== node scripts/conflict-markers.mjs
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+agent-team/REPEATS.md:25: <<<<<<< scratch-T-018-negative
+checker exit: 1
+== ./scripts/guards.sh (bare run; it does not call the checker until the human adds the hook-up line)
+guards exit: 0

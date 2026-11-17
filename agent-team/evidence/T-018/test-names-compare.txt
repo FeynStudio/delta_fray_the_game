@@ -1,0 +1,49 @@
+before (c1da5e6, before-config.log): 281 test lines, node reports ℹ tests 280; after (ed70c14, after-config.log): 325 test lines, node reports ℹ tests 324. One line in each list is the suite line 'checkHandoff on throw-away git repos', so 280 + 44 = 324 tests.
+after-all.log (ed70c14) holds the same test lines as after-config.log: ℹ tests 324 ℹ pass 323 ℹ fail 0 ℹ skipped 1 
+== lines in before that are missing in after (must be none)
+(end)
+== lines only in after: 44
+✔ checkTree does not follow a link to a folder
+✔ checkTree does not open .git, node_modules, .env files, secrets folders or binary files
+✔ checkTree fails on a folder that does not exist
+✔ checkTree reads a file whose first zero byte comes after the first 8000 bytes
+✔ checkTree reports a marker in every checked place with file and line, in sorted order
+✔ checkTree reports nothing on a clean tree
+✔ checkTree returns file, line and text for each finding
+✔ findMarkers does not flag a bare line of seven equals signs
+✔ findMarkers does not flag a carriage return that is not before the line feed
+✔ findMarkers does not flag a clean text
+✔ findMarkers does not flag a marker later on a line that starts with the same character
+✔ findMarkers does not flag a marker with a space before it
+✔ findMarkers does not flag a marker with a tab before it
+✔ findMarkers does not flag a marker with other text before it
+✔ findMarkers does not flag a text of line feeds only
+✔ findMarkers does not flag an empty text
+✔ findMarkers does not flag eight of the base character in a row
+✔ findMarkers does not flag eight of the closing character in a row
+✔ findMarkers does not flag eight of the opening character in a row
+✔ findMarkers does not flag seven of the base character followed directly by a letter
+✔ findMarkers does not flag seven of the character followed by a tab
+✔ findMarkers does not flag seven of the closing character followed directly by a letter
+✔ findMarkers does not flag seven of the opening character followed directly by a letter
+✔ findMarkers does not flag six of the base character in a row
+✔ findMarkers does not flag six of the closing character in a row
+✔ findMarkers does not flag six of the opening character in a row
+✔ findMarkers flags a base marker of a diff3-style conflict
+✔ findMarkers flags a base marker that is the whole line
+✔ findMarkers flags a closing marker alone in the text, with no opening marker
+✔ findMarkers flags a closing marker followed by a space and text
+✔ findMarkers flags a closing marker that is the whole line
+✔ findMarkers flags a marker followed by a space only
+✔ findMarkers flags a marker on line 1
+✔ findMarkers flags a marker on the last line with no line feed after it
+✔ findMarkers flags a marker that is the whole text
+✔ findMarkers flags a marker with text that ends with a carriage return and a line feed
+✔ findMarkers flags a whole-line marker that ends with a carriage return and a line feed
+✔ findMarkers flags all three markers of a diff3-style conflict
+✔ findMarkers flags an opening marker followed by a space and text
+✔ findMarkers flags an opening marker that is the whole line
+✔ findMarkers flags the same marker twice
+✔ findMarkers flags two markers in one text
+✔ findMarkers returns the marker line without control characters
+✔ no file in this repo holds a conflict marker
