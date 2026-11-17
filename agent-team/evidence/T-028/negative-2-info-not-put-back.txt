@@ -1,0 +1,79 @@
+T-028 Done-when 5: control for the put-back assertion, on bd0f181, scratch change, never committed, reverted with git restore
+scratch change: the line console.info = info; removed from the finally block of the before hook in tests/game.test.js
+
+$ git diff -- tests/game.test.js
+diff --git a/tests/game.test.js b/tests/game.test.js
+index 0c811aa..7f79e02 100644
+--- a/tests/game.test.js
++++ b/tests/game.test.js
+@@ -27,7 +27,6 @@ before(async () => {
+   try {
+     await import('../src/game.js');
+   } finally {
+-    console.info = info;
+   }
+   startup = { calls, before: info, after: console.info };
+   game = window.__game;
+
+$ node --test tests/game.test.js
+✔ second Space flies ship 0 to the rules end point; gauge back to power, turn passes to 1 (2.743ms)
+✔ with Shift the ship turns to the travel angle at launch, flies there and keeps that heading (1.2225ms)
+✔ after a backward move, on its next turn the dial sits at the new nose and a forward move follows it (0.4953ms)
+✔ halfway: still moving, Space and Shift change nothing, ship not yet at its end point (0.3829ms)
+✔ a large step never takes the ship past the applyMove end point (0.3056ms)
+✔ a real Space keydown launches the move like press(); key repeat is ignored (0.2628ms)
+✔ turns smoke scenario: enemy destroyed on the path respawns, attacker stays, turn 1 on power (0.2592ms)
+✔ the end point is the resolveMove result: the enemy stays drawn alive until the move ends (0.213ms)
+✔ a move into the wall: the mover is back at its spawn point, alive, and the turn has passed (0.2481ms)
+✔ a plain move passes the turn, and the next Space, Space moves the other ship (0.2604ms)
+✔ later steps never change the turn again: no turn timer and no second endTurn (0.279ms)
+✔ double kill through the game: both respawn, the turn passes once, and the next mover is alive (0.2101ms)
+✔ explosion after a hit: one entry at the enemy where it was hit; turn and gauge as before T-007 (0.2168ms)
+✔ explosion after a wall death: centre moved so the whole triangle is inside the map (0.2433ms)
+✔ explosions after a double kill: two entries, enemy where hit, mover inside the map (0.2441ms)
+✔ no explosion after a plain move (0.178ms)
+✔ an explosion is present at explosionMs - 1 and gone at explosionMs; turn, ships, gauge untouched (0.2619ms)
+✔ the next player can press Space while an explosion plays, and its move ends on time (0.2708ms)
+✔ score after a hit: unchanged during the animation, +1 for the mover in the step it ends (0.217ms)
+✔ score after a wall death: unchanged during the animation, -2 for the mover when it ends (0.1818ms)
+✔ scores add up over several turns; turn and gauge behave as before (0.4822ms)
+✔ a state loaded without scores starts from [0, 0] when a move ends (0.238ms)
+✔ moving phase with no anim: step goes back to power, same player, ships unmoved; then plays on (0.3388ms)
+✔ the game starts with clock 0 and both ships spawn protected (0.113ms)
+✔ step(ms) grows the clock by exactly ms, in every phase and across the end of a move (0.2966ms)
+✔ after player 1's first move only player 2's ship is still protected (blinks) (0.137ms)
+✖ loading the game logs one start-up line through the project logger; console.info is put back after (0.7881ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 26
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 84.0483
+
+✖ failing tests:
+
+test at tests\game.test.js:462:1
+✖ loading the game logs one start-up line through the project logger; console.info is put back after (0.7881ms)
+  AssertionError [ERR_ASSERTION]: console.info after the import is the function from before it
+  + actual - expected
+  
+  + [Function (anonymous)]
+  - [Function: info]
+             ^
+  
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-028/tests/game.test.js:471:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exit 1
+
+$ git restore tests/game.test.js
+$ git status --short -- src tests scripts   (prints nothing)
+$ git diff --stat bd0f181 -- src tests scripts   (prints nothing)

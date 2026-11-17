@@ -1,0 +1,30 @@
+T-028 Done-when 1: before, on BASE
+commit: 9d71f7913841bfd5421b4f565fdda16e7a1f262c (short 9d71f79), branch task/T-028-quiet-game-tests
+tree before the run: clean (log header line 2: dirty: no)
+command: ./scripts/verify.sh T-028 --feature config --label before
+last line of the log: RESULT: PASS
+
+$ grep -c '\[game\]' agent-team/evidence/T-028/before-config.log
+1
+$ wc -l < agent-team/evidence/T-028/before-config.log
+372
+
+$ grep -n '\[game\]' agent-team/evidence/T-028/before-config.log
+55:[game] game started {
+
+the start-up line and the state printed with it run from line 55 to the closing brace on line 83; number of lines:
+29
+line 83: }
+line 84: ✔ second Space flies ship 0 to the rules end point; gauge back to power, turn passes to 1 (6.1391ms)
+
+unit-test summary lines of the log:
+ℹ tests 324
+ℹ suites 1
+ℹ pass 323
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+
+the one skipped test:
+208:﹣ the Handoff of the brief for the current task branch names the latest code commit in this repo (35.3127ms) # handoff not filled in

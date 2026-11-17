@@ -1,0 +1,54 @@
+T-028 final check, run on 4b21b01 with the Handoff and handoff-config.log in the working tree, just before the last commit
+
+$ git status --short
+ M agent-team/tasks/T-028.md
+?? agent-team/evidence/T-028/final-check.txt
+?? agent-team/evidence/T-028/handoff-config.log
+
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit 0
+$ ./scripts/guards.sh
+exit 0
+$ node scripts/no-comments.mjs
+exit 0
+$ node scripts/conflict-markers.mjs
+exit 0
+
+handoff-config.log: commit: 4b21b01  branch: task/T-028-quiet-game-tests  2026-11-16T09:20:59Z
+dirty: no
+PASS guards
+PASS lint
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
+ℹ tests 325
+ℹ pass 325
+ℹ fail 0
+ℹ skipped 0
+$ grep -c '\[game\]' agent-team/evidence/T-028/handoff-config.log
+0
+$ wc -l < agent-team/evidence/T-028/handoff-config.log
+344
+180:✔ the Handoff of the brief for the current task branch names the latest code commit in this repo (227.3712ms)
+
+$ git diff --stat 9d71f79 -- src/ sim/ scripts/ index.html scenarios/ expected/ docs/ AGENTS.md agent-team/FEATURE_MAP.md   (prints nothing)
+$ git diff --name-status 9d71f79 -- . ':(exclude)agent-team/evidence/T-028' ':(exclude)agent-team/tasks/T-028.md'
+M	tests/game.test.js
+$ git diff --stat bd0f181 -- . ':(exclude)agent-team'   (prints nothing: no change outside agent-team/ since the code commit)
+
+$ git log --oneline 9d71f79..HEAD
+4b21b01 T-028: after evidence on bd0f181 (verify config and all PASS, 325 tests, no [game] line; negative controls, name compare, scope check)
+bd0f181 T-028: game tests record the start-up console.info during the import instead of printing it; one new test checks the recorded line and that console.info is put back
+5d2521a T-028: before evidence on BASE 9d71f79 (verify config PASS, 324 tests; one [game] start-up line plus the printed state, 29 of 372 log lines)
+
+$ git diff 9d71f79 -- agent-team/tasks/T-028.md | grep -c '^[-+]Decided by human\|^[-+]- Decided by human'   (0: no decision line added or removed by the owner)
+0
+
+main checkout, read only:
+$ git -C ../../../product-a status --short
+?? .gitignore
+$ git -C ../../../product-a log --oneline -1
+c1da5e6 Record the decision to build T-018, T-026, T-028 and T-030
