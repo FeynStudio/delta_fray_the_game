@@ -1,0 +1,66 @@
+T-041 Done-when 9, negative controls on the committed change ca46cb2, one at a time, nothing committed
+
+(a) in the worktree: the untracked scratch file T-041-scratch.txt at the root, one line: a windows-form path joined at run time from the drive letter C, Users, the fake name and a file name (not saved)
+$ node --test tests/home-paths.test.js: exit 1; the lines that name the scratch file, the failed tests and the counts:
+  ✖ no file in this repo holds a home-directory path (110.5657ms)
+  ℹ tests 45
+  ℹ pass 44
+  ℹ fail 1
+  ✖ failing tests:
+  T-041-scratch.txt:1: windows
+$ node scripts/home-paths.mjs: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  T-041-scratch.txt:1: windows home-directory path
+$ ./scripts/verify.sh T-041 --feature config --label negative: exit 1, stdout:
+  commit: ca46cb2  branch: task/T-041-home-path-guard  2026-11-17T06:29:58Z
+  dirty: yes
+  PASS guards
+  PASS lint
+  FAIL unit tests
+  PASS config: no magic numbers
+  PASS config: override honored
+  PASS config output
+  RESULT: FAIL
+$ grep -c <fake name> agent-team/evidence/T-041/negative-config.log: 0 (grep exit 1)
+scratch file removed: yes
+$ git status --short
+  ?? agent-team/evidence/T-041/negative-config.log
+  ?? agent-team/evidence/T-041/no-exemption.txt
+  ?? agent-team/evidence/T-041/proof.mjs
+  ?? agent-team/evidence/T-041/scan-root.mjs
+
+(b) to (e) in a scratch copy of the committed tree (git archive HEAD) under <OS temp dir>; each edit made to the copy's scripts/home-paths.mjs and undone before the next; node --test --test-reporter=tap tests/home-paths.test.js in the copy
+copy unchanged: tests 45, pass 45, fail 0, exit 0
+(b) the exit code forced to 0: tests 45, pass 44, fail 1, exit 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the report with exit 1 on a hit
+  undone: yes
+(c) the windows pattern dropped: tests 45, pass 31, fail 14, exit 1
+  failed: findHomePaths flags windows with backslashes
+  failed: findHomePaths flags windows with forward slashes
+  failed: findHomePaths flags windows with doubled backslashes inside JSON text
+  failed: findHomePaths flags windows with lower-case users
+  failed: findHomePaths flags windows in a file:/// address
+  failed: findHomePaths flags windows with an 8.3 short name
+  failed: findHomePaths flags two hits on one line as one entry with the kind of the first
+  failed: findHomePaths gives one entry per line with a hit
+  failed: checkTree reports a hit in every checked place with file, line and kind, in sorted order
+  failed: checkTree returns file, line and kind only for each finding
+  failed: checkTree reads a file whose first zero byte comes after the first 8000 bytes
+  failed: checkTree does not follow a link to a folder
+  failed: report gives the message, then one path:line: kind line per finding, and code 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the report with exit 1 on a hit
+  undone: yes
+(d) the walk narrowed to agent-team/evidence/: tests 45, pass 38, fail 7, exit 1
+  failed: checkTree reports a hit in every checked place with file, line and kind, in sorted order
+  failed: checkTree returns file, line and kind only for each finding
+  failed: checkTree reads a file whose first zero byte comes after the first 8000 bytes
+  failed: checkTree does not follow a link to a folder
+  failed: checkTree fails on a folder that does not exist
+  failed: report gives the message, then one path:line: kind line per finding, and code 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the report with exit 1 on a hit
+  undone: yes
+(e) agent-team added to the skipped folder names: tests 45, pass 44, fail 1, exit 1
+  failed: checkTree reports a hit in every checked place with file, line and kind, in sorted order
+  undone: yes
+after all controls, copy unchanged again: tests 45, pass 45, fail 0, exit 0
+scratch folder removed: yes
