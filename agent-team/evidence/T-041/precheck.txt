@@ -1,0 +1,23 @@
+T-041 Done-when 1 precheck, run in the worktree <worktree> (Git Bash on Windows 11) on 2026-11-17T06:22Z, before any file of this task was written
+BASE: 7e26d142c22bf93cc43ae41425a11977c3cfd985 (T-039: record review round 1)
+read from branch: task/T-039-conflict-markers-report (the approved head of T-039, as given by the session orchestrator); task/T-041-home-path-guard was cut there and HEAD was 7e26d14 at the time of the run
+
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+OS: MINGW64_NT-10.0-26300 3.6.10-5a1665c8.x86_64 (Git Bash on Windows 11)
+
+$ git status --short --ignored
+(no output: on BASE the worktree held no untracked and no ignored file; no node_modules folder, no .env file, no secrets folder. Top-level entries on disk: .claude .git .gitattributes .github AGENTS.md agent-team docs expected index.html package-lock.json package.json scenarios scripts sim src tests; .git is a file in a worktree)
+
+The three searches of the whole tree on disk, run from the worktree root exactly as the brief writes them (no quoting change was needed in Git Bash); `echo "exit ${PIPESTATUS[0]}"` was added after each to show grep's own exit code (1 = no line matched, 2 would be an error):
+$ X='--exclude-dir=.git --exclude=.git --exclude-dir=node_modules --exclude-dir=secrets --exclude=.env --exclude=.env.?*'
+$ grep -rnoIE $X -i '[A-Za-z]:[\\/]+users[\\/]+[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+$ grep -rnoIE $X -i '/[A-Za-z]/users/[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+$ grep -rnoIE $X '(^|[^A-Za-z0-9_.-])/(Users|home)/[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+
+Result: no output from any of the three searches; no file:line found anywhere in the BASE tree (tracked, untracked or ignored; T-039's evidence folder and brief included). The Stop rule does not apply.
