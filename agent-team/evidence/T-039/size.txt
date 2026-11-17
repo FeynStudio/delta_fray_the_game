@@ -1,0 +1,4 @@
+T-039 Done-when 4: size of `diff -u` of each proposed file against BASE 5638864 (header lines not counted)
+scripts/conflict-markers.mjs: added 8, deleted 6, total 14 (limit 15): within
+tests/conflict-markers.test.js: added 33, deleted 2, total 35 (limit 50): within
+scratch folder removed: yes

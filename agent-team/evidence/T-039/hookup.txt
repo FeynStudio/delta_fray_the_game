@@ -1,0 +1,22 @@
+T-039 Done-when 8: guards.sh hook-up with guards.sh unchanged, in a scratch copy of the worktree under <OS temp dir> with both proposed files (not a git repo, so verify.sh prints commit: none and dirty: unknown)
+scripts/guards.sh identical to BASE: yes
+clean copy: ./scripts/guards.sh exit 0, output ""
+marker line (built at run time) appended to src/config.js as line 44: ./scripts/guards.sh exit 1, output lines:
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+src/config.js:44: <<<<<<< HEAD
+marker removed; ./scripts/verify.sh T-039-scratch --feature config: exit 0, output lines:
+commit: none  branch: none  <time>
+dirty: unknown
+PASS guards
+PASS lint
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
+unit-test summary from the scratch log:
+ℹ tests 330
+ℹ pass 329
+ℹ fail 0
+ℹ skipped 1
+scratch folder removed: yes

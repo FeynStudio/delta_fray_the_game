@@ -1,0 +1,22 @@
+T-039 apply steps for the human (route A). Agents do not edit scripts/conflict-markers.mjs or tests/conflict-markers.test.js.
+
+When: after both reviews (normal and security) approve. The task branch task/T-039-conflict-markers-report holds evidence and the brief only and can be merged before or with the copy.
+
+1. In product-a, on a branch of your own cut from master:
+
+cp agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs scripts/conflict-markers.mjs
+cp agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js tests/conflict-markers.test.js
+git diff --stat
+./scripts/verify.sh T-039-applied --feature all
+./scripts/guards.sh
+
+2. Expected:
+- git diff --stat lists exactly the two files: scripts/conflict-markers.mjs (14 lines changed: 8 added, 6 deleted) and tests/conflict-markers.test.js (35 lines changed: 33 added, 2 deleted).
+- verify.sh prints RESULT: PASS. The unit-test count is 3 higher than before the copy (327 to 330 on BASE 5638864 with --feature config in the owner's scratch copy).
+- guards.sh prints nothing and exits 0.
+
+3. Commit the two files and open the pull request with the checks-change label (the CI step "Block changes to the checks" watches both files).
+
+4. After the merge the coordinator puts the line in agent-team/evidence/T-039/feature-map-line.txt into agent-team/FEATURE_MAP.md (section 9, replacing the "Conflict-marker guard (T-018)" line) and closes the task.
+
+Proven by the owner: the copy over the real paths, the conflict-marker unit tests, guards.sh and ./scripts/verify.sh T-039-scratch --feature config, all in a scratch copy of the worktree outside the repo (hookup.txt, after-scratch.txt). Not run by the owner: verify.sh with --feature all (it needs the browser smoke runs) and the copy in a git checkout of master.
