@@ -1,0 +1,27 @@
+precheck for T-038, run in the worktree <worktree> on branch task/T-038-syntax-check-fixes
+BASE: 7284fd1d50e60ad370dd93a01c86cd6f0347e668 (approved head of task/T-041-home-path-guard; HEAD of this branch when the precheck ran)
+branch: task/T-038-syntax-check-fixes
+
+$ git diff --stat f223992 7284fd1 -- tests/syntax-check.test.js
+(exit 0, output above: none expected)
+
+$ grep -n "syntax-check" .claude/settings.json
+21:      "Edit(./tests/syntax-check.test.js)"
+
+$ grep -n "execFileSync\|mkdtempSync\|isFile\|symlink\|package.json" tests/syntax-check.test.js
+3:import { execFileSync } from 'node:child_process';
+4:import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+18:    } else if (entry.isFile() && EXTS.includes(extname(entry.name))) {
+31:      execFileSync(process.execPath, ['--check', file], { encoding: 'utf8', stdio: ['ignore', 'ignore', 'pipe'], windowsHide: true });
+46:  const root = mkdtempSync(join(tmpdir(), 'syntax-check-'));
+(lines 3, 18, 31 and 46 as cited in the brief; line 4 is the node:fs import, which names mkdtempSync; no symlink or package.json line)
+
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+
+Done-when 2, before run on BASE 7284fd1, git status --porcelain at the start: (empty)
+$ ./scripts/verify.sh T-038 --feature config --label before
+line 2: dirty: no; every check PASS; RESULT: PASS; log agent-team/evidence/T-038/before-config.log
+unit tests: tests 372, pass 371, fail 0, skipped 1 (from the log's summary lines)

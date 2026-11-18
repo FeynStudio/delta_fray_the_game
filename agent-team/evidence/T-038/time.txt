@@ -1,0 +1,9 @@
+T-038 Done-when 8, time of `node --test tests/syntax-check.test.js` (TAP reporter), three runs per file, interleaved; copies of the worktree at 7284fd1; platform win32, node v24.15.0
+base run 1: tests 2, pass 2, fail 0, exit 0, 423 ms
+proposed run 1: tests 5, pass 5, fail 0, exit 0, 602 ms
+base run 2: tests 2, pass 2, fail 0, exit 0, 411 ms
+proposed run 2: tests 5, pass 5, fail 0, exit 0, 579 ms
+base run 3: tests 2, pass 2, fail 0, exit 0, 422 ms
+proposed run 3: tests 5, pass 5, fail 0, exit 0, 612 ms
+average base 419 ms, proposed 598 ms, difference 179 ms (limit 500 ms): within the limit
+scratch folder removed: yes

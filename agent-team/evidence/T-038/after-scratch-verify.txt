@@ -1,0 +1,21 @@
+T-038 Done-when 7, a fresh scratch copy of the worktree at 7284fd1 (not a git repo) with the proposed file copied over tests/syntax-check.test.js; platform win32, node v24.15.0, git version 2.56.0.windows.4
+$ ./scripts/verify.sh T-038-scratch --feature config -> exit 0
+  commit: none  branch: none  2026-11-18T15:40:00Z
+  dirty: unknown
+  PASS guards
+  PASS lint
+  PASS unit tests
+  PASS config: no magic numbers
+  PASS config: override honored
+  PASS config output
+  RESULT: PASS
+unit-test summary from the log: ℹ tests 375; ℹ suites 1; ℹ pass 374; ℹ fail 0; ℹ cancelled 0; ℹ skipped 1; ℹ todo 0
+the 5 tests of the proposed file, as the log reports them:
+  ✔ every .js and .mjs file under sim/ passes node --check
+  ✔ the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
+  ✔ plain removes every C0 control except the line feed, DEL and every C1 control
+  ✔ a failing line with control characters is reported by name with SyntaxError and none of them
+  ✔ the walk does not follow a folder link under sim/, while the linked folder itself is reported
+$ ./scripts/guards.sh -> exit 0, output ""
+scratch folder removed: yes
+syntax-check-* folders in <OS temp dir> now: 0

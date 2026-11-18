@@ -1,0 +1,44 @@
+T-038 Done-when 6, negative controls in a scratch copy of the worktree at 7284fd1 with the proposed file; one at a time, each undone before the next; never committed
+unchanged proposed file: tests 5, pass 5, fail 0, exit 0, 568 ms
+unchanged proposed file, dash set-up: tests 5, pass 5, fail 0, exit 0, 566 ms
+
+(a) cleaning taken out of the stderr path
+change (diff -u proposed -> scratch, changed lines only):
+  -      errors.push(`${name(file)}: ${plain(String(error.stderr || error.message)).trim()}`);
+  +      errors.push(`${name(file)}: ${String(error.stderr || error.message).trim()}`);
+result: tests 5, pass 4, fail 1, exit 1, 579 ms
+  failed: a failing line with control characters is reported by name with SyntaxError and none of them
+file restored: yes
+
+(b) package.json line removed from the fixture of test 2
+change (diff -u proposed -> scratch, changed lines only):
+  -    'package.json': '{"type":"module"}\n',
+result: tests 5, pass 4, fail 1, exit 1, 595 ms
+  failed: the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
+file restored: yes
+
+(c) walk follows folder links (entry tested with statSync)
+change (diff -u proposed -> scratch, changed lines only):
+  -import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+  +import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+  -    if (entry.isDirectory()) {
+  +    if (statSync(full).isDirectory()) {
+result: tests 5, pass 4, fail 1, exit 1, 586 ms
+  failed: the walk does not follow a folder link under sim/, while the linked folder itself is reported
+file restored: yes
+
+(d) resolve(...) taken out of both mkdtempSync calls, run in the 3b set-up
+change (diff -u proposed -> scratch, changed lines only):
+  -  const root = mkdtempSync(join(resolve(tmpdir()), 'syntax-check-'));
+  +  const root = mkdtempSync(join(tmpdir(), 'syntax-check-'));
+  -  const root = mkdtempSync(join(resolve(tmpdir()), 'syntax-check-'));
+  +  const root = mkdtempSync(join(tmpdir(), 'syntax-check-'));
+result: tests 5, pass 2, fail 3, exit 1, 400 ms
+  failed: the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
+  failed: a failing line with control characters is reported by name with SyntaxError and none of them
+  failed: the walk does not follow a folder link under sim/, while the linked folder itself is reported
+file restored: yes
+
+syntax-check-* folders left in -dash-temp: 0
+scratch folder removed: yes
+syntax-check-* folders in <OS temp dir> now: 0
