@@ -1,0 +1,34 @@
+T-041 Done-when 10, a checkout under a home folder (the CI case): a fresh scratch copy of the committed tree ca46cb2 (git archive HEAD, so no .git, no .env file, no secrets/ folder, no node_modules) under <OS temp dir>
+the copy's absolute path is itself a hit under the windows pattern (findHomePaths on the path string, the path not written down): yes; kinds: windows
+$ ./scripts/verify.sh T-041-scratch --feature all (in the copy): exit 0, stdout:
+  commit: none  branch: none  <time>
+  dirty: unknown
+  PASS guards
+  PASS lint
+  PASS unit tests
+  PASS render browser runs
+  PASS render browser output
+  PASS input browser runs
+  PASS input browser output
+  PASS movement scenario runs
+  PASS movement output
+  PASS hits scenario runs
+  PASS hits output
+  PASS turns scenario runs
+  PASS turns output
+  PASS turns browser runs
+  PASS turns browser output
+  PASS config: no magic numbers
+  PASS config: override honored
+  PASS config output
+  PASS balance sim
+  RESULT: PASS
+files the run wrote into the copy's agent-team/evidence/T-041-scratch/ (18): balance.json config.json hits.json input-smoke-direction-backward.png input-smoke-direction.png input-smoke-power.png input-smoke.json input-smoke.png movement.json render-smoke.json render-smoke.png run-all.log turns-smoke-backward-end.png turns-smoke-backward-mid.png turns-smoke-explosion.png turns-smoke.json turns-smoke.png turns.json
+unit-test counts from the copy's run-all.log:
+  ℹ tests 372
+  ℹ pass 371
+  ℹ fail 0
+  ℹ skipped 1
+$ node scripts/home-paths.mjs (in the copy, after the run): exit 0, stdout lines 0
+expectation of Done-when 10 holds: yes
+scratch folder removed: yes

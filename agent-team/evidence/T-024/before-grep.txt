@@ -1,0 +1,32 @@
+commit: a77ef5c  file: agent-team/FEATURE_MAP.md
+0	tip-left
+0	8:1
+0	devicePixelRatio
+0	lineJoin
+0	gaugePowerSweepMs
+0	gaugeNeedleSweepMs
+0	triangle wave
+0	farthest from its centre
+0	pinned on purpose
+0	clamps t
+0	monotone chain
+0	node scripts/run-scenario.mjs scenarios/
+0	"pick"
+0	3 decimals
+0	PORT
+0	never serves dotfiles
+0	node scripts/smoke.mjs --feature
+0	built-in WebSocket
+0	Chrome, then Edge
+0	DevToolsActivePort
+1	Browser.close
+0	source text
+2	sim/balance.mjs
+0	--games 2000
+0	seeded
+0	before-comment-list.txt
+0	guards.sh line 39
+0	records console.info
+0	tests in tests/movement.test.js
+0	syntax-check.test.js is protected
+1	a bare ./scripts/guards.sh run does not check it

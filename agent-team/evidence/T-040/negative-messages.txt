@@ -1,0 +1,59 @@
+T-040 Done-when 5: message limits (30a), on the code commit 175b35b.
+One scratch change at a time, never committed: in send, the ws.send line becomes 'if (method !== "<method>") ws.send(...)', so that one message is never sent and never answered, while its promise and its new timer are made as usual. Patches: scratch-skip-screenshot.patch, scratch-skip-key.patch, scratch-skip-close.patch, scratch-skip-navigate.patch. Each was undone with git restore scripts/smoke.mjs before the next one (the line after each block).
+Note on the patch files: as first saved during the runs they also held the uncommitted diff of the tracked file leftover-counts.txt; they were then made again with git diff -- scripts/smoke.mjs from the same sed line, without a run, so they now hold the scratch smoke.mjs line only. The smoke.mjs hunk is the same.
+Each run: node scripts/smoke.mjs --feature <f> --out <a file in the session scratch folder outside the repo>; the time is from the start of the node command to its exit. Leftover counts by count-leftovers.mjs, 15 s after each run ends (baseline: 0 folders, 11 chrome.exe).
+Lines 'warning: in the working copy of ... LF will be replaced by CRLF' that git diff printed are left out.
+
+== Page.captureScreenshot (turns), scratch-skip-screenshot.patch
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/neg-screenshot.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 20888 ms from its start
+stderr:
+  smoke turns: DevTools message Page.captureScreenshot timed out after 20000 ms
+result file:
+  {
+    "error": "DevTools message Page.captureScreenshot timed out after 20000 ms"
+  }
+counted 2026-11-18T16:01:35.940Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+after git restore, git status --short -- scripts/smoke.mjs: ''
+
+== Input.dispatchKeyEvent (input), scratch-skip-key.patch
+$ node scripts/smoke.mjs --feature input --out <scratch folder outside the repo>/neg-key.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 21333 ms from its start
+stderr:
+  smoke input: DevTools message Input.dispatchKeyEvent timed out after 20000 ms
+result file:
+  {
+    "error": "DevTools message Input.dispatchKeyEvent timed out after 20000 ms"
+  }
+counted 2026-11-18T16:02:12.830Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+after git restore, git status --short -- scripts/smoke.mjs: ''
+
+== Target.closeTarget (turns), scratch-skip-close.patch
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/neg-close.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 21259 ms from its start
+stderr:
+  smoke turns: DevTools message Target.closeTarget timed out after 20000 ms
+result file:
+  {
+    "error": "DevTools message Target.closeTarget timed out after 20000 ms"
+  }
+counted 2026-11-18T16:02:49.672Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+after git restore, git status --short -- scripts/smoke.mjs: ''
+
+== Page.navigate (turns), scratch-skip-navigate.patch
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/neg-navigate.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 20761 ms from its start
+stderr:
+  smoke turns: DevTools message Page.navigate timed out after 20000 ms
+result file:
+  {
+    "error": "DevTools message Page.navigate timed out after 20000 ms"
+  }
+counted 2026-11-18T16:03:26.032Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+after git restore, git status --short -- scripts/smoke.mjs: ''
+
+Summary: all four runs exit 1 within 60 s of their start (20888, 21333, 21259 and 20761 ms); each result file holds { "error": "DevTools message <method> timed out after 20000 ms" } for the skipped method; every count afterwards is 0 folders and the baseline 11 chrome.exe.

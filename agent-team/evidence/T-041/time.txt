@@ -1,0 +1,5 @@
+T-041 Done-when 16, time and walk size, in the worktree at ca46cb2
+run 1: tests 45, pass 45, fail 0, exit 0; real-repo tree test duration_ms: 110.7286; whole test file (node --test tests/home-paths.test.js, # duration_ms 337.0083); wall time of the node process 0.393 s
+run 2: tests 45, pass 45, fail 0, exit 0; real-repo tree test duration_ms: 112.2303; whole test file (node --test tests/home-paths.test.js, # duration_ms 337.9088); wall time of the node process 0.392 s
+run 3: tests 45, pass 45, fail 0, exit 0; real-repo tree test duration_ms: 106.6672; whole test file (node --test tests/home-paths.test.js, # duration_ms 326.7856); wall time of the node process 0.381 s
+files the real-repo walk opens (a count by an evidence-only walk with the same skip rules as checkTree): 1187, of which 848 read as text and 339 skipped as binary after the first 8000 bytes

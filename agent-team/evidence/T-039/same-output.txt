@@ -1,0 +1,9 @@
+T-039 Done-when 6: one scratch copy of the worktree under <OS temp dir>; BASE module at scripts/conflict-markers.mjs, proposed module copied next to it as scripts/conflict-markers.proposed.mjs, so both check the same root
+clean tree: BASE exit 0, 0 stdout bytes; proposed exit 0, 0 stdout bytes; stdout byte-identical: yes; same exit code: yes; stderr empty: yes
+marker lines (built at run time) appended: src/config.js line 44, agent-team/REPEATS.md line 28
+with markers: BASE exit 1, 174 stdout bytes; proposed exit 1, 174 stdout bytes; stdout byte-identical: yes; same exit code: yes; stderr empty: yes
+stdout of the proposed module with markers (identical to BASE above), line by line:
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+agent-team/REPEATS.md:28: >>>>>>> task/T-000-other
+src/config.js:44: <<<<<<< HEAD
+scratch folder removed: yes

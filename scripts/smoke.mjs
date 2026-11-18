@@ -12,6 +12,7 @@ const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1
 const feature = opt('--feature');
 const out = opt('--out');
 const EVAL_TIMEOUT_MS = 15000;
+const SEND_TIMEOUT_MS = 20000;
 
 
 function findBrowser() {
@@ -42,7 +43,14 @@ function connect(url) {
     send(method, params = {}, sessionId) {
       const id = ++nextId;
       ws.send(JSON.stringify({ id, method, params, sessionId }));
-      return new Promise((ok, fail) => pending.set(id, { ok, fail, method }));
+      return new Promise((ok, fail) => {
+        const timer = setTimeout(() => {
+          pending.delete(id);
+          fail(new Error(`DevTools message ${method} timed out after ${SEND_TIMEOUT_MS} ms`));
+        }, SEND_TIMEOUT_MS);
+        const settle = (fn) => (value) => { clearTimeout(timer); fn(value); };
+        pending.set(id, { ok: settle(ok), fail: settle(fail), method });
+      });
     },
     close: () => ws.close(),
   };
@@ -89,15 +97,18 @@ async function launchBrowser(exe, profile) {
 
       const page = {
         async eval(fn, ...fnArgs) {
+          const answer = send('Runtime.evaluate', {
+            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+          });
           let timer;
           const timedOut = new Promise((_, fail) => {
-            timer = setTimeout(() => fail(new Error(
-              `page evaluation timed out after ${EVAL_TIMEOUT_MS} ms in ${fn.name || 'an unnamed function'}`,
-            )), EVAL_TIMEOUT_MS);
+            timer = setTimeout(() => {
+              const error = new Error(`page evaluation timed out after ${EVAL_TIMEOUT_MS} ms in ${fn.name || 'an unnamed function'}`);
+              error.evalTimedOut = true;
+              fail(error);
+            }, EVAL_TIMEOUT_MS);
           });
-          const r = await Promise.race([send('Runtime.evaluate', {
-            expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
-          }), timedOut]).finally(() => clearTimeout(timer));
+          const r = await Promise.race([answer, timedOut]).finally(() => clearTimeout(timer));
           if (r.exceptionDetails) {
             throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
           }
@@ -117,10 +128,10 @@ async function launchBrowser(exe, profile) {
 
       const deadline = Date.now() + 15000;
       for (;;) {
-        const ready = await page.eval(
-          (base) => location.href.startsWith(base) && document.readyState === 'complete' && !!window.__game,
-          url.split('?')[0],
-        ).catch(() => false);
+        const ready = await page.eval(pageReadyProbe, url.split('?')[0]).catch((error) => {
+          if (error.evalTimedOut) throw error;
+          return false;
+        });
         if (ready) return page;
         if (Date.now() > deadline) throw new Error('window.__game not found; is index.html?debug=1 exposing the debug API?');
         await new Promise((r) => setTimeout(r, 100));
@@ -142,6 +153,10 @@ async function launchBrowser(exe, profile) {
   };
 }
 
+
+function pageReadyProbe(base) {
+  return location.href.startsWith(base) && document.readyState === 'complete' && !!window.__game;
+}
 
 async function renderProbe() {
   const cfg = (await import('/src/config.js')).default;

@@ -1,0 +1,9 @@
+T-039 Done-when 9: node --test tests/conflict-markers.test.js in two scratch copies of the worktree under <OS temp dir>, BASE files and proposed files, three runs each, interleaved; wall time of the whole node process
+run 1 BASE: 0.282 s, exit 0
+run 1 proposed: 0.397 s, exit 0
+run 2 BASE: 0.276 s, exit 0
+run 2 proposed: 0.389 s, exit 0
+run 3 BASE: 0.275 s, exit 0
+run 3 proposed: 0.405 s, exit 0
+average BASE 0.278 s, proposed 0.397 s, difference 0.119 s (limit 0.5 s): within
+scratch folder removed: yes

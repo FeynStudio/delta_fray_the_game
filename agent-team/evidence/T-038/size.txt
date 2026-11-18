@@ -1,0 +1,18 @@
+size.txt for T-038: added and deleted lines of diff -u between tests/syntax-check.test.js on BASE 7284fd1 and agent-team/evidence/T-038/proposed/tests/syntax-check.test.js (proposed.diff)
+counted twice: lines starting with + or - in proposed.diff (file headers left out), and lines starting with > or < in a plain diff of the same two files; both give the same numbers
+added: 42
+deleted: 6
+added plus deleted: 48 (limit 50): within
+file length: BASE 74 lines, proposed 110 lines
+the worktree's tests/syntax-check.test.js equals `git show 7284fd1:tests/syntax-check.test.js` byte for byte (cmp exit 0), so the diff is against BASE's file
+breakdown of the 48 lines:
+- node:fs import (symlinkSync added): 1 deleted, 1 added
+- CONTROL and plain (fix 1): 2 added
+- name() cleans the reported path, stderr cleaned before trim (fix 1): 2 deleted, 2 added
+- inFixture helper for the two new fixture tests (fix 2 path form included) and its blank line: 11 added
+- test 2 mkdtempSync under resolve(tmpdir()) (fix 2): 1 deleted, 1 added
+- test 2 fixture: package.json and sim/deep/top-return.js (fix 3): 2 added
+- test 2 checked and error-name assertions, top-return.js added (fix 3): 2 deleted, 2 added
+- string test (fix 1): 4 added
+- control-character fixture test (fix 1): 8 added
+- link test (fix 4): 9 added

@@ -1,0 +1,33 @@
+T-041 Done-when 15 scope check, in the worktree <worktree>, run just before the last commit, 2026-11-17T06:34:41Z; HEAD 4ded1cd, BASE 7e26d14; working-tree changes (this brief, the evidence files) are included because git diff BASE compares the working tree
+
+$ git diff --stat 7e26d14 -- scripts/guards.sh scripts/verify.sh scripts/smoke.mjs scripts/serve.mjs scripts/run-scenario.mjs scripts/no-comments.mjs scripts/conflict-markers.mjs scripts/handoff-check.mjs src/ sim/ index.html scenarios/ expected/ docs/ .github/ .claude/ package.json package-lock.json AGENTS.md .gitattributes agent-team/DECISIONS.md agent-team/BACKLOG.md agent-team/REPEATS.md agent-team/ROADMAP.md agent-team/tasks/T-039.md agent-team/evidence/T-039/
+(exit 0, no output above this line)
+
+$ git diff --name-status 7e26d14 -- scripts/ tests/
+A	scripts/home-paths.mjs
+A	tests/home-paths.test.js
+$ git ls-files --others --exclude-standard -- scripts/ tests/   (untracked there)
+(end)
+
+$ git diff --name-only 7e26d14 -- . ':(exclude)agent-team/evidence/T-041/' ':(exclude)agent-team/tasks/T-041.md' ':(exclude)agent-team/FEATURE_MAP.md'
+scripts/home-paths.mjs
+tests/home-paths.test.js
+(exit 0; only the two new files under scripts/ and tests/: outside them, agent-team/evidence/T-041/, this brief and FEATURE_MAP.md no file differs from BASE)
+$ git status --short --ignored
+ M agent-team/tasks/T-041.md
+?? agent-team/evidence/T-041/scope-check.txt
+?? agent-team/evidence/T-041/self-check.txt
+(only this brief and new evidence under agent-team/evidence/T-041/)
+
+$ git ls-files .gitignore
+(no output)
+
+$ node agent-team/evidence/T-041/proof.mjs leftovers
+folders in <OS temp dir> named home-paths-*: 0; named t041-*: 0
+(home-paths-* are the test's throw-away trees, t041-* the proof script's scratch copies; no other scratch copy was made)
+
+$ git diff --numstat 7e26d14 -- scripts/ tests/ agent-team/FEATURE_MAP.md
+1	0	agent-team/FEATURE_MAP.md
+72	0	scripts/home-paths.mjs
+199	0	tests/home-paths.test.js
+total added plus deleted: 272 (limit 350)

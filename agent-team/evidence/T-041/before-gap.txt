@@ -1,0 +1,24 @@
+T-041 Done-when 2: before and the gap, on BASE 7e26d14 in the worktree <worktree>, 2026-11-17
+
+Before (clean tree):
+$ ./scripts/verify.sh T-041 --feature config --label before
+commit: 7e26d14, dirty: no, every check PASS, RESULT: PASS (before-config.log)
+unit tests: tests 327, pass 326, fail 0, skipped 1 (the skipped one is the live handoff test, which skips while this brief's Handoff is the placeholder)
+
+The gap:
+An untracked scratch file T-041-scratch.txt was made at the worktree root by a one-line node command. It held one line: the word "see", a space, then a windows-form home-directory path joined at run time from four pieces with backslashes: the drive letter C with its colon, the word Users, the fake name, and a file name. The fake name is a plain word, not a real account name. Neither the file nor its text is saved.
+
+$ git status --short
+?? T-041-scratch.txt
+?? agent-team/evidence/T-041/
+$ ./scripts/verify.sh T-041 --feature config --label before-gap
+commit: 7e26d14, dirty: yes (the scratch file is outside agent-team/), every check PASS, RESULT: PASS, exit 0 (before-gap-config.log)
+unit tests: tests 327, pass 326, fail 0, skipped 1
+$ ./scripts/guards.sh
+(no output) exit 0
+$ grep -c <fake name> agent-team/evidence/T-041/before-gap-config.log
+0
+$ rm T-041-scratch.txt; git status --short
+?? agent-team/evidence/T-041/
+
+So on BASE nothing fails on a home-directory path in a repo file: the gap this task closes.

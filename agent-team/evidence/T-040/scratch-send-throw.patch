@@ -1,0 +1,14 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 5e9e66b..537b143 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -455,6 +455,9 @@ const FEATURES = {
+ 
+   async turns(browser, url, shots) {
+     const a = await browser.open(url, FULL_HD);
++    await a.eval(turnsProbe, 1n).catch((e) => process.stderr.write(`scratch caught: ${e.message}
++`));
++    await new Promise((done) => setTimeout(done, 16000));
+     const r = await a.eval(turnsProbe);
+     shots.push({ suffix: '', png: await a.screenshot() });
+     await stateShot(browser, url, shots, '-backward-mid', backwardLaunchProbe, [0.5], backwardMidWrong);

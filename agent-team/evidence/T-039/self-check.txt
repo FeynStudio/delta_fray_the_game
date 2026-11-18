@@ -1,0 +1,31 @@
+T-039 Done-when 10: self-check in the worktree <worktree>, 2026-11-17T06:10:01Z, HEAD 5638864
+
+$ node scripts/no-comments.mjs
+(exit 0, output above this line)
+$ node scripts/conflict-markers.mjs
+(exit 0, output above this line)
+note: both walk agent-team/evidence/, so they cover agent-team/evidence/T-039/proposed/ and proof.mjs
+
+$ grep -nE '<{7}|>{7}|\|{7}' agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js
+(grep exit 1: 1 means no match)
+
+$ grep -nE 'exec\(|execSync\(|shell:|eval\(|new Function|new RegExp|fetch\(|https?:|Object\.assign' agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js
+(grep exit 1: 1 means no match)
+
+$ grep -n '^import' agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs
+1:import { readdirSync, readFileSync } from 'node:fs';
+2:import { dirname, join, relative, resolve, sep } from 'node:path';
+3:import { fileURLToPath, pathToFileURL } from 'node:url';
+
+$ grep -nE 'child_process|execFile|spawn|fork\(|execSync' agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js
+3:import { execFileSync } from 'node:child_process';
+189:    return { code: 0, out: execFileSync(process.execPath, [resolve(root, SCRIPT)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+(one import and one call, line 189: execFileSync(process.execPath, [resolve(root, SCRIPT)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }), no shell; root is the withTree folder made by mkdtempSync(join(tmpdir(), 'conflict-markers-')))
+
+$ grep -nE 'console\.|util\.format' agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js agent-team/evidence/T-039/proof.mjs
+(grep exit 1: 1 means no match)
+
+$ node --check on both proposed files and proof.mjs
+agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs: exit 0
+agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js: exit 0
+agent-team/evidence/T-039/proof.mjs: exit 0

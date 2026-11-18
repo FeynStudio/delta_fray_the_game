@@ -1,0 +1,57 @@
+T-039 Done-when 5: scratch copies of the worktree under <OS temp dir>; BASE files in one, both proposed files copied over the real paths in the other
+BASE files: node --test --test-reporter=tap tests/conflict-markers.test.js: tests 44, pass 44, fail 0, exit 0
+proposed files: node --test --test-reporter=tap tests/conflict-markers.test.js: tests 47, pass 47, fail 0, exit 0
+new tests (3):
+  ok     report gives no lines and code 0 when nothing is found
+  ok     report gives the message, then one path:line: text line per finding in the given order, and code 1
+  ok     run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+BASE tests: 44; missing in the proposed file: 0; present but not passing: 0
+every test in the proposed run:
+  ok     findMarkers flags an opening marker followed by a space and text
+  ok     findMarkers flags a closing marker followed by a space and text
+  ok     findMarkers flags a closing marker alone in the text, with no opening marker
+  ok     findMarkers flags a base marker of a diff3-style conflict
+  ok     findMarkers flags an opening marker that is the whole line
+  ok     findMarkers flags a closing marker that is the whole line
+  ok     findMarkers flags a base marker that is the whole line
+  ok     findMarkers flags a marker on line 1
+  ok     findMarkers flags a marker on the last line with no line feed after it
+  ok     findMarkers flags a marker that is the whole text
+  ok     findMarkers flags a marker followed by a space only
+  ok     findMarkers flags a whole-line marker that ends with a carriage return and a line feed
+  ok     findMarkers flags a marker with text that ends with a carriage return and a line feed
+  ok     findMarkers flags two markers in one text
+  ok     findMarkers flags all three markers of a diff3-style conflict
+  ok     findMarkers flags the same marker twice
+  ok     findMarkers does not flag a marker with a space before it
+  ok     findMarkers does not flag a marker with a tab before it
+  ok     findMarkers does not flag a marker with other text before it
+  ok     findMarkers does not flag a marker later on a line that starts with the same character
+  ok     findMarkers does not flag a bare line of seven equals signs
+  ok     findMarkers does not flag seven of the character followed by a tab
+  ok     findMarkers does not flag a carriage return that is not before the line feed
+  ok     findMarkers does not flag a clean text
+  ok     findMarkers does not flag an empty text
+  ok     findMarkers does not flag a text of line feeds only
+  ok     findMarkers does not flag eight of the opening character in a row
+  ok     findMarkers does not flag six of the opening character in a row
+  ok     findMarkers does not flag seven of the opening character followed directly by a letter
+  ok     findMarkers does not flag eight of the closing character in a row
+  ok     findMarkers does not flag six of the closing character in a row
+  ok     findMarkers does not flag seven of the closing character followed directly by a letter
+  ok     findMarkers does not flag eight of the base character in a row
+  ok     findMarkers does not flag six of the base character in a row
+  ok     findMarkers does not flag seven of the base character followed directly by a letter
+  ok     findMarkers returns the marker line without control characters
+  ok     checkTree reports a marker in every checked place with file and line, in sorted order
+  ok     checkTree returns file, line and text for each finding
+  ok     checkTree reports nothing on a clean tree
+  ok     checkTree does not open .git, node_modules, .env files, secrets folders or binary files
+  ok     checkTree reads a file whose first zero byte comes after the first 8000 bytes
+  ok     checkTree does not follow a link to a folder
+  ok     checkTree fails on a folder that does not exist
+  ok     report gives no lines and code 0 when nothing is found
+  ok     report gives the message, then one path:line: text line per finding in the given order, and code 1
+  ok     run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  ok     no file in this repo holds a conflict marker
+scratch folder removed: yes

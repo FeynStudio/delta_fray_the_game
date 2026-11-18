@@ -1,0 +1,14 @@
+T-039 Done-when 12: after checks in the worktree <worktree>, HEAD 71d269a (Write the T-039 Handoff and set the brief to IN REVIEW), 2026-11-17T06:12:12Z
+verify: ./scripts/verify.sh T-039 --feature config --label after -> after-config.log (RESULT: PASS, dirty: no, 327 tests, 327 pass, 0 skipped; the 1 skipped before was the live handoff test, skipped while the Handoff was the placeholder)
+
+$ ./scripts/guards.sh
+(exit 0, output above this line)
+
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+(exit 0)
+
+Earlier, at HEAD 43cca86 with the Handoff filled in (not yet committed) but no hash in it, the same command printed:
+FAIL handoff names the latest code commit
+Handoff does not name b6b5548; latest code commit is b6b5548 (Merge pull request #6 from FeynStudio/chore/protect-conflict-syntax-checks)
+(exit 1); the Handoff took b6b5548 from that message.

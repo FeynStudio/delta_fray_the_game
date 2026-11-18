@@ -1,0 +1,23 @@
+apply-steps.txt for T-038 (route A). For the human only; agents do not edit tests/syntax-check.test.js.
+
+When: after both reviews (reviewer and security reviewer) approve. On a branch of your own from master; the task branch holds evidence and the brief only and can be merged before or with it. tests/syntax-check.test.js is the same on master 5638864 and on BASE 7284fd1 (see precheck.txt: no change since f223992), so the copy applies on master as it is.
+
+In product-a (Git Bash):
+
+cp agent-team/evidence/T-038/proposed/tests/syntax-check.test.js tests/syntax-check.test.js
+git diff --stat
+./scripts/verify.sh T-038-applied --feature all
+./scripts/guards.sh
+
+What you should see:
+- git diff --stat lists exactly tests/syntax-check.test.js (42 insertions, 6 deletions; proposed.diff shows the change).
+- verify.sh prints RESULT: PASS and guards.sh exits 0 with no output. The unit-test count is 3 higher than before the copy (three new tests in tests/syntax-check.test.js).
+- agent-team/evidence/T-038-applied/run-all.log shows `dirty: yes` on line 2 until the copy is committed; that is expected.
+- Line endings: the proposed file is LF in the repo (.gitattributes sets eol=lf for .js), so cp copies an LF file and no conversion step is needed.
+- If the branch you copy into does not hold agent-team/evidence/T-038/ (the task branch not merged yet), take the file from the task branch instead: git show task/T-038-syntax-check-fixes:agent-team/evidence/T-038/proposed/tests/syntax-check.test.js > tests/syntax-check.test.js
+
+Then commit the one file and open the pull request with the checks-change label: the CI step "Block changes to the checks" watches tests/syntax-check.test.js.
+
+After the merge the coordinator puts in the line of feature-map-line.txt and closes the task.
+
+Not proven by the owner: the --feature all run (the owner's scratch proof used --feature config, as the brief asks; --feature all needs the browser for the smoke checks). The cp and the --feature config run were proven in a scratch copy (after-scratch-verify.txt).

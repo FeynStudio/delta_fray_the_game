@@ -1,0 +1,12 @@
+T-041 Done-when 11, hook-up without touching guards.sh: a scratch copy of the committed tree ca46cb2 (git archive HEAD) under <OS temp dir>
+the copy's scripts/guards.sh, last three lines after the edit:
+  node scripts/conflict-markers.mjs || FAIL=1
+  node scripts/home-paths.mjs || FAIL=1
+  exit $FAIL
+worktree scripts/guards.sh unchanged against HEAD: yes
+clean copy: ./scripts/guards.sh exit 0, output lines 0
+with T-041-scratch.txt at the copy root (the Done-when 2 scratch line): ./scripts/guards.sh exit 1, output:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  T-041-scratch.txt:1: windows home-directory path
+expectation of Done-when 11 holds: yes
+scratch folder removed: yes

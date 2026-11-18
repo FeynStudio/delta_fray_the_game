@@ -1,0 +1,35 @@
+self-check for T-038, in the worktree at d8423e1 (the proposed file is committed there)
+
+$ node scripts/no-comments.mjs
+exit 0, output above: none
+$ node scripts/conflict-markers.mjs
+exit 0, output above: none
+$ node scripts/home-paths.mjs
+exit 0, output above: none
+both no-comments.mjs and conflict-markers.mjs walk the whole tree, agent-team/evidence/T-038/proposed/ and proof.mjs included
+
+$ grep -nE 'exec\(|execSync\(|shell:|eval\(|new Function|fetch\(|https?:|Object\.assign' agent-team/evidence/T-038/proposed/tests/syntax-check.test.js
+exit 1 (1 = no match)
+
+child-process calls in the proposed file ($ grep -nE 'execFile|execSync|spawn|fork\(|exec\(|child_process' agent-team/evidence/T-038/proposed/tests/syntax-check.test.js):
+3:import { execFileSync } from 'node:child_process';
+33:      execFileSync(process.execPath, ['--check', file], { encoding: 'utf8', stdio: ['ignore', 'ignore', 'pipe'], windowsHide: true });
+call lines (execFileSync( ): 1; the other line is the import
+
+BASE line 31 vs the proposed call line, byte for byte:
+BASE line 31 sha256 192f46b82c20a79efef7bb39a2d13452be7d2c358e7fbe0a87c2e68cef2e1cf2
+proposed line 33 sha256 192f46b82c20a79efef7bb39a2d13452be7d2c358e7fbe0a87c2e68cef2e1cf2
+identical: yes
+
+imports ($ grep -n '^import' agent-team/evidence/T-038/proposed/tests/syntax-check.test.js):
+1:import { test } from 'node:test';
+2:import assert from 'node:assert/strict';
+3:import { execFileSync } from 'node:child_process';
+4:import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+5:import { tmpdir } from 'node:os';
+6:import { dirname, extname, join, relative, resolve, sep } from 'node:path';
+7:import { fileURLToPath } from 'node:url';
+imports not from node: built-ins: 0
+
+non-ASCII or control bytes other than the line feed in the proposed file: 0
+console or util.format calls in the proposed file and proof.mjs: agent-team/evidence/T-038/proposed/tests/syntax-check.test.js:0 agent-team/evidence/T-038/proof.mjs:0 

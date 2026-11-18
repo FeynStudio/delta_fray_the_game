@@ -1,0 +1,46 @@
+T-039 review round 2 self-check in the worktree <worktree>, 2026-11-18T17:03:05Z, HEAD 8320738 plus the uncommitted round 2 files
+
+$ diff -u (round 1 test file at 551b6a5) (round 2 test file)
+--- a/agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js@551b6a5
++++ b/agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js
+@@ -1,7 +1,7 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+ import { execFileSync } from 'node:child_process';
+-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
++import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { dirname, join, resolve } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+@@ -186,7 +186,7 @@
+ 
+ function runCopy(root) {
+   try {
+-    return { code: 0, out: execFileSync(process.execPath, [resolve(root, SCRIPT)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
++    return { code: 0, out: execFileSync(process.execPath, [realpathSync(resolve(root, SCRIPT))], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+   } catch (error) {
+     return { code: error.status, out: error.stdout };
+   }
+(diff exit 1)
+
+$ git diff --stat 551b6a5 -- agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs   (module unchanged in round 2)
+(exit 0, output above this line)
+
+$ node scripts/no-comments.mjs
+(exit 0, output above this line)
+$ node scripts/conflict-markers.mjs
+(exit 0, output above this line)
+
+$ grep -nE '<{7}|>{7}|\|{7}' (both proposed files)
+(grep exit 1: 1 means no match)
+$ grep -nE 'exec\(|execSync\(|shell:|eval\(|new Function|new RegExp|fetch\(|https?:|Object\.assign' (both proposed files)
+(grep exit 1: 1 means no match)
+$ grep -nE 'child_process|execFile|spawn|fork\(|execSync' (proposed test)
+3:import { execFileSync } from 'node:child_process';
+189:    return { code: 0, out: execFileSync(process.execPath, [realpathSync(resolve(root, SCRIPT))], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+$ grep -nE 'console\.|util\.format' (both proposed files and proof.mjs)
+(grep exit 1: 1 means no match)
+
+node --check agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs: exit 0
+node --check agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js: exit 0
+node --check agent-team/evidence/T-039/proof.mjs: exit 0

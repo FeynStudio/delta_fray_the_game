@@ -1,0 +1,31 @@
+T-040 Done-when 4: page-ready before and after (30b).
+Scratch changes, never committed, each undone with git restore scripts/smoke.mjs right after its run (git status --short then showed only untracked evidence files):
+  before, on BASE dd7ce20: scratch-page-ready-before.patch, the unnamed page-ready arrow function returns new Promise(() => base), so the page-ready evaluation never answers;
+  after, on the code commit 175b35b: scratch-page-ready-after.patch, the same body in pageReadyProbe.
+Leftover counts by count-leftovers.mjs, 15 s after each run ends (baseline before the first run of this task: 0 folders, 11 chrome.exe; leftover-counts.txt).
+
+== before, BASE dd7ce20
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/page-ready-before.json
+commit: dd7ce20; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 15851 ms from its start
+stderr:
+  smoke turns: window.__game not found; is index.html?debug=1 exposing the debug API?
+result file:
+  {
+    "error": "window.__game not found; is index.html?debug=1 exposing the debug API?"
+  }
+counted 2026-11-18T15:58:39.962Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+
+== after, code commit 175b35b
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/page-ready-after.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 1 insertion(+), 1 deletion(-)
+exit 1 after 15886 ms from its start
+stderr:
+  smoke turns: page evaluation timed out after 15000 ms in pageReadyProbe
+result file:
+  {
+    "error": "page evaluation timed out after 15000 ms in pageReadyProbe"
+  }
+counted 2026-11-18T16:00:36.447Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+
+Reading: on BASE the evaluation timed out after 15000 ms, the loop's .catch(() => false) swallowed it, the 15 s deadline set before the loop had passed by then, and the run failed with the loop's own message. On the change the same time-out is rethrown at once and the run fails with the time-out message naming pageReadyProbe, in stderr and in the result file. Both runs end at about the same time because the first evaluation's 15000 ms limit and the loop's 15 s deadline are the same length. Both: exit 1, 0 folders and the baseline 11 chrome.exe afterwards.

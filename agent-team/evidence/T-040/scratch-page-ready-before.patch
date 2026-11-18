@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..97edaa8 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -118,7 +118,7 @@ async function launchBrowser(exe, profile) {
+       const deadline = Date.now() + 15000;
+       for (;;) {
+         const ready = await page.eval(
+-          (base) => location.href.startsWith(base) && document.readyState === 'complete' && !!window.__game,
++          (base) => new Promise(() => base),
+           url.split('?')[0],
+         ).catch(() => false);
+         if (ready) return page;

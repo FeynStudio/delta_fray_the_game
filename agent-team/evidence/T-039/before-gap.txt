@@ -1,0 +1,17 @@
+T-039 Done-when 3: the gap on BASE 5638864, in a scratch copy of the worktree (no .git, .env, secrets/ or node_modules) under <OS temp dir>
+scripts/conflict-markers.mjs in the scratch copy is byte-identical to BASE: yes
+tests/conflict-markers.test.js in the scratch copy is byte-identical to BASE: yes
+step 1: removed the line `    process.exit(1);` from the scratch module; process.exit left in it: no
+step 2: appended one opening marker line (built at run time) to the scratch src/config.js as line 44
+step 3: node --test --test-reporter=tap tests/conflict-markers.test.js: tests 44, pass 43, fail 1, exit 1
+  failed: no file in this repo holds a conflict marker
+step 4: node scripts/conflict-markers.mjs: exit 0, stdout lines:
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+src/config.js:44: <<<<<<< HEAD
+step 5: ./scripts/guards.sh: exit 0, output lines:
+GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers
+src/config.js:44: <<<<<<< HEAD
+step 6: marker removed from src/config.js, process.exit(1) still removed from the module; node --test --test-reporter=tap tests/conflict-markers.test.js: tests 44, pass 44, fail 0, exit 0
+step 7: module restored too (both files as on BASE); node --test --test-reporter=tap tests/conflict-markers.test.js: tests 44, pass 44, fail 0, exit 0
+expectation of Done-when 3 holds: yes
+scratch folder removed: yes

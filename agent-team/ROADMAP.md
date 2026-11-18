@@ -23,9 +23,9 @@ Triage only briefs backlog lines that belong to the current phase. A phase ends 
 **Out of scope:** networking, currency, factions, payments
  
 **Exit gate**
-- [ ] `verify.sh` and guards pass on `main`
-- [ ] Balance targets in `balance-targets.json` pass (e.g. opponents meet within 3–6 moves)
-- [ ] Human playtest: decide whether the cat-and-mouse dynamic is fun
+- [x] `verify.sh` and guards pass on `main`
+- [x] Balance targets in `balance-targets.json` pass (e.g. opponents meet within 3–6 moves)
+- [x] Human playtest: decide whether the cat-and-mouse dynamic is fun
 - [ ] Decision recorded: continue to Phase 2, rework, or change direction
 ---
  

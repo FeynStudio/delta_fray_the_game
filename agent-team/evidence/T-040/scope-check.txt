@@ -1,0 +1,67 @@
+T-040 Done-when 8 (scope), 9 (no comment, guards), 10 (FEATURE_MAP) and 12 (size), taken just before the last commit.
+HEAD: 79897db (the working tree also holds the uncommitted evidence and Handoff update of that last commit; agent-team/ only). BASE: dd7ce20. Code commit: 175b35b.
+
+$ git diff --stat dd7ce20 -- expected/ scenarios/ src/ sim/ tests/ index.html scripts/serve.mjs scripts/guards.sh scripts/verify.sh .github/ .claude/ package.json package-lock.json
+(empty, exit 0)
+
+$ git diff --name-only dd7ce20 -- . ':(exclude)agent-team/*'   (committed and working tree)
+scripts/smoke.mjs
+$ git status --short -- . ':(exclude)agent-team/*'
+(nothing outside agent-team/ is uncommitted)
+
+Hunks of git diff -U0 dd7ce20 -- scripts/smoke.mjs, each with the allowed part it is in (brief, Coordinator choices):
+  @@ -14,0 +15 @@ const EVAL_TIMEOUT_MS = 15000;
+      -> constants block: the one new constant SEND_TIMEOUT_MS
+  @@ -45 +46,8 @@ function connect(url) {
+      -> send inside connect: the returned promise gets the timer (ws.send line and the rest of connect unchanged)
+  @@ -91,0 +100,3 @@ async function launchBrowser(exe, profile) {
+      -> page.eval: message built and sent first, then timer and race; time-out Error marked
+  @@ -94,3 +105,5 @@ async function launchBrowser(exe, profile) {
+      -> page.eval: message built and sent first, then timer and race; time-out Error marked
+  @@ -98,3 +111 @@ async function launchBrowser(exe, profile) {
+      -> page.eval: message built and sent first, then timer and race; time-out Error marked
+  @@ -120,4 +131,4 @@ async function launchBrowser(exe, profile) {
+      -> the page-ready loop inside open: pageReadyProbe and the catch that rethrows a marked time-out
+  @@ -145,0 +157,4 @@ async function launchBrowser(exe, profile) {
+      -> new function pageReadyProbe, before renderProbe with the other probes
+
+Import block (lines 1-7) and the scanner directive line, SHA-256 on BASE and HEAD:
+  BASE imports    bbe5e2f1ca60e594280c9f1e078625911fe9797876e5e06688864ef19b159d75
+  HEAD imports    bbe5e2f1ca60e594280c9f1e078625911fe9797876e5e06688864ef19b159d75
+  BASE directive  8f031c58cb7690e817a025f83293887bc8073ec385bd633293df22ffb120b9ec
+  HEAD directive  8f031c58cb7690e817a025f83293887bc8073ec385bd633293df22ffb120b9ec
+  lines of the file holding nosemgrep on HEAD: 1 (line 77)
+  import lines on HEAD: 6; on BASE: 6
+
+Added lines of scripts/smoke.mjs checked for http, ws:, fetch, WebSocket, spawn, Object.assign, 127. and localhost:
+  (no match, grep exit 1)
+Added lines that send a DevTools message: 1 (the Runtime.evaluate call of page.eval, moved up). The line holding `expression:` is the only one in the file on BASE and on HEAD and has the same SHA-256 on both: BASE e4ff1373360109007dad0dad09c85772f94c80ec85ccdd514b2a7986535dddea, HEAD e4ff1373360109007dad0dad09c85772f94c80ec85ccdd514b2a7986535dddea. (A first try of this check used a shell pattern that the shell expanded; it was replaced by this hash comparison.)
+
+$ git ls-files .gitignore
+(prints nothing)
+
+Personal data in this branch's evidence and brief:
+$ node scripts/home-paths.mjs   (whole worktree)
+  (prints nothing, exit 0)
+  files under agent-team/evidence/T-040 and agent-team/tasks/T-040.md holding the Windows account name (taken from the environment, not written here): 0
+  ... holding AppData, a Temp folder path, /tmp/ or the scratch folder: 0
+  ... holding a browser command line (user-data-dir, remote-debugging-port, --headless): 0
+
+$ node scripts/no-comments.mjs
+  (exit 0)
+$ node scripts/conflict-markers.mjs
+  (exit 0)
+$ ./scripts/guards.sh
+  (exit 0)
+
+FEATURE_MAP (Done-when 10):
+$ git diff --numstat dd7ce20 -- agent-team/FEATURE_MAP.md
+1	1	agent-team/FEATURE_MAP.md
+  removed line starts: -  - Time limit and closed capture pages (T-030): every page
+  added line starts:   +  - Time limit and closed capture pages (T-030): every page
+
+Size (Done-when 12):
+$ git diff --numstat dd7ce20 -- scripts/smoke.mjs agent-team/FEATURE_MAP.md
+1	1	agent-team/FEATURE_MAP.md
+26	11	scripts/smoke.mjs
+  total added plus deleted: 39 (limit 60)
