@@ -1,0 +1,20 @@
+T-040 Done-when 2: SHA-256 of the three T-017 screenshots from ./scripts/verify.sh T-040 --feature turns --label before on BASE dd7ce20 (dirty: no, RESULT: PASS, before-turns.log). The verify outputs were renamed to before-* right after the run.
+
+sha256sum of the before files:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *before-turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *before-turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *before-turns-smoke-explosion.png
+
+agent-team/evidence/T-030/after-png-sha256.txt, the first three hash lines:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+Compared:
+  EQUAL turns-smoke-backward-mid.png
+  EQUAL turns-smoke-backward-end.png
+  EQUAL turns-smoke-explosion.png
+
+Result files of the before run:
+  before-turns-smoke.json identical to expected/turns-smoke.json
+  before-turns.json identical to expected/turns.json

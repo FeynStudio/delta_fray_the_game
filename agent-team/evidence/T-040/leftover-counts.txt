@@ -1,0 +1,3 @@
+counted 2026-11-18T15:55:52.234Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T15:56:32.905Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T15:58:39.962Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
