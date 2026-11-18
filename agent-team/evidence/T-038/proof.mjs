@@ -170,8 +170,8 @@ function gaps() {
     }
   });
   const above = [];
-  for (let dir = dirname(resolve(tmpdir())); ; dir = dirname(dir)) {
-    above.push(dir + ': package.json ' + (existsSync(join(dir, 'package.json')) ? 'FOUND' : 'none'));
+  for (let dir = dirname(resolve(tmpdir())), up = '<OS temp dir>/..'; ; dir = dirname(dir), up += '/..') {
+    above.push(up + (dir === parse(dir).root ? ' (the drive or file-system root)' : '') + ': package.json ' + (existsSync(join(dir, 'package.json')) ? 'FOUND' : 'none'));
     if (dir === parse(dir).root) break;
   }
   say('package.json in each folder above the OS temp dir (<OS temp dir> itself: ' + (existsSync(join(resolve(tmpdir()), 'package.json')) ? 'FOUND' : 'none') + '):');
