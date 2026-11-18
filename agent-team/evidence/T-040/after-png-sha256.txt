@@ -1,0 +1,33 @@
+T-040 Done-when 7: same pictures and same results, on the code commit 175b35b (both runs on 79897db, which adds only the Handoff to it; dirty: no).
+
+Before (BASE dd7ce20, before-png-sha256.txt):
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *before-turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *before-turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *before-turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-040 --feature turns --label after (RESULT: PASS, after-turns.log), hashed right after the run:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-040 --feature all --label after (RESULT: PASS, after-all.log); these are the files now in this folder:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+Compared with the before files (cmp, byte for byte):
+  SAME turns-smoke-backward-mid.png = before-turns-smoke-backward-mid.png
+  SAME turns-smoke-backward-end.png = before-turns-smoke-backward-end.png
+  SAME turns-smoke-explosion.png = before-turns-smoke-explosion.png
+
+Result files of the all run (cmp against expected/, byte for byte):
+  SAME render-smoke.json = expected/render-smoke.json
+  SAME input-smoke.json = expected/input-smoke.json
+  SAME turns-smoke.json = expected/turns-smoke.json
+  SAME turns.json = expected/turns.json
+  SAME movement.json = expected/movement.json
+  SAME hits.json = expected/hits.json
+  SAME config.json = expected/config.json
+The turns run's turns-smoke.json and turns.json were also checked with cmp against expected/ right after that run: same (the all run then wrote over them).
+
+Unit tests: before 372 tests, 371 pass, 1 skipped (handoff test, Handoff not filled in); after (turns and all) 372 tests, 372 pass, 0 skipped. Same count.
