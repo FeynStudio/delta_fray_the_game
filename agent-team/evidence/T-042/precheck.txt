@@ -1,0 +1,89 @@
+T-042 precheck (Done-when 1), taken in the task worktree on BASE before any change
+BASE: 94bc009 (94bc0099b11821ae62180cb29e362e6c7104b4e5), branch task/T-042-serve-allow-list
+
+$ git diff --stat f8c9e2c 94bc009 -- scripts/serve.mjs scripts/smoke.mjs index.html src/ package.json
+(prints nothing; exit 0)
+
+scripts/serve.mjs on BASE (63 lines), the lines named under Files read, with their numbers:
+3:import { readFile } from 'node:fs/promises';
+7:const TYPES = {
+8:  '.html': 'text/html; charset=utf-8',
+9:  '.js': 'text/javascript; charset=utf-8',
+10:  '.mjs': 'text/javascript; charset=utf-8',
+11:  '.css': 'text/css; charset=utf-8',
+12:  '.json': 'application/json; charset=utf-8',
+13:  '.png': 'image/png',
+14:  '.svg': 'image/svg+xml',
+15:  '.ico': 'image/x-icon',
+16:};
+18:export function startServer(root, port = 0, host = '127.0.0.1') {
+19:  const base = resolve(root);
+23:      path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+28:    if (path.endsWith('/')) path += 'index.html';
+29:    const parts = path.split('/').filter(Boolean);
+30:    const file = resolve(base, ...parts);
+31:    if (parts.some((p) => p.startsWith('.') || p === 'secrets') || !file.startsWith(base + sep)) {
+35:    try {
+36:      const body = await readFile(file);
+37:      res.writeHead(200, {
+38:        'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream',
+39:        'Cache-Control': 'no-store',
+40:      });
+41:      res.end(body);
+42:    } catch {
+43:      res.writeHead(404).end('Not found');
+44:    }
+46:  return new Promise((ok, fail) => {
+47:    server.once('error', fail);
+48:    server.listen(port, host, () => {
+49:      ok({
+50:        url: `http://${host}:${server.address().port}`,
+51:        close: () => new Promise((done) => { server.closeAllConnections(); server.close(done); }),
+52:      });
+53:    });
+54:  });
+57:const isMain = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+58:if (isMain) {
+59:  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+60:  const port = Number(process.env.PORT ?? 5173);
+61:  await startServer(root, port, '127.0.0.1');
+62:  process.stdout.write(`Serving ${root} at http://localhost:${port}/index.html (Ctrl+C to stop)\n`);
+63:}
+
+scripts/smoke.mjs on BASE, lines 7, 488 and 490:
+7:import { startServer } from './serve.mjs';
+488:  server = await startServer(ROOT, 0);
+490:  result = await FEATURES[feature](browser, `${server.url}/index.html?debug=1`, shots);
+
+$ grep -n 'src=' index.html
+14:  <script type="module" src="src/game.js"></script>
+
+$ grep -rnE "import|fetch\(" src/
+src/game.js:1:import { createInitialState, endTurn, resolveMove, scoreMove } from './rules.js';
+src/game.js:2:import {
+src/game.js:5:import { drawFrame, fitCanvas } from './render.js';
+src/game.js:6:import log from './log.js';
+src/input.js:1:import config from './config.js';
+src/input.js:2:import { createInitialState, shipPoints, wrapDegrees } from './rules.js';
+src/render.js:1:import config from './config.js';
+src/render.js:2:import { currentScores, isSpawnProtected, shipPoints } from './rules.js';
+src/rules.js:1:import config from './config.js';
+(only src/game.js from index.html and relative imports of ./config.js, ./rules.js, ./input.js, ./render.js, ./log.js; no fetch; every path matches the allow-list ^/src/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.js$ or is /index.html)
+
+$ ls src/
+config.js
+game.js
+input.js
+log.js
+render.js
+rules.js
+
+$ test -e tests/serve.test.js
+exit 1
+
+$ git --version
+git version 2.56.0.windows.4
+$ node --version
+v24.15.0
+Operating system: Microsoft Windows [Version 10.0.26300.9974] (win32, x64: x64)
+Browser findBrowser picks: CHROME_PATH not set; the first candidate that exists is Google Chrome under the Program Files folder (<ProgramFiles>/Google/Chrome/Application/chrome.exe); Edge exists only under Program Files (x86), later in the list. Version: not read; the command to read the file version of chrome.exe was denied by the permission system, and no other way was tried.

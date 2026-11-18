@@ -1,0 +1,19 @@
+T-042 Done-when 2: before run on BASE 94bc009 (./scripts/verify.sh T-042 --feature turns --label before; before-turns.log: dirty: no, RESULT: PASS)
+Unit tests (before-turns.log lines 386-393): tests 378, pass 377, fail 0, skipped 1 (the handoff test: '# handoff not filled in').
+
+SHA-256 of the three T-017 screenshots of the before run (renamed to before-* right after the run):
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *before-turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *before-turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *before-turns-smoke-explosion.png
+
+Values in agent-team/evidence/T-040/after-png-sha256.txt:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+SAME turns-smoke-backward-mid.png
+SAME turns-smoke-backward-end.png
+SAME turns-smoke-explosion.png
+
+SAME before-turns.json = expected/turns.json
+SAME before-turns-smoke.json = expected/turns-smoke.json
