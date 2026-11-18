@@ -1,0 +1,91 @@
+T-040 Done-when 1: preconditions and the gaps by reading, on BASE.
+
+BASE: dd7ce206bece8ab99674aa06d264e435b8279bc5 (dd7ce20, head of task/T-038-syntax-check-fixes, T-038 review round 1 recorded). The task branch was at this commit when these lines were taken: HEAD dd7ce20.
+
+$ git diff --stat f223992 dd7ce20 -- scripts/smoke.mjs
+(prints nothing, exit 0: scripts/smoke.mjs on BASE is the master f223992 copy the coordinator read; 489 lines)
+
+Tools: git version 2.56.0.windows.4; node v24.15.0.
+Browser findBrowser picks: CHROME_PATH is not set; the first candidate that exists is the Program Files Google Chrome chrome.exe (Google Chrome). Its version is in message-timing.txt (Browser.getVersion, asked by the scratch timing change).
+Operating system: Windows 11 Pro 10.0.26300 (from the session environment), Git Bash.
+
+a. send inside connect (lines 42-46): the message is sent and a promise is stored in pending with no timer; only an answer through onmessage (33-39) settles it.
+   33:   ws.onmessage = (ev) => {
+   34:     const msg = JSON.parse(ev.data);
+   35:     const p = msg.id && pending.get(msg.id);
+   36:     if (!p) return;
+   37:     pending.delete(msg.id);
+   38:     if (msg.error) p.fail(new Error(`${p.method}: ${msg.error.message}`)); else p.ok(msg.result);
+   39:   };
+   40:   return {
+   41:     ready: new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('cannot connect to the browser')); }),
+   42:     send(method, params = {}, sessionId) {
+   43:       const id = ++nextId;
+   44:       ws.send(JSON.stringify({ id, method, params, sessionId }));
+   45:       return new Promise((ok, fail) => pending.set(id, { ok, fail, method }));
+   46:     },
+
+b. page.eval (lines 91-105): the timer is made at 92-97, before send('Runtime.evaluate', ...) and JSON.stringify(fnArgs) are called at 98-99; .finally(() => clearTimeout(timer)) is attached at 100, after them. If either threw synchronously, Promise.race and .finally would never be reached and the timer would reject 15 s later with no handler.
+   91:         async eval(fn, ...fnArgs) {
+   92:           let timer;
+   93:           const timedOut = new Promise((_, fail) => {
+   94:             timer = setTimeout(() => fail(new Error(
+   95:               `page evaluation timed out after ${EVAL_TIMEOUT_MS} ms in ${fn.name || 'an unnamed function'}`,
+   96:             )), EVAL_TIMEOUT_MS);
+   97:           });
+   98:           const r = await Promise.race([send('Runtime.evaluate', {
+   99:             expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+  100:           }), timedOut]).finally(() => clearTimeout(timer));
+  101:           if (r.exceptionDetails) {
+  102:             throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+  103:           }
+  104:           return r.result.value;
+  105:         },
+
+c. key, screenshot and the page close (lines 106-115): plain awaits of send / cdp.send, no limit.
+  106:         async key(type, { autoRepeat = false } = {}, name = 'Space') {
+  107:           const keys = { Space: { key: ' ', code: 'Space', windowsVirtualKeyCode: 32 }, Shift: { key: 'Shift', code: 'ShiftLeft', windowsVirtualKeyCode: 16 } };
+  108:           await send('Input.dispatchKeyEvent', { type, autoRepeat, ...keys[name] });
+  109:         },
+  110:         async screenshot() {
+  111:           return Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64');
+  112:         },
+  113:         async close() {
+  114:           await cdp.send('Target.closeTarget', { targetId });
+  115:         },
+
+d. the five set-up messages of open (lines 83-88): Target.createTarget, Target.attachToTarget, Emulation.setDeviceMetricsOverride, Page.bringToFront, Page.navigate; plain awaits, no limit.
+   82:     async open(url, { width, height, dpr }) {
+   83:       const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank' });
+   84:       const { sessionId } = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
+   85:       const send = (method, params) => cdp.send(method, params, sessionId);
+   86:       await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: dpr, mobile: false });
+   87:       await send('Page.bringToFront');
+   88:       await send('Page.navigate', { url });
+
+e. the page-ready loop (lines 118-127): an unnamed arrow function evaluated with .catch(() => false), so a time-out of page.eval in it is swallowed and the run fails with the loop's own message once the deadline is past.
+  118:       const deadline = Date.now() + 15000;
+  119:       for (;;) {
+  120:         const ready = await page.eval(
+  121:           (base) => location.href.startsWith(base) && document.readyState === 'complete' && !!window.__game,
+  122:           url.split('?')[0],
+  123:         ).catch(() => false);
+  124:         if (ready) return page;
+  125:         if (Date.now() > deadline) throw new Error('window.__game not found; is index.html?debug=1 exposing the debug API?');
+  126:         await new Promise((r) => setTimeout(r, 100));
+  127:       }
+
+f. for reference, the browser close method (129-141) keeps its own 3000 ms race around Browser.close; the main block ends with process.exit(code) at line 489.
+  129:     async close() {
+  130:       const closing = cdp.send('Browser.close').then(() => null, (err) => err);
+  131:       const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
+  489: process.exit(code);
+
+Every timer in the file on BASE (grep -n 'setTimeout\|setInterval'):
+  65:    const timer = setTimeout(() => finish(fail, new Error('browser did not start within 20s')), 20000);
+  66:    const poll = setInterval(() => {
+  94:            timer = setTimeout(() => fail(new Error(
+  126:        await new Promise((r) => setTimeout(r, 100));
+  131:      const closeErr = await Promise.race([closing, new Promise((r) => setTimeout(() => r(null), 3000))]);
+  137:        await new Promise((r) => setTimeout(r, 100));
+  140:      await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);

@@ -1,0 +1,32 @@
+commit: 6984edd  file: agent-team/FEATURE_MAP.md
+1	tip-left
+1	8:1
+1	devicePixelRatio
+1	lineJoin
+1	gaugePowerSweepMs
+1	gaugeNeedleSweepMs
+1	triangle wave
+1	farthest from its centre
+1	pinned on purpose
+1	clamps t
+1	monotone chain
+1	node scripts/run-scenario.mjs scenarios/
+1	"pick"
+1	3 decimals
+1	PORT
+0	never serves dotfiles
+1	node scripts/smoke.mjs --feature
+1	built-in WebSocket
+1	Chrome, then Edge
+1	DevToolsActivePort
+2	Browser.close
+1	source text
+3	sim/balance.mjs
+1	--games 2000
+1	seeded
+1	before-comment-list.txt
+1	guards.sh line 39
+1	records console.info
+1	tests in tests/movement.test.js
+1	syntax-check.test.js is protected
+0	a bare ./scripts/guards.sh run does not check it

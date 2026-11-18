@@ -1,0 +1,49 @@
+T-038 Done-when 5, the proposed file in a scratch copy of the worktree at d8423e1, platform win32, node v24.15.0
+
+5a. $ node --test --test-reporter=tap tests/syntax-check.test.js   (proposed file)
+proposed file: tests 5, pass 5, fail 0, exit 0, 587 ms
+  ok     every .js and .mjs file under sim/ passes node --check
+  ok     the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
+  ok     plain removes every C0 control except the line feed, DEL and every C1 control
+  ok     a failing line with control characters is reported by name with SyntaxError and none of them
+  ok     the walk does not follow a folder link under sim/, while the linked folder itself is reported
+BASE test name present and passing: yes (every .js and .mjs file under sim/ passes node --check)
+BASE test name present and passing: yes (the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file)
+
+5b. The string test and the control-character fixture test are in the 5a list above. Set-up: the line `const a = "<ESC>[31m<BEL><BS>" }` appended to the copy's sim/balance.mjs (scratch only), then tests/syntax-check.test.js run with the default reporter (as verify.sh runs it) and with TAP; count of bytes 0x00-0x09, 0x0B-0x1F and 0x7F in stdout plus stderr
+BASE file, default reporter: exit 1, names sim/balance.mjs: yes, control bytes 3 {"0x1b":1,"0x07":1,"0x08":1}
+BASE file, TAP: tests 2, pass 1, fail 1, exit 1, 415 ms
+  failed: every .js and .mjs file under sim/ passes node --check
+BASE file, TAP: names sim/balance.mjs: yes, control bytes 3 {"0x1b":1,"0x07":1,"0x08":1}
+BASE file, default reporter, lines naming sim/balance.mjs or SyntaxError (controls shown as \xNN):
+  ℹ node --check ran on sim/balance.mjs
+  sim/balance.mjs: <OS temp dir>\t038-fix-t0KoeR\base\sim\balance.mjs:82
+  SyntaxError: Unexpected token '}'
+proposed file, default reporter: exit 1, names sim/balance.mjs: yes, control bytes 0 {}
+proposed file, TAP: tests 5, pass 4, fail 1, exit 1, 585 ms
+  failed: every .js and .mjs file under sim/ passes node --check
+proposed file, TAP: names sim/balance.mjs: yes, control bytes 0 {}
+proposed file, default reporter, lines naming sim/balance.mjs or SyntaxError (controls shown as \xNN):
+  ℹ node --check ran on sim/balance.mjs
+  ✔ a failing line with control characters is reported by name with SyntaxError and none of them (56.9965ms)
+  sim/balance.mjs: <OS temp dir>\t038-fix-t0KoeR\proposed\sim\balance.mjs:82
+  SyntaxError: Unexpected token '}'
+sim/balance.mjs restored in both copies: yes
+
+5c. The 3b set-up (folder -dash-temp in the copy root, TEMP, TMP and TMPDIR = -dash-temp) with the proposed file
+proposed file, dash set-up: tests 5, pass 5, fail 0, exit 0, 582 ms
+syntax-check-* folders left in -dash-temp: 0 (entries in it: 0)
+syntax-check-* folders in <OS temp dir> before the run 0, after 0, new 0
+-dash-temp removed: yes
+
+5d. Scratch-only instrumentation: one line added after `const found = checkSyntax(...)` in test 2 of the copy that writes `found` to found.json in the copy root; removed after the run
+instrumented proposed file: tests 5, pass 5, fail 0, exit 0, 588 ms
+checked: ["sim/broken.mjs","sim/clean.mjs","sim/deep/fine.js","sim/deep/more/bad.js","sim/deep/top-return.js"]
+error: sim/broken.mjs -> SyntaxError: Unexpected token '}'
+error: sim/deep/more/bad.js -> SyntaxError: Unexpected token ';'
+error: sim/deep/top-return.js -> SyntaxError: Illegal return statement
+copy's test file equals the proposed file again: yes
+
+5e. Link test result from 5a: ok; the test ends with assert.equal(existsSync(root), false) after rmSync, so the junction and its target (both inside the fixture) are gone when it passes
+syntax-check-* folders in <OS temp dir> now: 0
+scratch folder removed: yes

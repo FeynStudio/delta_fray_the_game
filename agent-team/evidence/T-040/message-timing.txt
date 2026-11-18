@@ -1,0 +1,641 @@
+T-040 Done-when 3: longest single DevTools message round trip and longest single page evaluation, measured on BASE dd7ce20 before keeping the limits (brief, Limits and Stop rule line 2).
+Scratch change, never committed: scratch-message-timing.patch. In send it notes the time before ws.send and writes 'MSG <method> <ms>' to stderr when the answer or error arrives (a side branch p.then(w, w), the returned promise is unchanged); in page.eval it writes 'EVAL <probe> <ms>' after the race (the unnamed page-ready function is printed as page-ready-check); after cdp.ready it sends one extra Browser.getVersion and writes 'VERSION <product>'. Undone with git restore scripts/smoke.mjs; git status --short afterwards showed only the untracked evidence folder.
+Runs: the three smoke commands that ./scripts/verify.sh --feature all runs (render, input, turns), in that order, three rounds, each as node scripts/smoke.mjs --feature <name> --out <a file in the session scratch folder outside the repo>. All nine exited 0 and every result file was identical to expected/<name>-smoke.json.
+Browser: Chrome/157.0.8103.78 (Browser.getVersion product, the same in all nine runs), headless, picked by findBrowser (CHROME_PATH not set).
+
+DevTools messages timed: 408 (Browser.getVersion is the scratch message; the others are the script's own)
+Longest message round trip: MSG Page.captureScreenshot 128.9 ms
+Evaluations timed: 156
+Longest evaluation: EVAL gaugeAfterFrameProbe 37.7 ms
+Stop rule limit: 3000 ms. Not triggered. Limits kept: EVAL_TIMEOUT_MS 15000 ms (unchanged) and SEND_TIMEOUT_MS 20000 ms (new), about 155 times the longest message round trip measured.
+
+Longest per method (ms), over the three rounds:
+  Page.captureScreenshot               max    128.9  calls 27
+  Runtime.evaluate                     max     37.6  calls 156
+  Target.createTarget                  max     30.8  calls 36
+  Page.navigate                        max     23.4  calls 36
+  Target.attachToTarget                max     21.0  calls 36
+  Emulation.setDeviceMetricsOverride   max     16.3  calls 36
+  Browser.getVersion                   max     15.9  calls 9
+  Browser.close                        max     11.1  calls 9
+  Page.bringToFront                    max      7.1  calls 36
+  Input.dispatchKeyEvent               max      2.1  calls 9
+  Target.closeTarget                   max      1.0  calls 18
+
+Longest per probe (ms), over the three rounds:
+  gaugeAfterFrameProbe                 max     37.7  calls 9
+  page-ready-check                     max     18.1  calls 72
+  freezeLoopProbe                      max     17.9  calls 9
+  backwardLaunchProbe                  max      5.6  calls 6
+  explosionProbe                       max      3.7  calls 3
+  phaseSetupProbe                      max      2.8  calls 9
+  gaugeProbe                           max      2.8  calls 9
+  stateProbe                           max      2.6  calls 9
+  turnsProbe                           max      2.3  calls 3
+  inputProbe                           max      2.1  calls 3
+  renderProbe                          max      1.9  calls 6
+  drawnStateProbe                      max      1.6  calls 9
+  shiftFlipProbe                       max      1.0  calls 3
+  phaseProbe                           max      1.0  calls 6
+
+Raw stderr of the nine runs, with the exit code and the comparison after each (the out path is left out):
+== round 1, node scripts/smoke.mjs --feature render
+MSG Browser.getVersion 14.2 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 27.9 ms
+MSG Target.attachToTarget 6.8 ms
+MSG Emulation.setDeviceMetricsOverride 14.0 ms
+MSG Page.bringToFront 5.5 ms
+MSG Page.navigate 14.4 ms
+MSG Runtime.evaluate 13.4 ms
+EVAL page-ready-check 13.7 ms
+MSG Runtime.evaluate 1.5 ms
+EVAL page-ready-check 1.6 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL renderProbe 1.9 ms
+MSG Page.captureScreenshot 109.1 ms
+MSG Target.createTarget 16.7 ms
+MSG Target.attachToTarget 4.4 ms
+MSG Emulation.setDeviceMetricsOverride 2.6 ms
+MSG Page.bringToFront 0.4 ms
+MSG Page.navigate 6.5 ms
+MSG Runtime.evaluate 14.3 ms
+EVAL page-ready-check 14.4 ms
+MSG Runtime.evaluate 1.7 ms
+EVAL page-ready-check 2.0 ms
+MSG Runtime.evaluate 1.7 ms
+EVAL renderProbe 1.8 ms
+MSG Browser.close 0.7 ms
+exit 0
+result identical to expected/render-smoke.json
+== round 1, node scripts/smoke.mjs --feature input
+MSG Browser.getVersion 15.4 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 29.7 ms
+MSG Target.attachToTarget 6.6 ms
+MSG Emulation.setDeviceMetricsOverride 16.3 ms
+MSG Page.bringToFront 7.1 ms
+MSG Page.navigate 17.6 ms
+MSG Runtime.evaluate 16.3 ms
+EVAL page-ready-check 16.6 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL page-ready-check 1.5 ms
+MSG Runtime.evaluate 2.0 ms
+EVAL inputProbe 2.1 ms
+MSG Page.captureScreenshot 90.7 ms
+MSG Target.createTarget 14.5 ms
+MSG Target.attachToTarget 4.1 ms
+MSG Emulation.setDeviceMetricsOverride 4.4 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 11.4 ms
+MSG Runtime.evaluate 12.1 ms
+EVAL page-ready-check 12.3 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL page-ready-check 1.0 ms
+MSG Runtime.evaluate 0.8 ms
+EVAL shiftFlipProbe 0.9 ms
+MSG Target.createTarget 12.3 ms
+MSG Target.attachToTarget 5.1 ms
+MSG Emulation.setDeviceMetricsOverride 3.6 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 5.3 ms
+MSG Runtime.evaluate 11.0 ms
+EVAL page-ready-check 11.1 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL page-ready-check 1.5 ms
+MSG Input.dispatchKeyEvent 1.2 ms
+MSG Runtime.evaluate 0.6 ms
+EVAL phaseProbe 0.7 ms
+MSG Input.dispatchKeyEvent 0.4 ms
+MSG Runtime.evaluate 0.4 ms
+EVAL phaseProbe 0.4 ms
+MSG Input.dispatchKeyEvent 0.4 ms
+MSG Target.createTarget 16.7 ms
+MSG Target.attachToTarget 5.0 ms
+MSG Emulation.setDeviceMetricsOverride 4.2 ms
+MSG Page.bringToFront 0.7 ms
+MSG Page.navigate 7.1 ms
+MSG Runtime.evaluate 9.3 ms
+EVAL page-ready-check 9.4 ms
+MSG Runtime.evaluate 1.5 ms
+EVAL page-ready-check 1.7 ms
+MSG Runtime.evaluate 2.7 ms
+EVAL phaseSetupProbe 2.8 ms
+MSG Runtime.evaluate 33.1 ms
+EVAL gaugeAfterFrameProbe 33.2 ms
+MSG Page.captureScreenshot 110.3 ms
+MSG Runtime.evaluate 1.9 ms
+EVAL gaugeProbe 2.0 ms
+MSG Target.closeTarget 0.6 ms
+MSG Target.createTarget 22.7 ms
+MSG Target.attachToTarget 7.2 ms
+MSG Emulation.setDeviceMetricsOverride 4.4 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 4.9 ms
+MSG Runtime.evaluate 9.0 ms
+EVAL page-ready-check 9.0 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.2 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL phaseSetupProbe 1.0 ms
+MSG Runtime.evaluate 28.3 ms
+EVAL gaugeAfterFrameProbe 28.5 ms
+MSG Page.captureScreenshot 106.5 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL gaugeProbe 1.5 ms
+MSG Target.closeTarget 1.0 ms
+MSG Target.createTarget 20.9 ms
+MSG Target.attachToTarget 6.4 ms
+MSG Emulation.setDeviceMetricsOverride 4.9 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 5.4 ms
+MSG Runtime.evaluate 8.2 ms
+EVAL page-ready-check 8.3 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL page-ready-check 1.9 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL phaseSetupProbe 1.2 ms
+MSG Runtime.evaluate 33.0 ms
+EVAL gaugeAfterFrameProbe 33.1 ms
+MSG Page.captureScreenshot 87.3 ms
+MSG Runtime.evaluate 1.7 ms
+EVAL gaugeProbe 1.8 ms
+MSG Target.closeTarget 0.6 ms
+MSG Browser.close 9.0 ms
+exit 0
+result identical to expected/input-smoke.json
+== round 1, node scripts/smoke.mjs --feature turns
+MSG Browser.getVersion 15.9 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 30.8 ms
+MSG Target.attachToTarget 7.7 ms
+MSG Emulation.setDeviceMetricsOverride 15.1 ms
+MSG Page.bringToFront 1.7 ms
+MSG Page.navigate 23.4 ms
+MSG Runtime.evaluate 15.1 ms
+EVAL page-ready-check 15.5 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL page-ready-check 1.9 ms
+MSG Runtime.evaluate 2.2 ms
+EVAL turnsProbe 2.3 ms
+MSG Page.captureScreenshot 98.0 ms
+MSG Target.createTarget 13.8 ms
+MSG Target.attachToTarget 5.9 ms
+MSG Emulation.setDeviceMetricsOverride 7.0 ms
+MSG Page.bringToFront 0.8 ms
+MSG Page.navigate 7.7 ms
+MSG Runtime.evaluate 12.8 ms
+EVAL page-ready-check 12.9 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 12.1 ms
+EVAL freezeLoopProbe 12.2 ms
+MSG Runtime.evaluate 3.7 ms
+EVAL backwardLaunchProbe 3.8 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL drawnStateProbe 1.0 ms
+MSG Page.captureScreenshot 99.5 ms
+MSG Runtime.evaluate 2.0 ms
+EVAL stateProbe 2.1 ms
+MSG Target.closeTarget 0.6 ms
+MSG Target.createTarget 21.7 ms
+MSG Target.attachToTarget 5.3 ms
+MSG Emulation.setDeviceMetricsOverride 4.3 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 6.8 ms
+MSG Runtime.evaluate 10.8 ms
+EVAL page-ready-check 11.0 ms
+MSG Runtime.evaluate 1.5 ms
+EVAL page-ready-check 1.6 ms
+MSG Runtime.evaluate 17.8 ms
+EVAL freezeLoopProbe 17.9 ms
+MSG Runtime.evaluate 3.0 ms
+EVAL backwardLaunchProbe 3.1 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL drawnStateProbe 0.9 ms
+MSG Page.captureScreenshot 98.9 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL stateProbe 1.9 ms
+MSG Target.closeTarget 0.8 ms
+MSG Target.createTarget 21.7 ms
+MSG Target.attachToTarget 6.0 ms
+MSG Emulation.setDeviceMetricsOverride 3.4 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 6.7 ms
+MSG Runtime.evaluate 10.5 ms
+EVAL page-ready-check 10.6 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL page-ready-check 1.5 ms
+MSG Runtime.evaluate 1.9 ms
+EVAL freezeLoopProbe 2.0 ms
+MSG Runtime.evaluate 3.3 ms
+EVAL explosionProbe 3.4 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL drawnStateProbe 1.3 ms
+MSG Page.captureScreenshot 97.6 ms
+MSG Runtime.evaluate 1.7 ms
+EVAL stateProbe 1.8 ms
+MSG Target.closeTarget 0.3 ms
+MSG Browser.close 8.7 ms
+exit 0
+result identical to expected/turns-smoke.json
+== round 2, node scripts/smoke.mjs --feature render
+MSG Browser.getVersion 14.0 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 29.7 ms
+MSG Target.attachToTarget 7.5 ms
+MSG Emulation.setDeviceMetricsOverride 14.6 ms
+MSG Page.bringToFront 5.6 ms
+MSG Page.navigate 13.0 ms
+MSG Runtime.evaluate 13.3 ms
+EVAL page-ready-check 13.5 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL page-ready-check 1.4 ms
+MSG Runtime.evaluate 1.6 ms
+EVAL renderProbe 1.7 ms
+MSG Page.captureScreenshot 106.4 ms
+MSG Target.createTarget 17.2 ms
+MSG Target.attachToTarget 8.4 ms
+MSG Emulation.setDeviceMetricsOverride 1.7 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 5.9 ms
+MSG Runtime.evaluate 8.2 ms
+EVAL page-ready-check 8.3 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL page-ready-check 1.1 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL renderProbe 1.3 ms
+MSG Browser.close 0.3 ms
+exit 0
+result identical to expected/render-smoke.json
+== round 2, node scripts/smoke.mjs --feature input
+MSG Browser.getVersion 11.3 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 20.5 ms
+MSG Target.attachToTarget 21.0 ms
+MSG Emulation.setDeviceMetricsOverride 15.8 ms
+MSG Page.bringToFront 3.0 ms
+MSG Page.navigate 15.2 ms
+MSG Runtime.evaluate 11.9 ms
+EVAL page-ready-check 12.1 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL page-ready-check 1.4 ms
+MSG Runtime.evaluate 1.9 ms
+EVAL inputProbe 2.0 ms
+MSG Page.captureScreenshot 128.9 ms
+MSG Target.createTarget 15.6 ms
+MSG Target.attachToTarget 4.8 ms
+MSG Emulation.setDeviceMetricsOverride 3.9 ms
+MSG Page.bringToFront 0.4 ms
+MSG Page.navigate 5.4 ms
+MSG Runtime.evaluate 12.4 ms
+EVAL page-ready-check 12.6 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL shiftFlipProbe 1.0 ms
+MSG Target.createTarget 17.8 ms
+MSG Target.attachToTarget 6.4 ms
+MSG Emulation.setDeviceMetricsOverride 4.1 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 7.5 ms
+MSG Runtime.evaluate 8.7 ms
+EVAL page-ready-check 8.8 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL page-ready-check 2.1 ms
+MSG Input.dispatchKeyEvent 2.1 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL phaseProbe 1.0 ms
+MSG Input.dispatchKeyEvent 0.8 ms
+MSG Runtime.evaluate 0.6 ms
+EVAL phaseProbe 0.7 ms
+MSG Input.dispatchKeyEvent 0.5 ms
+MSG Target.createTarget 13.4 ms
+MSG Target.attachToTarget 5.9 ms
+MSG Emulation.setDeviceMetricsOverride 6.2 ms
+MSG Page.bringToFront 0.7 ms
+MSG Page.navigate 8.6 ms
+MSG Runtime.evaluate 10.9 ms
+EVAL page-ready-check 11.1 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL page-ready-check 1.0 ms
+MSG Runtime.evaluate 0.6 ms
+EVAL phaseSetupProbe 0.7 ms
+MSG Runtime.evaluate 37.6 ms
+EVAL gaugeAfterFrameProbe 37.7 ms
+MSG Page.captureScreenshot 101.3 ms
+MSG Runtime.evaluate 2.1 ms
+EVAL gaugeProbe 2.2 ms
+MSG Target.closeTarget 0.6 ms
+MSG Target.createTarget 26.1 ms
+MSG Target.attachToTarget 9.6 ms
+MSG Emulation.setDeviceMetricsOverride 4.4 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 5.5 ms
+MSG Runtime.evaluate 9.9 ms
+EVAL page-ready-check 10.0 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL page-ready-check 1.1 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL phaseSetupProbe 1.0 ms
+MSG Runtime.evaluate 26.2 ms
+EVAL gaugeAfterFrameProbe 26.3 ms
+MSG Page.captureScreenshot 82.8 ms
+MSG Runtime.evaluate 1.7 ms
+EVAL gaugeProbe 1.8 ms
+MSG Target.closeTarget 0.6 ms
+MSG Target.createTarget 23.0 ms
+MSG Target.attachToTarget 5.5 ms
+MSG Emulation.setDeviceMetricsOverride 4.5 ms
+MSG Page.bringToFront 0.9 ms
+MSG Page.navigate 8.3 ms
+MSG Runtime.evaluate 8.9 ms
+EVAL page-ready-check 9.0 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL page-ready-check 1.0 ms
+MSG Runtime.evaluate 0.6 ms
+EVAL phaseSetupProbe 0.7 ms
+MSG Runtime.evaluate 29.3 ms
+EVAL gaugeAfterFrameProbe 29.5 ms
+MSG Page.captureScreenshot 103.1 ms
+MSG Runtime.evaluate 1.6 ms
+EVAL gaugeProbe 1.7 ms
+MSG Target.closeTarget 0.4 ms
+MSG Browser.close 11.1 ms
+exit 0
+result identical to expected/input-smoke.json
+== round 2, node scripts/smoke.mjs --feature turns
+MSG Browser.getVersion 13.2 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 30.4 ms
+MSG Target.attachToTarget 6.8 ms
+MSG Emulation.setDeviceMetricsOverride 14.6 ms
+MSG Page.bringToFront 5.3 ms
+MSG Page.navigate 13.7 ms
+MSG Runtime.evaluate 14.7 ms
+EVAL page-ready-check 15.1 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL page-ready-check 1.5 ms
+MSG Runtime.evaluate 1.9 ms
+EVAL turnsProbe 2.0 ms
+MSG Page.captureScreenshot 92.1 ms
+MSG Target.createTarget 16.9 ms
+MSG Target.attachToTarget 6.5 ms
+MSG Emulation.setDeviceMetricsOverride 4.4 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 7.0 ms
+MSG Runtime.evaluate 10.3 ms
+EVAL page-ready-check 10.5 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL page-ready-check 1.4 ms
+MSG Runtime.evaluate 5.4 ms
+EVAL freezeLoopProbe 6.0 ms
+MSG Runtime.evaluate 3.8 ms
+EVAL backwardLaunchProbe 3.9 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL drawnStateProbe 1.1 ms
+MSG Page.captureScreenshot 95.4 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL stateProbe 1.5 ms
+MSG Target.closeTarget 0.6 ms
+MSG Target.createTarget 26.2 ms
+MSG Target.attachToTarget 5.6 ms
+MSG Emulation.setDeviceMetricsOverride 6.2 ms
+MSG Page.bringToFront 0.7 ms
+MSG Page.navigate 7.1 ms
+MSG Runtime.evaluate 9.9 ms
+EVAL page-ready-check 10.0 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.2 ms
+MSG Runtime.evaluate 7.5 ms
+EVAL freezeLoopProbe 7.6 ms
+MSG Runtime.evaluate 3.2 ms
+EVAL backwardLaunchProbe 3.3 ms
+MSG Runtime.evaluate 0.8 ms
+EVAL drawnStateProbe 0.9 ms
+MSG Page.captureScreenshot 99.2 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL stateProbe 1.9 ms
+MSG Target.closeTarget 0.5 ms
+MSG Target.createTarget 23.5 ms
+MSG Target.attachToTarget 6.6 ms
+MSG Emulation.setDeviceMetricsOverride 6.9 ms
+MSG Page.bringToFront 0.4 ms
+MSG Page.navigate 6.4 ms
+MSG Runtime.evaluate 9.4 ms
+EVAL page-ready-check 9.5 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 10.9 ms
+EVAL freezeLoopProbe 11.1 ms
+MSG Runtime.evaluate 2.4 ms
+EVAL explosionProbe 2.5 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL drawnStateProbe 1.3 ms
+MSG Page.captureScreenshot 79.4 ms
+MSG Runtime.evaluate 1.6 ms
+EVAL stateProbe 1.7 ms
+MSG Target.closeTarget 0.7 ms
+MSG Browser.close 9.7 ms
+exit 0
+result identical to expected/turns-smoke.json
+== round 3, node scripts/smoke.mjs --feature render
+MSG Browser.getVersion 11.0 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 21.5 ms
+MSG Target.attachToTarget 15.8 ms
+MSG Emulation.setDeviceMetricsOverride 7.3 ms
+MSG Page.bringToFront 1.9 ms
+MSG Page.navigate 16.1 ms
+MSG Runtime.evaluate 17.9 ms
+EVAL page-ready-check 18.1 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.2 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL renderProbe 1.5 ms
+MSG Page.captureScreenshot 73.2 ms
+MSG Target.createTarget 13.1 ms
+MSG Target.attachToTarget 6.7 ms
+MSG Emulation.setDeviceMetricsOverride 4.7 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 8.8 ms
+MSG Runtime.evaluate 14.7 ms
+EVAL page-ready-check 14.8 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL renderProbe 1.5 ms
+MSG Browser.close 0.6 ms
+exit 0
+result identical to expected/render-smoke.json
+== round 3, node scripts/smoke.mjs --feature input
+MSG Browser.getVersion 12.6 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 16.5 ms
+MSG Target.attachToTarget 14.5 ms
+MSG Emulation.setDeviceMetricsOverride 5.6 ms
+MSG Page.bringToFront 3.7 ms
+MSG Page.navigate 15.8 ms
+MSG Runtime.evaluate 17.4 ms
+EVAL page-ready-check 17.7 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL inputProbe 1.9 ms
+MSG Page.captureScreenshot 96.3 ms
+MSG Target.createTarget 13.0 ms
+MSG Target.attachToTarget 2.6 ms
+MSG Emulation.setDeviceMetricsOverride 8.2 ms
+MSG Page.bringToFront 0.8 ms
+MSG Page.navigate 6.5 ms
+MSG Runtime.evaluate 10.8 ms
+EVAL page-ready-check 11.0 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL page-ready-check 1.1 ms
+MSG Runtime.evaluate 0.8 ms
+EVAL shiftFlipProbe 0.9 ms
+MSG Target.createTarget 12.8 ms
+MSG Target.attachToTarget 4.8 ms
+MSG Emulation.setDeviceMetricsOverride 4.7 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 5.4 ms
+MSG Runtime.evaluate 10.5 ms
+EVAL page-ready-check 10.6 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL page-ready-check 1.6 ms
+MSG Input.dispatchKeyEvent 1.5 ms
+MSG Runtime.evaluate 0.8 ms
+EVAL phaseProbe 0.8 ms
+MSG Input.dispatchKeyEvent 0.6 ms
+MSG Runtime.evaluate 0.5 ms
+EVAL phaseProbe 0.6 ms
+MSG Input.dispatchKeyEvent 0.6 ms
+MSG Target.createTarget 19.0 ms
+MSG Target.attachToTarget 5.8 ms
+MSG Emulation.setDeviceMetricsOverride 4.0 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 6.4 ms
+MSG Runtime.evaluate 10.0 ms
+EVAL page-ready-check 10.1 ms
+MSG Runtime.evaluate 4.0 ms
+EVAL page-ready-check 4.1 ms
+MSG Runtime.evaluate 0.8 ms
+EVAL phaseSetupProbe 0.9 ms
+MSG Runtime.evaluate 32.7 ms
+EVAL gaugeAfterFrameProbe 32.9 ms
+MSG Page.captureScreenshot 88.8 ms
+MSG Runtime.evaluate 2.7 ms
+EVAL gaugeProbe 2.8 ms
+MSG Target.closeTarget 0.7 ms
+MSG Target.createTarget 29.3 ms
+MSG Target.attachToTarget 5.8 ms
+MSG Emulation.setDeviceMetricsOverride 4.0 ms
+MSG Page.bringToFront 0.5 ms
+MSG Page.navigate 7.8 ms
+MSG Runtime.evaluate 10.2 ms
+EVAL page-ready-check 10.3 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.2 ms
+MSG Runtime.evaluate 0.9 ms
+EVAL phaseSetupProbe 1.0 ms
+MSG Runtime.evaluate 21.0 ms
+EVAL gaugeAfterFrameProbe 21.1 ms
+MSG Page.captureScreenshot 85.8 ms
+MSG Runtime.evaluate 2.6 ms
+EVAL gaugeProbe 2.6 ms
+MSG Target.closeTarget 0.5 ms
+MSG Target.createTarget 24.4 ms
+MSG Target.attachToTarget 7.1 ms
+MSG Emulation.setDeviceMetricsOverride 5.8 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 5.2 ms
+MSG Runtime.evaluate 8.7 ms
+EVAL page-ready-check 8.8 ms
+MSG Runtime.evaluate 1.2 ms
+EVAL page-ready-check 1.3 ms
+MSG Runtime.evaluate 0.7 ms
+EVAL phaseSetupProbe 0.7 ms
+MSG Runtime.evaluate 27.4 ms
+EVAL gaugeAfterFrameProbe 27.5 ms
+MSG Page.captureScreenshot 83.7 ms
+MSG Runtime.evaluate 1.8 ms
+EVAL gaugeProbe 1.9 ms
+MSG Target.closeTarget 0.6 ms
+MSG Browser.close 10.8 ms
+exit 0
+result identical to expected/input-smoke.json
+== round 3, node scripts/smoke.mjs --feature turns
+MSG Browser.getVersion 7.5 ms
+VERSION Chrome/157.0.8103.78
+MSG Target.createTarget 21.7 ms
+MSG Target.attachToTarget 11.2 ms
+MSG Emulation.setDeviceMetricsOverride 3.0 ms
+MSG Page.bringToFront 1.5 ms
+MSG Page.navigate 11.6 ms
+MSG Runtime.evaluate 10.0 ms
+EVAL page-ready-check 10.2 ms
+MSG Runtime.evaluate 1.1 ms
+EVAL page-ready-check 1.2 ms
+MSG Runtime.evaluate 2.0 ms
+EVAL turnsProbe 2.2 ms
+MSG Page.captureScreenshot 109.7 ms
+MSG Target.createTarget 13.5 ms
+MSG Target.attachToTarget 6.0 ms
+MSG Emulation.setDeviceMetricsOverride 5.0 ms
+MSG Page.bringToFront 0.6 ms
+MSG Page.navigate 6.7 ms
+MSG Runtime.evaluate 9.7 ms
+EVAL page-ready-check 9.9 ms
+MSG Runtime.evaluate 1.4 ms
+EVAL page-ready-check 1.6 ms
+MSG Runtime.evaluate 8.2 ms
+EVAL freezeLoopProbe 8.4 ms
+MSG Runtime.evaluate 4.6 ms
+EVAL backwardLaunchProbe 4.7 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL drawnStateProbe 1.0 ms
+MSG Page.captureScreenshot 96.6 ms
+MSG Runtime.evaluate 2.1 ms
+EVAL stateProbe 2.2 ms
+MSG Target.closeTarget 1.0 ms
+MSG Target.createTarget 20.8 ms
+MSG Target.attachToTarget 6.3 ms
+MSG Emulation.setDeviceMetricsOverride 3.0 ms
+MSG Page.bringToFront 0.4 ms
+MSG Page.navigate 6.1 ms
+MSG Runtime.evaluate 8.5 ms
+EVAL page-ready-check 8.6 ms
+MSG Runtime.evaluate 1.6 ms
+EVAL page-ready-check 1.8 ms
+MSG Runtime.evaluate 10.9 ms
+EVAL freezeLoopProbe 11.0 ms
+MSG Runtime.evaluate 5.5 ms
+EVAL backwardLaunchProbe 5.6 ms
+MSG Runtime.evaluate 1.0 ms
+EVAL drawnStateProbe 1.1 ms
+MSG Page.captureScreenshot 95.7 ms
+MSG Runtime.evaluate 2.5 ms
+EVAL stateProbe 2.6 ms
+MSG Target.closeTarget 0.8 ms
+MSG Target.createTarget 26.0 ms
+MSG Target.attachToTarget 5.7 ms
+MSG Emulation.setDeviceMetricsOverride 3.6 ms
+MSG Page.bringToFront 0.4 ms
+MSG Page.navigate 6.3 ms
+MSG Runtime.evaluate 9.7 ms
+EVAL page-ready-check 9.8 ms
+MSG Runtime.evaluate 1.3 ms
+EVAL page-ready-check 1.4 ms
+MSG Runtime.evaluate 13.4 ms
+EVAL freezeLoopProbe 13.5 ms
+MSG Runtime.evaluate 3.6 ms
+EVAL explosionProbe 3.7 ms
+MSG Runtime.evaluate 1.5 ms
+EVAL drawnStateProbe 1.6 ms
+MSG Page.captureScreenshot 78.1 ms
+MSG Runtime.evaluate 1.9 ms
+EVAL stateProbe 2.0 ms
+MSG Target.closeTarget 0.6 ms
+MSG Browser.close 10.6 ms
+exit 0
+result identical to expected/turns-smoke.json

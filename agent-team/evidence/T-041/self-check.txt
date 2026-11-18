@@ -1,0 +1,40 @@
+T-041 Done-when 12 self-check, in the worktree <worktree> at HEAD 4ded1cd (code commit ca46cb2; the brief's Handoff edit is not yet committed), 2026-11-17T06:34:11Z
+
+$ node scripts/no-comments.mjs
+(exit 0)
+$ node scripts/conflict-markers.mjs
+(exit 0)
+$ ./scripts/guards.sh
+(exit 0)
+$ grep -nE 'eval\(|new Function|new RegExp|fetch\(|https?:|exec\(|execSync\(|shell:|Object\.assign' scripts/home-paths.mjs tests/home-paths.test.js
+(grep exit 1, 1 = no line matched)
+$ grep -nE "^import|console\.|util\.format|execFileSync\(" scripts/home-paths.mjs tests/home-paths.test.js
+scripts/home-paths.mjs:1:import { readdirSync, readFileSync } from 'node:fs';
+scripts/home-paths.mjs:2:import { dirname, join, relative, resolve, sep } from 'node:path';
+scripts/home-paths.mjs:3:import { fileURLToPath, pathToFileURL } from 'node:url';
+tests/home-paths.test.js:1:import { test } from 'node:test';
+tests/home-paths.test.js:2:import assert from 'node:assert/strict';
+tests/home-paths.test.js:3:import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+tests/home-paths.test.js:4:import { tmpdir } from 'node:os';
+tests/home-paths.test.js:5:import { dirname, join, resolve } from 'node:path';
+tests/home-paths.test.js:6:import { fileURLToPath } from 'node:url';
+tests/home-paths.test.js:7:import { execFileSync } from 'node:child_process';
+tests/home-paths.test.js:8:import { checkTree, findHomePaths, report } from '../scripts/home-paths.mjs';
+tests/home-paths.test.js:180:    return { code: 0, out: execFileSync(process.execPath, [resolve(root, SCRIPT)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+$ node scripts/home-paths.mjs
+(exit 0)
+
+The three searches of Done-when 1, on the whole worktree (the two new files and agent-team/evidence/T-041/ included), exactly as in precheck.txt:
+$ X='--exclude-dir=.git --exclude=.git --exclude-dir=node_modules --exclude-dir=secrets --exclude=.env --exclude=.env.?*'
+$ grep -rnoIE $X -i '[A-Za-z]:[\\/]+users[\\/]+[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+$ grep -rnoIE $X -i '/[A-Za-z]/users/[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+$ grep -rnoIE $X '(^|[^A-Za-z0-9_.-])/(Users|home)/[A-Za-z0-9_]' . | cut -d: -f1,2
+exit 1
+
+$ node --input-type=module -e "import { checkHandoff } from './scripts/handoff-check.mjs'; ...checkHandoff('.', 'T-041')..."
+result PASS; reason Handoff names ca46cb2; commit ca46cb23c3744e6720e277a25ee2226b1c075535; subject T-041: add the home-path checker and its tests, with before evidence
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+(exit 0)

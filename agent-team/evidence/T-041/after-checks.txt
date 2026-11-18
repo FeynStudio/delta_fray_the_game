@@ -1,0 +1,105 @@
+T-041 Done-when 13, after checks on the committed change ca46cb2, run in the worktree <worktree> with this brief's Handoff naming ca46cb2 (uncommitted brief edit and new evidence under agent-team/ only, so dirty: no)
+
+$ ./scripts/verify.sh T-041 --feature config --label after
+commit: ca46cb2  branch: task/T-041-home-path-guard  <time as logged>
+dirty: no
+PASS guards
+PASS lint
+PASS unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: PASS
+ℹ tests 372
+ℹ pass 372
+ℹ fail 0
+ℹ skipped 0
+
+$ ./scripts/verify.sh T-041 --feature all --label after
+commit: ca46cb2  branch: task/T-041-home-path-guard  <time as logged>
+dirty: no
+PASS guards
+PASS lint
+PASS unit tests
+PASS render browser runs
+PASS render browser output
+PASS input browser runs
+PASS input browser output
+PASS movement scenario runs
+PASS movement output
+PASS hits scenario runs
+PASS hits output
+PASS turns scenario runs
+PASS turns output
+PASS turns browser runs
+PASS turns browser output
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+PASS movesToFirstEncounter: median = 5 (target 3 to 35)
+PASS edgeDeathRate: mean = 0.0011892724212719927 (target - to 0.1)
+PASS balance sim
+RESULT: PASS
+ℹ tests 372
+ℹ pass 372
+ℹ fail 0
+ℹ skipped 0
+
+$ ./scripts/guards.sh
+(exit 0, no output)
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+(exit 0)
+
+Test names (every spec reporter result line of each log, top-level and nested, timing removed, sorted, duplicates kept; the suite line 'checkHandoff on throw-away git repos' is one of them):
+before-config.log: 328 lines; after-config.log: 373 lines; after-all.log: 373 lines
+names in before but not in after-config (dropped or renamed): 0
+after-config and after-all name lists differ: no
+names new in after-config (45), the tests of tests/home-paths.test.js (three of its names, 'checkTree reads a file whose first zero byte comes after the first 8000 bytes', 'checkTree does not follow a link to a folder' and 'checkTree fails on a folder that does not exist', are also names in tests/conflict-markers.test.js, so they appear twice after):
+  checkTree does not follow a link to a folder
+  checkTree does not open .git, node_modules, secrets folders, .env files other than .env.example, or binary files
+  checkTree fails on a folder that does not exist
+  checkTree reads a file whose first zero byte comes after the first 8000 bytes
+  checkTree reports a hit in every checked place with file, line and kind, in sorted order
+  checkTree returns file, line and kind only for each finding
+  findHomePaths does not flag /homework/
+  findHomePaths does not flag Users or home with nothing after the separator
+  findHomePaths does not flag \Users\ with no drive letter
+  findHomePaths does not flag a backtick
+  findHomePaths does not flag a clean text
+  findHomePaths does not flag a star
+  findHomePaths does not flag a tilde
+  findHomePaths does not flag an empty text
+  findHomePaths does not flag example.com/home/page
+  findHomePaths does not flag the end of the line
+  findHomePaths does not flag the placeholder $USER
+  findHomePaths does not flag the placeholder ${USER}
+  findHomePaths does not flag the placeholder %USERNAME%
+  findHomePaths does not flag the placeholder <account>
+  findHomePaths does not flag the placeholder <name> with <drive>
+  findHomePaths does not flag the placeholder <user>
+  findHomePaths does not flag the word Users alone
+  findHomePaths flags drive-mount in the Git Bash form
+  findHomePaths flags drive-mount in the WSL form
+  findHomePaths flags home for /Users/ after a quote
+  findHomePaths flags home for /Users/ after a space
+  findHomePaths flags home for /Users/ at the line start
+  findHomePaths flags home for /home/ after (
+  findHomePaths flags home for /home/ after =
+  findHomePaths flags home for /home/ after a quote
+  findHomePaths flags home for /home/ after a space
+  findHomePaths flags the kind of the first hit when a later one is windows
+  findHomePaths flags two hits on one line as one entry with the kind of the first
+  findHomePaths flags windows in a file:/// address
+  findHomePaths flags windows with an 8.3 short name
+  findHomePaths flags windows with backslashes
+  findHomePaths flags windows with doubled backslashes inside JSON text
+  findHomePaths flags windows with forward slashes
+  findHomePaths flags windows with lower-case users
+  findHomePaths gives one entry per line with a hit
+  no file in this repo holds a home-directory path
+  report gives no lines and code 0 when nothing is found
+  report gives the message, then one path:line: kind line per finding, and code 1
+  run directly, the checker is silent with exit 0 on a clean tree and prints the report with exit 1 on a hit
+the one test skipped before (live handoff test, '# handoff not filled in') passes after: 1 line
+count check: before 327 tests = 326 pass + 1 skipped; after 372 = 327 + 45 new, 372 pass, 0 skipped

@@ -1,0 +1,59 @@
+T-041 Done-when 8, on the committed tree ca46cb2
+
+8a. Every quoted string constant of scripts/home-paths.mjs (line: text), from the file itself:
+  1: 'node:fs'
+  2: 'node:path'
+  3: 'node:url'
+  5: '\n'
+  7: '.git'
+  8: 'node_modules'
+  8: 'secrets'
+  9: '.env'
+  10: '.env.'
+  11: '.env.example'
+  13: 'windows'
+  14: 'drive-mount'
+  15: 'home'
+  17: 'GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name'
+  45: '/'
+  57: 'utf8'
+  64: `${hit.file}:${hit.line}: ${hit.kind} home-directory path`
+  69: '..'
+The names in them that skip anything: .git (GIT_NAME), node_modules and secrets (SKIP_DIRS), .env (ENV_NAME) and the .env. prefix (ENV_PREFIX); .env.example (ENV_KEPT) is the one name kept. No other file, folder or path name appears; the three regular expressions are literals with no name in them.
+
+8b. A scratch copy of the committed tree (git archive HEAD) under <OS temp dir>; one joined fixture line (built at run time with the fake name, never saved) appended to one file at a time and undone before the next; each time `node agent-team/evidence/T-041/scan-root.mjs <copy root>` is run from the worktree (it calls the worktree checker's checkTree and report on the folder given)
+clean copy: exit 0, stdout lines 0
+
+fixture line of kind windows appended to scripts/home-paths.mjs as line 73: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  scripts/home-paths.mjs:73: windows home-directory path
+  exactly that file and line: yes; undone: yes
+
+fixture line of kind drive-mount appended to tests/home-paths.test.js as line 200: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  tests/home-paths.test.js:200: drive-mount home-directory path
+  exactly that file and line: yes; undone: yes
+
+fixture line of kind home appended to agent-team/tasks/T-041.md as line 192: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  agent-team/tasks/T-041.md:192: home home-directory path
+  exactly that file and line: yes; undone: yes
+
+fixture line of kind windows appended to agent-team/DECISIONS.md as line 171: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  agent-team/DECISIONS.md:171: windows home-directory path
+  exactly that file and line: yes; undone: yes
+
+fixture line of kind drive-mount appended to agent-team/BACKLOG.md as line 492: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  agent-team/BACKLOG.md:492: drive-mount home-directory path
+  exactly that file and line: yes; undone: yes
+
+fixture line of kind home appended to agent-team/evidence/T-041/precheck.txt as line 24: exit 1, stdout:
+  GUARD FAIL [no-home-paths]: Replace the home-directory path with a placeholder such as <OS temp dir> or <user>; never commit an account name
+  agent-team/evidence/T-041/precheck.txt:24: home home-directory path
+  exactly that file and line: yes; undone: yes
+
+after all six, copy clean again: exit 0, stdout lines 0
+expectation of Done-when 8b holds: yes
+scratch folder removed: yes

@@ -1,0 +1,32 @@
+commit: 93c76dc  BASE: a77ef5c  (round 2)
+$ git diff --stat a77ef5c -- . ':!agent-team/FEATURE_MAP.md' ':!agent-team/evidence/T-024' ':!agent-team/tasks/T-024.md'
+ agent-team/REPEATS.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+(REPEATS.md is not an owner change: it comes from the review record commit below)
+$ git log --format='%h %s' a77ef5c..HEAD -- agent-team/REPEATS.md
+188137d T-024: record review round 1
+$ git diff --stat a77ef5c 5068cd6 -- (same pathspec; round 1 owner commits)
+(end of output: empty)
+$ git diff --stat 188137d HEAD -- (same pathspec; round 2 owner commits)
+(end of output: empty)
+$ git diff --numstat a77ef5c -- agent-team/FEATURE_MAP.md
+14	5	agent-team/FEATURE_MAP.md
+$ git diff --word-diff=porcelain a77ef5c -- agent-team/FEATURE_MAP.md, removed words only
+-angle});
+-does not check it.
+$ git diff -U0 a77ef5c -- agent-team/FEATURE_MAP.md, hunk headers
+@@ -11 +11 @@ The game draws o
+@@ -20,0 +21 @@ Command-line c
+@@ -31,0 +33 @@ Command-line c
+@@ -38 +40 @@ Command-line che
+@@ -41,0 +44 @@ Command-line c
+@@ -51,0 +55 @@ Command-line c
+@@ -80 +84 @@ Command-line che
+@@ -84 +88,6 @@ Command-line c
+@@ -87 +96 @@ Command-line che
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+$ ./scripts/guards.sh
+exit 0
+$ node scripts/home-paths.mjs
+exit 0

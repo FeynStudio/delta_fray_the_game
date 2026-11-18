@@ -1,0 +1,16 @@
+T-040 final check, taken just before the last commit on top of 79897db (working tree: this commit's agent-team/ files).
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+  (exit 0)
+$ node scripts/home-paths.mjs
+  (exit 0)
+$ node scripts/no-comments.mjs
+  (exit 0)
+$ node scripts/conflict-markers.mjs
+  (exit 0)
+$ ./scripts/guards.sh
+  (exit 0)
+$ node agent-team/evidence/T-040/count-leftovers.mjs 0
+counted 2026-11-18T16:08:58.367Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+$ git status --short -- scripts/ src/ tests/ expected/
+  (nothing)

@@ -1,0 +1,46 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 813d5d9..7b403fd 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -41,8 +41,13 @@ function connect(url) {
+     ready: new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('cannot connect to the browser')); }),
+     send(method, params = {}, sessionId) {
+       const id = ++nextId;
++      const t0 = performance.now();
+       ws.send(JSON.stringify({ id, method, params, sessionId }));
+-      return new Promise((ok, fail) => pending.set(id, { ok, fail, method }));
++      const p = new Promise((ok, fail) => pending.set(id, { ok, fail, method }));
++      const w = () => process.stderr.write(`MSG ${method} ${(performance.now() - t0).toFixed(1)} ms
++`);
++      p.then(w, w);
++      return p;
+     },
+     close: () => ws.close(),
+   };
+@@ -77,6 +82,9 @@ async function launchBrowser(exe, profile) {
+   });
+   const cdp = connect(wsUrl);
+   await cdp.ready;
++  const ver = await cdp.send('Browser.getVersion');
++  process.stderr.write(`VERSION ${ver.product}
++`);
+ 
+   return {
+     async open(url, { width, height, dpr }) {
+@@ -89,6 +97,7 @@ async function launchBrowser(exe, profile) {
+ 
+       const page = {
+         async eval(fn, ...fnArgs) {
++          const e0 = performance.now();
+           let timer;
+           const timedOut = new Promise((_, fail) => {
+             timer = setTimeout(() => fail(new Error(
+@@ -98,6 +107,8 @@ async function launchBrowser(exe, profile) {
+           const r = await Promise.race([send('Runtime.evaluate', {
+             expression: `(${fn})(...${JSON.stringify(fnArgs)})`, awaitPromise: true, returnByValue: true,
+           }), timedOut]).finally(() => clearTimeout(timer));
++          process.stderr.write(`EVAL ${fn.name || 'page-ready-check'} ${(performance.now() - e0).toFixed(1)} ms
++`);
+           if (r.exceptionDetails) {
+             throw new Error(`page error: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+           }

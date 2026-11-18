@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 5e9e66b..f42904a 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -155,7 +155,7 @@ async function launchBrowser(exe, profile) {
+ 
+ 
+ function pageReadyProbe(base) {
+-  return location.href.startsWith(base) && document.readyState === 'complete' && !!window.__game;
++  return new Promise(() => base);
+ }
+ 
+ async function renderProbe() {

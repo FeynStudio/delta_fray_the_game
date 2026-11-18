@@ -1,0 +1,31 @@
+T-040 leftover counts. Every "counted" line below is the raw output of count-leftovers.mjs (node agent-team/evidence/T-040/count-leftovers.mjs <seconds to wait>), in the order taken. It prints two counts only: the number of galaxy-smoke-* folders in the OS temp dir and the number of chrome.exe processes by image name (tasklist with an image-name filter). No command line, no process path and no temp-dir path is printed or saved.
+Lines 1 to 9 were appended to this file by the commands themselves (lines 3 to 9 from the run logs of page-ready.txt, negative-messages.txt and negative-send-throw.txt). The three lines in the second block were printed to the terminal and pasted here from that output.
+Baseline (line 1, taken right before the first smoke run of this task): 0 folders, 11 chrome.exe. No other agent ran browser smoke runs in this window (session orchestrator's instruction).
+
+1. baseline, before ./scripts/verify.sh T-040 --feature turns --label before (BASE dd7ce20)
+2. 15 s after that before run
+3. 15 s after the page-ready before run (BASE, scratch-page-ready-before.patch)
+4. 15 s after the page-ready after run (175b35b, scratch-page-ready-after.patch)
+5. 15 s after the Page.captureScreenshot run (turns)
+6. 15 s after the Input.dispatchKeyEvent run (input)
+7. 15 s after the Target.closeTarget run (turns)
+8. 15 s after the Page.navigate run (turns)
+9. 15 s after the failed-call run (turns, scratch-send-throw.patch)
+
+counted 2026-11-18T15:55:52.234Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T15:56:32.905Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T15:58:39.962Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:00:36.447Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:01:35.940Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:02:12.830Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:02:49.672Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:03:26.032Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+counted 2026-11-18T16:04:52.398Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+
+Pasted from terminal output:
+- right after the nine scratch timing runs on BASE (message-timing.txt), with no wait:
+counted 2026-11-18T15:57:37.098Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+- right before ./scripts/verify.sh T-040 --feature turns --label after, with no wait:
+counted 2026-11-18T16:06:16.162Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+- 15 s after ./scripts/verify.sh T-040 --feature all --label after:
+counted 2026-11-18T16:07:20.327Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11

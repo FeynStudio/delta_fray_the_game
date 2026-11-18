@@ -1,0 +1,47 @@
+scope-check for T-038, in the worktree <worktree> at 3538241 on task/T-038-syntax-check-fixes, run just before the commit that saves it
+
+$ git diff --stat 7284fd1 -- scripts/ tests/ src/ sim/ index.html scenarios/ expected/ docs/ .github/ .claude/ package.json package-lock.json AGENTS.md agent-team/FEATURE_MAP.md agent-team/BACKLOG.md agent-team/DECISIONS.md agent-team/REPEATS.md agent-team/ROADMAP.md
+(exit 0; output above: none)
+
+$ git diff --name-only 7284fd1   (committed and working tree together)
+agent-team/evidence/T-038/after-scratch-verify.txt
+agent-team/evidence/T-038/apply-steps.txt
+agent-team/evidence/T-038/before-config.log
+agent-team/evidence/T-038/before-gaps.txt
+agent-team/evidence/T-038/config.json
+agent-team/evidence/T-038/feature-map-line.txt
+agent-team/evidence/T-038/fixes.txt
+agent-team/evidence/T-038/negative-scratch.txt
+agent-team/evidence/T-038/precheck.txt
+agent-team/evidence/T-038/proof.mjs
+agent-team/evidence/T-038/proposed.diff
+agent-team/evidence/T-038/proposed/tests/syntax-check.test.js
+agent-team/evidence/T-038/scope-check.txt
+agent-team/evidence/T-038/self-check.txt
+agent-team/evidence/T-038/size.txt
+agent-team/evidence/T-038/time.txt
+agent-team/tasks/T-038.md
+$ git status --short --untracked-files=all
+ M agent-team/evidence/T-038/scope-check.txt
+?? agent-team/evidence/T-038/after-config.log
+files that differ from BASE outside agent-team/evidence/T-038/ and agent-team/tasks/T-038.md: 0
+
+$ git ls-files .gitignore
+(exit 0; output above: none)
+
+syntax-check-* folders in <OS temp dir>: 0; t038-* folders: 0
+
+$ node scripts/home-paths.mjs
+(exit 0; output above: none)
+files in agent-team/evidence/T-038/ and agent-team/tasks/T-038.md holding the account name (whoami, case-insensitive): 0
+files holding AppData or scratchpad (scope-check.txt itself left out): 0
+file:line of every line with a drive letter followed by Users (scope-check.txt left out; empty means none): 
+
+Done-when 11, the after results on 3538241 (the commit that holds the Handoff):
+$ ./scripts/verify.sh T-038 --feature config --label after -> commit: 3538241  branch:; dirty: no; 6 checks PASS, 0 FAIL; RESULT: PASS
+unit tests: ℹ tests 372;ℹ pass 372;ℹ fail 0;ℹ skipped 0
+$ ./scripts/guards.sh
+exit 0, output above: none
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+exit 0

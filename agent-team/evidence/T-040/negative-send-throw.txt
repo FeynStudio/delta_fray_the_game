@@ -1,0 +1,56 @@
+T-040 Done-when 6: no live timer after a failed call (30d).
+
+a. Before, without a browser: timer-pattern.mjs (comment-free, writes with process.stdout.write only).
+   'base' copies BASE's page.eval order: the 200 ms timer is made, then Promise.race([sendThatThrows(), timedOut]).finally(clear) is evaluated; sendThatThrows throws while the array is built, so race and .finally are never reached.
+   'change' copies the change's order: the call first, then the timer and the race in the same synchronous step.
+   The script listens to uncaughtExceptionMonitor (which only watches; Node still ends the process as it would) to print the origin, and to exit for the code. The worktree path in Node's stack lines is replaced by <worktree>.
+
+$ node agent-team/evidence/T-040/timer-pattern.mjs base   (stdout and stderr together)
+order base: timer of 200 ms, then waiting 600 ms after the call
+caller caught: send threw before the message left
+process ending, origin unhandledRejection: timed out after 200 ms
+process exit code 1
+file:///<worktree>/agent-team/evidence/T-040/timer-pattern.mjs:13
+    timer = setTimeout(() => fail(new Error(`timed out after ${LIMIT_MS} ms`)), LIMIT_MS);
+                                  ^
+
+Error: timed out after 200 ms
+    at Timeout._onTimeout (file:///<worktree>/agent-team/evidence/T-040/timer-pattern.mjs:13:35)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+
+Node.js v24.15.0
+shell exit 1
+
+$ node agent-team/evidence/T-040/timer-pattern.mjs change   (stdout and stderr together)
+order change: timer of 200 ms, then waiting 600 ms after the call
+caller caught: send threw before the message left
+still running 600 ms after the call, ending normally
+process exit code 0
+shell exit 0
+
+Reading: with BASE's order the caller catches the send error, and 200 ms later the timer's promise rejects with no handler: origin unhandledRejection, exit code 1, before the script's last line. With the change's order the caller catches the same error, no timer was made, and the script runs to its end with exit code 0.
+
+b. After, with the browser, on the code commit 175b35b.
+   Scratch change, never committed: scratch-send-throw.patch. In FEATURES.turns, before the real turnsProbe call, one extra call a.eval(turnsProbe, 1n) (a BigInt, which JSON.stringify cannot handle), its rejection caught and written to stderr as 'scratch caught: ...', then a 16000 ms wait (longer than EVAL_TIMEOUT_MS), then the run carries on. In the patch the '\n' of that template literal shows as a line break inside it; the output is the same. Undone with git restore scripts/smoke.mjs.
+   Leftover count by count-leftovers.mjs, 15 s after the run ends (baseline: 0 folders, 11 chrome.exe).
+
+$ node scripts/smoke.mjs --feature turns --out <scratch folder outside the repo>/send-throw.json
+commit: 175b35b; scratch diff against HEAD:  1 file changed, 3 insertions(+)
+exit 0 after 17786 ms from its start
+stderr:
+  scratch caught: Do not know how to serialize a BigInt
+result file:
+  {
+    "destroyed enemy respawns at its spawn point": true,
+    "attacker survives at the end of its move": true,
+    "turn passes to player 2": true,
+    "next move starts on the power gauge": true,
+    "no turn timer": true
+  }
+counted 2026-11-18T16:04:52.398Z after waiting 15 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 11
+after git restore, git status --short -- scripts/smoke.mjs: ''
+result file identical to expected/turns-smoke.json (cmp exit 0)
+stderr lines matching unhandled|UnhandledPromiseRejection|origin (grep -ci): 0
+
+Reading: exit 0, the result equals expected/turns-smoke.json, stderr holds only the scratch line with JSON.stringify's own BigInt error and no unhandled-rejection line, although the run went on for 16 s after the failed call; 0 folders and 11 chrome.exe afterwards.

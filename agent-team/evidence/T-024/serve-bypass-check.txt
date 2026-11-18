@@ -1,0 +1,33 @@
+platform win32, node v24.15.0; throw-away folder in the OS temp dir: root/ holds fake index.html, .env, .env.local, .git/config, secrets/x.txt, sub/s.txt and two junctions (link-out -> ../outside, link-secrets -> secrets); outside/o.txt sits next to root/
+request path as sent on the wire -> status body (bodies are the fake file contents; 404 = refused)
+/index.html -> 200 fake-index
+/secrets/x.txt -> 404 Not found
+/.env -> 404 Not found
+/.ENV -> 404 Not found
+/.git/config -> 404 Not found
+/secrets./x.txt -> 404 Not found
+/.env. -> 404 Not found
+/%2e%2e/outside/o.txt -> 404 Not found
+/sub%5C..%5C..%5Coutside%5Co.txt -> 404 Not found
+/SECRETS/x.txt -> 200 fake-secret
+/sEcReTs/x.txt -> 200 fake-secret
+/%53ECRETS/x.txt -> 200 fake-secret
+/secrets%5Cx.txt -> 200 fake-secret
+/sub%5C..%5Csecrets%5Cx.txt -> 200 fake-secret
+/sub%5C..%5C.env -> 200 fake-env
+/sub%5C..%5C.env.local -> 200 fake-env-local
+/sub%5C..%5C.git%5Cconfig -> 200 fake-git-config
+/ENV~1 -> 200 fake-env
+/ENV~1.LOC -> 200 fake-env-local
+/ENV~2.LOC -> 404 Not found
+/GIT~1/config -> 200 fake-git-config
+/secrets::$INDEX_ALLOCATION/x.txt -> 200 fake-secret
+/secrets%3A%3A$INDEX_ALLOCATION/x.txt -> 200 fake-secret
+/link-out/o.txt -> 200 fake-outside
+/link-secrets/x.txt -> 200 fake-secret
+/index.html with Host: rebind.example -> 200 fake-index
+/sub%5C..%5C.env with Host: rebind.example -> 200 fake-env
+cleanup link-out: removed
+cleanup link-secrets: removed
+cleanup: link targets still there before the folder is removed: outside/o.txt true, secrets/x.txt true
+cleanup: throw-away folder removed true
