@@ -1,0 +1,51 @@
+T-042 Done-when 6: scripts/serve.mjs read on code commit 9a94a75 (HEAD 9a94a75 holds the same file) against BASE 94bc009
+
+$ grep -n "realpath" scripts/serve.mjs
+3:import { readFile, realpath } from 'node:fs/promises';
+29:  const file = await realpath(resolve(base, ...parts)).catch(() => null);
+38:  const ready = realpath(resolve(root));
+(realpath is imported from node:fs/promises on line 3 and called as realpath(...) on lines 29 and 38: the promise version, which runs the native realpath; no other realpath)
+
+$ grep -nE "realpathSync\(|fs\.realpath\(" scripts/serve.mjs
+(prints nothing; exit 1)
+
+Run-directly block, SHA-256 of the lines from 'const isMain' to the end of the file:
+BASE 94bc009 (lines 57-63): d55515cdec5f4060016493cd68d34898dbb834d917b5aefc3495834453921b55
+HEAD 9a94a75 (lines 81-87): d55515cdec5f4060016493cd68d34898dbb834d917b5aefc3495834453921b55
+
+Import lines on HEAD:
+2:import { createServer } from 'node:http';
+3:import { readFile, realpath } from 'node:fs/promises';
+4:import { dirname, extname, isAbsolute, relative, resolve } from 'node:path';
+5:import { fileURLToPath, pathToFileURL } from 'node:url';
+(node:http, node:fs/promises, node:path, node:url only; package.json and package-lock.json unchanged, see scope-check.txt)
+
+Listen call and returned object on HEAD:
+72:    server.listen(port, host, () => {
+74:        url: `http://${host}:${server.address().port}`,
+75:        close: () => new Promise((done) => { server.closeAllConnections(); server.close(done); }),
+
+Export line, BASE and HEAD:
+BASE: 18:export function startServer(root, port = 0, host = '127.0.0.1') {
+HEAD: 37:export function startServer(root, port = 0, host = '127.0.0.1') {
+
+TYPES table unchanged: yes
+404 and 400 bodies on HEAD:
+43:      res.writeHead(421).end('Misdirected request');
+51:      res.writeHead(400).end('Bad request');
+56:      res.writeHead(404).end('Not found');
+67:      res.writeHead(404).end('Not found');
+
+$ git diff --numstat 94bc009 9a94a75 -- scripts/serve.mjs tests/serve.test.js
+35	11	scripts/serve.mjs
+220	0	tests/serve.test.js
+
+Order in which a request is answered on HEAD (Coordinator choices 1 to 8), by line:
+1 Host: lines 40-45 (lower-cased Host must be 127.0.0.1:<port> or localhost:<port>, port = server.address().port; else 421 Misdirected request; createServer gets requireHostHeader: false so a missing Host reaches this check instead of Node's own 400)
+2 raw %2F / %5C: line 49 (on the undecoded URL pathname, either case; path = null, then 404 on line 55)
+3 decode: lines 47-53 (decodeURIComponent of the URL pathname, 400 Bad request on error); line 54: only '/' becomes '/index.html'
+4 odd characters: line 19 ODD and line 28 (backslash, colon, ~, U+0000-U+001F, U+007F)
+5 allow-list: lines 18 and 20 (exact /index.html or ^/src/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.js$, exact case)
+6 names: lines 21-24 (each part lower-cased: no leading '.', not 'secrets', no trailing '.' or space)
+7 real path: lines 29-34 (fs.promises.realpath; real root from line 38, resolved once before listen, startServer rejects if it fails; path.relative inside the real root, no '..' first part, not absolute; parts split on / and \ pass rule 6; joined with / they pass rule 5; owner addition: they must also equal the requested path exactly, so a case alias such as /src/Game.js on a case-insensitive volume, or a link inside src/ to another allowed file, is refused; a realpath error is 404)
+8 read: lines 59-68 (readFile of the real path, 200 with the TYPES Content-Type and Cache-Control: no-store, 404 Not found on a read error)

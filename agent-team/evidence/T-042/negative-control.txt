@@ -1,0 +1,31 @@
+T-042 Done-when 5c: negative control. Scratch change (never committed): git show 94bc009:scripts/serve.mjs > scripts/serve.mjs, on top of code commit 9a94a75 (tests/serve.test.js from that commit).
+$ node --test --test-reporter=tap tests/serve.test.js   -> exit 1
+Saved: only the ok / not ok lines (test titles) and the summary counts; nothing else of the output.
+not ok 1 - a: encoded separators %5C and %2F get 404
+not ok 2 - b: case variants of secrets, dotfiles, index.html and src get 404
+not ok 3 - c: 8.3 short names and any ~ get 404
+not ok 4 - d: NTFS stream names and colons get 404
+ok 5 - e: trailing dots and spaces get 404
+not ok 6 - f: folder links inside the root to secrets/ or outside the root get 404
+not ok 7 - f: a file symlink src/env.js to .env gets 404
+not ok 8 - g: a wrong or missing Host gets 421; 127.0.0.1 and localhost with the own port get what the path alone gets
+not ok 9 - h: dotfiles, secrets/, files outside the allow-list, control characters and device names get 404, a bad escape 400
+ok 10 - i: / and /index.html and JavaScript under src/ are served with their type
+not ok 11 - a server started on a folder link to the root serves the same files and refuses every kind
+not ok 12 - startServer rejects when the root cannot be resolved
+# tests 12
+# suites 0
+# pass 2
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 288.4946
+# short name ENV~1 existed in the fixture: yes
+# short name src/LONGMO~1.JS existed in the fixture: yes
+Undone with: git restore scripts/serve.mjs
+--- git status --short after the restore:
+?? agent-team/evidence/T-042/negative-control.txt
+?? agent-team/evidence/T-042/probe-after.txt
+?? agent-team/evidence/T-042/probe-diff.txt
+(only paths under agent-team/)

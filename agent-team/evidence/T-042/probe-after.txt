@@ -1,0 +1,122 @@
+fixture: folder link link-out -> ../outside made
+fixture: folder link src/link-out -> ../../outside made
+fixture: folder link link-secrets -> secrets made
+fixture: folder link src/link-secrets -> ../secrets made
+fixture: folder link root-link -> root (next to root, used as a server root) made
+fixture: file symlink src/env.js -> ../.env made
+platform win32, node v24.15.0; throw-away folder in the OS temp dir: root/ holds fake index.html, src/game.js, src/config.js, src/sub/deep.js, src/longmodulename.js, src/secrets/x.js, .env, .env.local, .gitignore, .git/config, secrets/x.txt, secrets/x.js, sub/s.txt, package.json; outside/ next to root/ holds fake o.txt and o.js
+fixture: short name ENV~1 exists: yes
+fixture: short name ENV~1.LOC exists: yes
+fixture: short name GIT~1 exists: yes
+fixture: short name GITIGN~1 exists: yes
+fixture: short name src/LONGMO~1.JS exists: yes
+kind | request path as sent | Host header sent (<port> = the port the server listens on) | status, then the body when it is a fake file body
+a | /sub%5C..%5C.env | Host: 127.0.0.1:<port> | 404
+a | /sub%5c..%5c.env.local | Host: 127.0.0.1:<port> | 404
+a | /sub%5C..%5C.git%5Cconfig | Host: 127.0.0.1:<port> | 404
+a | /secrets%5Cx.txt | Host: 127.0.0.1:<port> | 404
+a | /nope%5C..%5C.env | Host: 127.0.0.1:<port> | 404
+a | /%5Csecrets%5Cx.txt | Host: 127.0.0.1:<port> | 404
+a | /sub%5C..%5C..%5Coutside%5Co.txt | Host: 127.0.0.1:<port> | 404
+a | /secrets%2Fx.txt | Host: 127.0.0.1:<port> | 404
+a | /sub%2f..%2f.env | Host: 127.0.0.1:<port> | 404
+a | /src%2Fgame.js | Host: 127.0.0.1:<port> | 404
+b | /SECRETS/x.txt | Host: 127.0.0.1:<port> | 404
+b | /Secrets/x.txt | Host: 127.0.0.1:<port> | 404
+b | /sEcReTs/x.txt | Host: 127.0.0.1:<port> | 404
+b | /%53ECRETS/x.txt | Host: 127.0.0.1:<port> | 404
+b | /.ENV | Host: 127.0.0.1:<port> | 404
+b | /.GIT/config | Host: 127.0.0.1:<port> | 404
+b | /INDEX.HTML | Host: 127.0.0.1:<port> | 404
+b | /SRC/game.js | Host: 127.0.0.1:<port> | 404
+b | /src/GAME.JS | Host: 127.0.0.1:<port> | 404
+b | /Index.html | Host: 127.0.0.1:<port> | 404
+b | /src/Game.js | Host: 127.0.0.1:<port> | 404
+c | /ENV~1 | Host: 127.0.0.1:<port> | 404
+c | /ENV~1.LOC | Host: 127.0.0.1:<port> | 404
+c | /GIT~1/config | Host: 127.0.0.1:<port> | 404
+c | /GITIGN~1 | Host: 127.0.0.1:<port> | 404
+c | /ENV~1::$DATA | Host: 127.0.0.1:<port> | 404
+c | /src/LONGMO~1.JS | Host: 127.0.0.1:<port> | 404
+d | /secrets::$INDEX_ALLOCATION/x.txt | Host: 127.0.0.1:<port> | 404
+d | /secrets%3A%3A$INDEX_ALLOCATION/x.txt | Host: 127.0.0.1:<port> | 404
+d | /.env::$DATA | Host: 127.0.0.1:<port> | 404
+d | /index.html::$DATA | Host: 127.0.0.1:<port> | 404
+d | /src/game.js::$DATA | Host: 127.0.0.1:<port> | 404
+e | /secrets./x.txt | Host: 127.0.0.1:<port> | 404
+e | /secrets%20/x.txt | Host: 127.0.0.1:<port> | 404
+e | /.env. | Host: 127.0.0.1:<port> | 404
+e | /.env%20 | Host: 127.0.0.1:<port> | 404
+e | /index.html. | Host: 127.0.0.1:<port> | 404
+e | /index.html%20 | Host: 127.0.0.1:<port> | 404
+e | /src./game.js | Host: 127.0.0.1:<port> | 404
+e | /src/game.js. | Host: 127.0.0.1:<port> | 404
+e | /src/game.js%20 | Host: 127.0.0.1:<port> | 404
+f | /link-out/o.txt | Host: 127.0.0.1:<port> | 404
+f | /link-secrets/x.txt | Host: 127.0.0.1:<port> | 404
+f | /link-secrets/x.js | Host: 127.0.0.1:<port> | 404
+f | /src/link-out/o.js | Host: 127.0.0.1:<port> | 404
+f | /src/link-secrets/x.js | Host: 127.0.0.1:<port> | 404
+f | /src/env.js | Host: 127.0.0.1:<port> | 404
+h | /.env | Host: 127.0.0.1:<port> | 404
+h | /.env.local | Host: 127.0.0.1:<port> | 404
+h | /.git/config | Host: 127.0.0.1:<port> | 404
+h | /secrets/x.txt | Host: 127.0.0.1:<port> | 404
+h | /%2e%2e/outside/o.txt | Host: 127.0.0.1:<port> | 404
+h | //secrets/x.txt | Host: 127.0.0.1:<port> | 404
+h | /src/ | Host: 127.0.0.1:<port> | 404
+h | /sub/s.txt | Host: 127.0.0.1:<port> | 404
+h | /package.json | Host: 127.0.0.1:<port> | 404
+h | /%00 | Host: 127.0.0.1:<port> | 404
+h | /src/game.js%00 | Host: 127.0.0.1:<port> | 404
+h | /src/game%01.js | Host: 127.0.0.1:<port> | 404
+h | /nul | Host: 127.0.0.1:<port> | 404
+h | /src/nul.js | Host: 127.0.0.1:<port> | 404
+h | /%E0%A4%A | Host: 127.0.0.1:<port> | 400
+i | / | Host: 127.0.0.1:<port> | 200 fake-index
+i | /index.html | Host: 127.0.0.1:<port> | 200 fake-index
+i | /index.html?debug=1 | Host: 127.0.0.1:<port> | 200 fake-index
+i | /src/game.js | Host: 127.0.0.1:<port> | 200 fake-game
+i | /src/config.js | Host: 127.0.0.1:<port> | 200 fake-config
+i | /src/sub/deep.js | Host: 127.0.0.1:<port> | 200 fake-deep
+f-root-link | / | Host: 127.0.0.1:<port> | 200 fake-index
+f-root-link | /index.html | Host: 127.0.0.1:<port> | 200 fake-index
+f-root-link | /index.html?debug=1 | Host: 127.0.0.1:<port> | 200 fake-index
+f-root-link | /src/game.js | Host: 127.0.0.1:<port> | 200 fake-game
+f-root-link | /src/config.js | Host: 127.0.0.1:<port> | 200 fake-config
+f-root-link | /src/sub/deep.js | Host: 127.0.0.1:<port> | 200 fake-deep
+f-root-link | /.env | Host: 127.0.0.1:<port> | 404
+f-root-link | /sub%5C..%5C.env | Host: 127.0.0.1:<port> | 404
+f-root-link | /ENV~1 | Host: 127.0.0.1:<port> | 404
+f-root-link | /SECRETS/x.txt | Host: 127.0.0.1:<port> | 404
+f-root-link | /link-out/o.txt | Host: 127.0.0.1:<port> | 404
+g | /index.html | Host: rebind.example | 421
+g | /sub%5C..%5C.env | Host: rebind.example | 421
+g | /index.html | Host: rebind.example:<port> | 421
+g | /sub%5C..%5C.env | Host: rebind.example:<port> | 421
+g | /index.html | Host: localhost:<another port> | 421
+g | /sub%5C..%5C.env | Host: localhost:<another port> | 421
+g | /index.html | Host: 127.0.0.1 (no port) | 421
+g | /sub%5C..%5C.env | Host: 127.0.0.1 (no port) | 421
+g | /index.html | Host: 127.0.0.2:<port> | 421
+g | /sub%5C..%5C.env | Host: 127.0.0.2:<port> | 421
+g | /index.html | Host: [::1]:<port> | 421
+g | /sub%5C..%5C.env | Host: [::1]:<port> | 421
+g | /index.html | Host: (empty) | 421
+g | /sub%5C..%5C.env | Host: (empty) | 421
+g | /index.html | Host: (no Host header) | 421
+g | /sub%5C..%5C.env | Host: (no Host header) | 421
+g | /index.html | Host: 127.0.0.1:<port> | 200 fake-index
+g | /sub%5C..%5C.env | Host: 127.0.0.1:<port> | 404
+g | /index.html | Host: localhost:<port> | 200 fake-index
+g | /sub%5C..%5C.env | Host: localhost:<port> | 404
+g | /index.html | Host: LOCALHOST:<port> | 200 fake-index
+g | /sub%5C..%5C.env | Host: LOCALHOST:<port> | 404
+cleanup src/env.js: removed
+cleanup root-link: removed
+cleanup src/link-secrets: removed
+cleanup link-secrets: removed
+cleanup src/link-out: removed
+cleanup link-out: removed
+cleanup: link targets still there before the folder is removed: outside/o.txt true, secrets/x.txt true, .env true, root/index.html true
+cleanup: throw-away folder removed true
