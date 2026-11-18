@@ -1,0 +1,68 @@
+T-039 review round 2 scope check in the worktree <worktree>, HEAD b3d15a9, run just before the last commit, 2026-11-18T17:04:53Z; written outside the repo and moved in afterwards
+
+$ git diff --stat 5638864 -- scripts/ tests/ src/ sim/ index.html scenarios/ expected/ docs/ .github/ .claude/ package.json package-lock.json AGENTS.md agent-team/FEATURE_MAP.md agent-team/BACKLOG.md agent-team/DECISIONS.md agent-team/ROADMAP.md
+(exit 0, output above this line; agent-team/REPEATS.md is left out of this list because the round 1 review commit 7e26d14 added one row to it, see below)
+
+$ git diff --stat 5638864 -- agent-team/REPEATS.md
+ agent-team/REPEATS.md | 1 +
+ 1 file changed, 1 insertion(+)
+$ git log --format="%h %s" 5638864..HEAD -- agent-team/REPEATS.md
+7e26d14 T-039: record review round 1
+
+$ git log --format="%h %an: %s" 551b6a5..HEAD   (commits since round 1: 7e26d14 and 8320738 are the coordinator's review and decision records, e7eb8e4 and b3d15a9 are the owner's round 2 commits)
+b3d15a9 Agent Echo: T-039 round 2: add the round 2 Handoff section
+e7eb8e4 Agent Echo: T-039 round 2: run the end-to-end test's copy by its real path
+8320738 Agent Echo: T-039: record the decision for review round 2
+7e26d14 Agent Echo: T-039: record review round 1
+
+$ { git diff --name-only 5638864; git ls-files --others --exclude-standard; } | sort -u
+agent-team/REPEATS.md
+agent-team/evidence/T-039/after-checks.txt
+agent-team/evidence/T-039/after-config.log
+agent-team/evidence/T-039/after-round2-config.log
+agent-team/evidence/T-039/after-scratch.txt
+agent-team/evidence/T-039/apply-steps.txt
+agent-team/evidence/T-039/before-config.log
+agent-team/evidence/T-039/before-gap.txt
+agent-team/evidence/T-039/config.json
+agent-team/evidence/T-039/feature-map-line.txt
+agent-team/evidence/T-039/hookup.txt
+agent-team/evidence/T-039/negative-scratch.txt
+agent-team/evidence/T-039/precheck.txt
+agent-team/evidence/T-039/proof.mjs
+agent-team/evidence/T-039/proposed.diff
+agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs
+agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js
+agent-team/evidence/T-039/round2-after-checks.txt
+agent-team/evidence/T-039/round2-after-scratch.txt
+agent-team/evidence/T-039/round2-hookup.txt
+agent-team/evidence/T-039/round2-links.txt
+agent-team/evidence/T-039/round2-negative-scratch.txt
+agent-team/evidence/T-039/round2-self-check.txt
+agent-team/evidence/T-039/round2-time.txt
+agent-team/evidence/T-039/same-output.txt
+agent-team/evidence/T-039/scope-check.txt
+agent-team/evidence/T-039/self-check.txt
+agent-team/evidence/T-039/size.txt
+agent-team/evidence/T-039/time.txt
+agent-team/tasks/T-039.md
+
+$ git ls-files .gitignore
+(exit 0, output above this line)
+
+$ node agent-team/evidence/T-039/proof.mjs leftovers
+folders in <OS temp dir> named conflict-markers-*: 0; named t039-*: 0
+
+$ grep -rniF "$(whoami)" agent-team/evidence/T-039 agent-team/tasks/T-039.md   (the account name, not written here)
+(grep exit 1: 1 means no match)
+$ grep -rniF -e "$HOME" -e "$(cygpath -w "$HOME")" -e "$(cygpath -m "$HOME")" agent-team/evidence/T-039 agent-team/tasks/T-039.md   (home folder, three spellings)
+(grep exit 1: 1 means no match)
+$ grep -rniE "appdata|local[/\\]temp|users[/\\]" agent-team/evidence/T-039 agent-team/tasks/T-039.md   (OS temp dir and session temp path)
+agent-team/evidence/T-039/scope-check.txt:38:$ grep -rniE "appdata|local[/\\]temp|users[/\\]" agent-team/evidence/T-039 agent-team/tasks/T-039.md   (OS temp dir and session temp path)
+agent-team/tasks/T-039.md:271:- Promote to guard: (1) verify.sh fails if the unit-test count drops below the last recorded count, or if a test file reports fewer tests than expected. This catches a test file that exits 0 early (Issue 2). (2) A guards.sh or verify.sh grep that evidence/ files and brief lines hold no drive-letter path under a user folder, no /c/Users path, no AppData path and no short 8.3 name.
+(grep exit 0; the matches are the grep pattern quoted in the round 1 scope-check.txt and the words 'AppData path' and '/c/Users path' in the security review block, none of them a path)
+
+$ node scripts/conflict-markers.mjs
+(exit 0, output above this line)
+$ node scripts/no-comments.mjs
+(exit 0, output above this line)

@@ -2,7 +2,7 @@ T-039 apply steps for the human (route A). Agents do not edit scripts/conflict-m
 
 When: after both reviews (normal and security) approve. The task branch task/T-039-conflict-markers-report holds evidence and the brief only and can be merged before or with the copy.
 
-1. In product-a, on a branch of your own cut from master:
+1. In product-a, on a branch of your own cut from master (587b686 at review round 2, or any later master on which scripts/conflict-markers.mjs and tests/conflict-markers.test.js are still as at BASE 5638864; check with `git diff --stat 5638864 master -- scripts/conflict-markers.mjs tests/conflict-markers.test.js`, which must print nothing; at 587b686 it prints nothing):
 
 cp agent-team/evidence/T-039/proposed/scripts/conflict-markers.mjs scripts/conflict-markers.mjs
 cp agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js tests/conflict-markers.test.js
@@ -19,4 +19,4 @@ git diff --stat
 
 4. After the merge the coordinator puts the line in agent-team/evidence/T-039/feature-map-line.txt into agent-team/FEATURE_MAP.md (section 9, replacing the "Conflict-marker guard (T-018)" line) and closes the task.
 
-Proven by the owner: the copy over the real paths, the conflict-marker unit tests, guards.sh and ./scripts/verify.sh T-039-scratch --feature config, all in a scratch copy of the worktree outside the repo (hookup.txt, after-scratch.txt). Not run by the owner: verify.sh with --feature all (it needs the browser smoke runs) and the copy in a git checkout of master.
+Proven by the owner: the copy over the real paths, the conflict-marker unit tests, guards.sh and ./scripts/verify.sh T-039-scratch --feature config, all in a scratch copy of the worktree outside the repo (round 1: hookup.txt, after-scratch.txt; round 2 test file: round2-hookup.txt, round2-after-scratch.txt, and round2-links.txt for an OS temp dir reached through a junction or an 8.3 short name). Not run by the owner: verify.sh with --feature all (it needs the browser smoke runs) and the copy in a git checkout of master.

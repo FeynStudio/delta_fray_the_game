@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -186,7 +186,7 @@ test('report gives the message, then one path:line: text line per finding in the
 
 function runCopy(root) {
   try {
-    return { code: 0, out: execFileSync(process.execPath, [resolve(root, SCRIPT)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+    return { code: 0, out: execFileSync(process.execPath, [realpathSync(resolve(root, SCRIPT))], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
   } catch (error) {
     return { code: error.status, out: error.stdout };
   }
