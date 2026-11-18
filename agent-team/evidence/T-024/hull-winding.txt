@@ -1,0 +1,3 @@
+convexHull taken from src/rules.js characters 2196 to 2702
+right triangle: 3 points in, hull [{"x":0,"y":0},{"x":10,"y":0},{"x":0,"y":10}], signed area 50
+square with edge midpoints and centre: 9 points in, hull [{"x":0,"y":0},{"x":10,"y":0},{"x":10,"y":10},{"x":0,"y":10}], signed area 100

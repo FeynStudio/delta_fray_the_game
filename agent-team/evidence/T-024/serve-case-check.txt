@@ -1,0 +1,9 @@
+platform win32; throw-away root in the OS temp dir holding index.html, .env and secrets/x.txt
+/index.html -> 200 index-file
+/secrets/x.txt -> 404 Not found
+/SECRETS/x.txt -> 200 secret-file
+/Secrets/x.txt -> 200 secret-file
+/secrets./x.txt -> 404 Not found
+/.env -> 404 Not found
+/.ENV -> 404 Not found
+/%2e%2e/x -> 404 Not found
