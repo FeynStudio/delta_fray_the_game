@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 5e9e66b..218a9e4 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -42,7 +42,7 @@ function connect(url) {
+     ready: new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('cannot connect to the browser')); }),
+     send(method, params = {}, sessionId) {
+       const id = ++nextId;
+-      ws.send(JSON.stringify({ id, method, params, sessionId }));
++      if (method !== 'Page.captureScreenshot') ws.send(JSON.stringify({ id, method, params, sessionId }));
+       return new Promise((ok, fail) => {
+         const timer = setTimeout(() => {
+           pending.delete(id);
