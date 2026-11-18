@@ -1,10 +1,10 @@
-T-038 Done-when 3, the gaps on BASE's tests/syntax-check.test.js, run from the worktree at 7284fd1, platform win32, node v24.15.0
+T-038 Done-when 3, the gaps on BASE's tests/syntax-check.test.js, run from the worktree at d8423e1, platform win32, node v24.15.0
 
 3a. Throw-away folder in the OS temp dir; bad.mjs holds one failing line `const a = "<ESC>[31m<BEL><BS>" }` (bytes written by the script, never saved here)
 $ node --check <throw-away>/bad.mjs -> exit 1
 count of bytes 0x00-0x09, 0x0B-0x1F and 0x7F in stderr: 11 {"0x0d":8,"0x1b":1,"0x07":1,"0x08":1}
 stderr with every control character shown as \xNN:
-  <OS temp dir>\t038-3a-lKOU87\bad.mjs:1
+  <OS temp dir>\t038-3a-1gq02A\bad.mjs:1
   const a = "\x1b[31m\x07\x08" }
                       ^
   SyntaxError: Unexpected token '}'
@@ -12,16 +12,16 @@ stderr with every control character shown as \xNN:
 scratch folder removed: yes
 
 3b. Scratch copy of the worktree with BASE's file; folder -dash-temp made in the copy root; TEMP, TMP and TMPDIR all set to -dash-temp; `node --test tests/syntax-check.test.js` run from the copy root
-BASE file, dash set-up: tests 2, pass 1, fail 1, exit 1, 320 ms
+BASE file, dash set-up: tests 2, pass 1, fail 1, exit 1, 323 ms
   failed: the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
 the failing assertion compares names only, so Node's message is not in that output; scratch-only instrumentation: one line added after `const found = checkSyntax(...)` in test 2 of the copy writes `found` to found.json in the copy root, then the same run again
-instrumented BASE file, dash set-up: tests 2, pass 1, fail 1, exit 1, 314 ms
+instrumented BASE file, dash set-up: tests 2, pass 1, fail 1, exit 1, 321 ms
   failed: the walk and the check report a broken file by name, pass clean files, skip other files and report a folder with no code file
 checked: ["sim/broken.mjs","sim/clean.mjs","sim/deep/fine.js","sim/deep/more/bad.js"]
-error: sim/broken.mjs -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-mEXeuX\sim\broken.mjs
-error: sim/clean.mjs -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-mEXeuX\sim\clean.mjs
-error: sim/deep/fine.js -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-mEXeuX\sim\deep\fine.js
-error: sim/deep/more/bad.js -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-mEXeuX\sim\deep\more\bad.js
+error: sim/broken.mjs -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-DQ02aj\sim\broken.mjs
+error: sim/clean.mjs -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-DQ02aj\sim\clean.mjs
+error: sim/deep/fine.js -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-DQ02aj\sim\deep\fine.js
+error: sim/deep/more/bad.js -> C:\Program Files\nodejs\node.exe: bad option: -dash-temp\syntax-check-DQ02aj\sim\deep\more\bad.js
 copy's test file equals BASE's again: yes
 syntax-check-* folders left in -dash-temp: 0
 scratch folder removed: yes

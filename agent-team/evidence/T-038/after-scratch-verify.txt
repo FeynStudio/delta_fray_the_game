@@ -1,6 +1,6 @@
-T-038 Done-when 7, a fresh scratch copy of the worktree at 7284fd1 (not a git repo) with the proposed file copied over tests/syntax-check.test.js; platform win32, node v24.15.0, git version 2.56.0.windows.4
+T-038 Done-when 7, a fresh scratch copy of the worktree at d8423e1 (not a git repo) with the proposed file copied over tests/syntax-check.test.js; platform win32, node v24.15.0, git version 2.56.0.windows.4
 $ ./scripts/verify.sh T-038-scratch --feature config -> exit 0
-  commit: none  branch: none  2026-11-18T15:40:00Z
+  commit: none  branch: none  2026-11-18T15:40:58Z
   dirty: unknown
   PASS guards
   PASS lint
