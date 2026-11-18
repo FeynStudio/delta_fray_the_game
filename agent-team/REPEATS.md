@@ -28,3 +28,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | new test fails on a platform the owner did not run because of path handling (temp dir behind a symlink: macOS /var, Windows junction or 8.3 short name) | 1 | T-039 |
 | guard's documented rule omits the false hits it makes on ordinary text (web routes such as /home/<page> flagged by the home-path pattern) | 1 | T-041 |
 | Handoff misstates what a commit contains (names a file the commit does not touch) | 1 | T-038 |
+| evidence hand-pasted from terminal output or a patch re-made without a run (disclosed, cross-checked) | 1 | T-040 |
