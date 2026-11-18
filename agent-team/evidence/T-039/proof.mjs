@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, copyFileSync, cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, copyFileSync, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir, userInfo } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,17 +21,30 @@ const REPORT_TWO = 'report gives the message, then one path:line: text line per 
 const END_TO_END = 'run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker';
 const MESSAGE = 'GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers';
 const STEP = process.argv[2];
+const SAVE_AS = process.argv[3];
+const ROUND1 = '551b6a5';
 
-const forms = (path) => [path, path.split('\\').join('/'), path.split('\\').join('\\\\')];
+const msys = (path) => (/^[A-Za-z]:/.test(path) ? '/' + path[0] + path.slice(2).split('\\').join('/') : path);
+const forms = (path) => [path, path.split('\\').join('/'), path.split('\\').join('\\\\'), msys(path)];
 const HIDE = [...forms(ROOT).map((form) => [form, '<worktree>']), ...forms(tmpdir()).map((form) => [form, '<OS temp dir>']), ...forms(homedir()).map((form) => [form, '<home>']), [userInfo().username, '<user>']];
-const scrub = (text) => HIDE.reduce((acc, [form, mark]) => acc.split(form).join(mark), String(text));
+function hideAll(text, form, mark) {
+  if (!form) return text;
+  let acc = '';
+  let rest = text;
+  for (let at = rest.toLowerCase().indexOf(form.toLowerCase()); at !== -1; at = rest.toLowerCase().indexOf(form.toLowerCase())) {
+    acc += rest.slice(0, at) + mark;
+    rest = rest.slice(at + form.length);
+  }
+  return acc + rest;
+}
+const scrub = (text) => HIDE.reduce((acc, [form, mark]) => hideAll(acc, form, mark), String(text));
 const out = [];
 const say = (line) => out.push(scrub(line));
-const save = (name) => writeFileSync(join(EVIDENCE, name), out.join('\n') + '\n');
+const save = (name) => writeFileSync(join(EVIDENCE, SAVE_AS || name), out.join('\n') + '\n');
 const env = { ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_'))), GIT_CEILING_DIRECTORIES: dirname(tmpdir()) };
 
-function run(cmd, args, cwd, encoding = 'utf8') {
-  const r = spawnSync(cmd, args, { cwd, env, encoding, windowsHide: true, maxBuffer: 1 << 26 });
+function run(cmd, args, cwd, encoding = 'utf8', extra = {}) {
+  const r = spawnSync(cmd, args, { cwd, env: { ...env, ...extra }, encoding, windowsHide: true, maxBuffer: 1 << 26 });
   return { code: r.status, stdout: r.stdout, stderr: r.stderr };
 }
 
@@ -57,8 +70,8 @@ function withBase(run) {
   }
 }
 
-function tap(dir) {
-  const r = run(process.execPath, ['--test', '--test-reporter=tap', TEST], dir);
+function tap(dir, extra = {}) {
+  const r = run(process.execPath, ['--test', '--test-reporter=tap', TEST], dir, 'utf8', extra);
   const tests = r.stdout.split('\n').map((line) => line.match(/^(not ok|ok) \d+ - (.*)$/)).filter(Boolean).map((m) => ({ ok: m[1] === 'ok', name: m[2].split('\\#').join('#') }));
   const count = (key) => (r.stdout.split('\n').find((line) => line.startsWith('# ' + key + ' ')) || '').split(' ')[2];
   return { code: r.code, tests, failed: tests.filter((t) => !t.ok).map((t) => t.name), summary: 'tests ' + count('tests') + ', pass ' + count('pass') + ', fail ' + count('fail') + ', exit ' + r.code };
@@ -248,12 +261,84 @@ function time() {
   save('time.txt');
 }
 
+const PROBE = [
+  "import { realpathSync } from 'node:fs';",
+  "import { resolve } from 'node:path';",
+  "import { pathToFileURL } from 'node:url';",
+  'const a = process.argv[1];',
+  'const href = (p) => pathToFileURL(p).href;',
+  'process.stdout.write(JSON.stringify({ isMain: href(resolve(a)) === import.meta.url, js: href(realpathSync(a)) === import.meta.url, native: href(realpathSync.native(a)) === import.meta.url }));',
+  '',
+].join('\n');
+
+const yes = (flag) => (flag ? 'yes' : 'no');
+
+function probe(label, dir) {
+  const file = join(dir, 'probe.mjs');
+  writeFileSync(file, PROBE);
+  say(label + ': JS realpathSync equals the path as given: ' + yes(realpathSync(file) === file) + '; realpathSync.native equals the path as given: ' + yes(realpathSync.native(file) === file) + '; JS and native agree: ' + yes(realpathSync(file) === realpathSync.native(file)));
+  for (const [how, argv] of [['as given', file], ['through JS realpathSync', realpathSync(file)], ['through realpathSync.native', realpathSync.native(file)]]) {
+    const r = run(process.execPath, [argv], dir);
+    const seen = r.code === 0 ? JSON.parse(r.stdout) : null;
+    say('  started with the path ' + how + ': exit ' + r.code + (seen ? '; in the child, argv[1] matches import.meta.url (the isMain test): ' + yes(seen.isMain) + '; JS realpathSync(argv[1]) matches: ' + yes(seen.js) + '; realpathSync.native(argv[1]) matches: ' + yes(seen.native) : '; stderr ' + JSON.stringify(r.stderr)));
+  }
+  rmSync(file);
+}
+
+function links() {
+  say('T-039 review round 2: the end-to-end test with the OS temp dir reached as a plain folder, through a junction and as an 8.3 short name. Everything sits in one throw-away folder under <OS temp dir>; the junction is removed in finally (the link only), then the folder');
+  say('round 1 test file: git show ' + ROUND1 + ':agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js; round 2 test file: agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js; module: the proposed module (unchanged in round 2) in both trees');
+  withBase((base) => {
+    const real = join(base, 'real-temp');
+    const link = join(base, 'link-temp');
+    const long = join(base, 'long-folder-name-for-short-test');
+    mkdirSync(real);
+    mkdirSync(long);
+    symlinkSync(real, link, 'junction');
+    try {
+      say('junction made: link-temp -> real-temp; lstat says symbolic link: ' + yes(lstatSync(link).isSymbolicLink()));
+      const shortRun = run('cygpath', ['-d', long], base);
+      const short = shortRun.code === 0 ? shortRun.stdout.trim() : '';
+      const shortOk = short !== '' && short !== long && short.includes('~') && existsSync(short) && realpathSync.native(short) === realpathSync.native(long);
+      say('8.3 short name of long-folder-name-for-short-test (cygpath -d): ' + (shortOk ? short : 'not available (' + JSON.stringify(shortRun.stdout + shortRun.stderr) + ')'));
+      const temps = [['plain folder', real], ['through a junction', link]];
+      if (shortOk) temps.push(['8.3 short name', short]);
+      say('');
+      say('which path makes the isMain test true: a probe module that compares pathToFileURL(resolve(argv[1])) with import.meta.url, as scripts/conflict-markers.mjs does');
+      for (const [label, dir] of temps) probe(label, dir);
+      const r1 = scratch(base, 'r1', true);
+      writeFileSync(join(r1, TEST), run('git', ['show', ROUND1 + ':agent-team/evidence/T-039/proposed/tests/conflict-markers.test.js'], ROOT).stdout);
+      const r2 = scratch(base, 'r2', true);
+      say('');
+      say('node --test --test-reporter=tap ' + TEST + ' with TEMP, TMP and TMPDIR set to the folder');
+      for (const [label, dir] of temps) {
+        const extra = { TEMP: dir, TMP: dir, TMPDIR: dir };
+        for (const [name, tree] of [['round 1 test', r1], ['round 2 test', r2]]) {
+          const t = tap(tree, extra);
+          sayTap(label + ', ' + name, t);
+          say('  end-to-end test passes: ' + yes(t.tests.some((x) => x.name === END_TO_END && x.ok)) + '; conflict-markers-* folders left in the temp folder: ' + readdirSync(dir).filter((n) => n.startsWith('conflict-markers-')).length);
+        }
+      }
+    } finally {
+      let gone = false;
+      try {
+        unlinkSync(link);
+        gone = !existsSync(link);
+      } catch (error) {
+        say('junction removal failed: ' + error.code);
+      }
+      say('junction removed: ' + yes(gone) + '; its target still there until the folder is removed: ' + yes(existsSync(real)));
+    }
+  });
+  save('round2-links.txt');
+}
+
 function leftovers() {
   const names = readdirSync(tmpdir());
   return 'folders in <OS temp dir> named conflict-markers-*: ' + names.filter((n) => n.startsWith('conflict-markers-')).length + '; named t039-*: ' + names.filter((n) => n.startsWith('t039-')).length;
 }
 
-const STEPS = { gap, diff, after, same, negative, hookup, time };
+const STEPS = { gap, diff, after, same, negative, hookup, time, links };
 if (STEP === 'leftovers') process.stdout.write(leftovers() + '\n');
 else {
   STEPS[STEP]();

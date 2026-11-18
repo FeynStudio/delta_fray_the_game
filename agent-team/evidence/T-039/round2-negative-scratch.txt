@@ -1,0 +1,21 @@
+T-039 Done-when 7: negative controls in a scratch copy of the worktree under <OS temp dir> with both proposed files; one at a time on scripts/conflict-markers.mjs, each undone before the next; nothing committed
+proposed files unchanged: node --test --test-reporter=tap tests/conflict-markers.test.js: tests 47, pass 47, fail 0, exit 0
+(a) process.exit(code) removed from the isMain block: tests 47, pass 46, fail 1, exit 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  as expected (exactly: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker): yes; undone: yes
+(b) the exit code forced to 0: tests 47, pass 46, fail 1, exit 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  as expected (exactly: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker): yes; undone: yes
+(c) one word of MESSAGE changed (Resolve to Fix): tests 47, pass 45, fail 2, exit 1
+  failed: report gives the message, then one path:line: text line per finding in the given order, and code 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  as expected (exactly: report gives the message, then one path:line: text line per finding in the given order, and code 1 | run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker): yes; undone: yes
+(d) the line format changed to path:line text (colon after the line number removed): tests 47, pass 45, fail 2, exit 1
+  failed: report gives the message, then one path:line: text line per finding in the given order, and code 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  as expected (exactly: report gives the message, then one path:line: text line per finding in the given order, and code 1 | run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker): yes; undone: yes
+(e) the lines not written: tests 47, pass 46, fail 1, exit 1
+  failed: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker
+  as expected (exactly: run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker): yes; undone: yes
+after all controls, proposed files unchanged again: tests 47, pass 47, fail 0, exit 0
+scratch folder removed: yes
