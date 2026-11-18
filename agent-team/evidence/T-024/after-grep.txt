@@ -1,4 +1,4 @@
-commit: 9b62f66  file: agent-team/FEATURE_MAP.md
+commit: 6984edd  file: agent-team/FEATURE_MAP.md
 1	tip-left
 1	8:1
 1	devicePixelRatio
@@ -14,7 +14,7 @@ commit: 9b62f66  file: agent-team/FEATURE_MAP.md
 1	"pick"
 1	3 decimals
 1	PORT
-1	never serves dotfiles
+0	never serves dotfiles
 1	node scripts/smoke.mjs --feature
 1	built-in WebSocket
 1	Chrome, then Edge
