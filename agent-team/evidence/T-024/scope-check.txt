@@ -1,0 +1,24 @@
+commit: dd64326  BASE: a77ef5c
+$ git diff --stat a77ef5c -- . ':!agent-team/FEATURE_MAP.md' ':!agent-team/evidence/T-024' ':!agent-team/tasks/T-024.md'
+(end of output: empty)
+$ git diff --numstat a77ef5c -- agent-team/FEATURE_MAP.md
+14	5	agent-team/FEATURE_MAP.md
+$ git diff --word-diff=porcelain a77ef5c -- agent-team/FEATURE_MAP.md, removed words only
+-angle});
+-does not check it.
+$ git diff -U0 a77ef5c -- agent-team/FEATURE_MAP.md, hunk headers
+@@ -11 +11 @@ The game draws on a canvas, so agents can't click elements. src/game.js exposes
+@@ -20,0 +21 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -31,0 +33 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -38 +40 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -41,0 +44 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -51,0 +55 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -80 +84 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -84 +88,6 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+@@ -87 +96 @@ Command-line checks: ./scripts/verify.sh T-### --feature <name> always runs guar
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+$ ./scripts/guards.sh
+exit 0
+$ node scripts/home-paths.mjs
+exit 0
