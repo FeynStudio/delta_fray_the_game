@@ -1,0 +1,59 @@
+T-042 Done-when 9 and 14: final check on 6ac9255 (code commit 9a94a75; Handoff in the working tree names it)
+
+after-turns.log: commit: 6ac9255  branch: task/T-042-serve-allow-list | dirty: no | RESULT: PASS
+  unit tests: tests 390 pass 390 fail 0 skipped 0 
+after-all.log: commit: 6ac9255  branch: task/T-042-serve-allow-list | dirty: no | RESULT: PASS
+  unit tests: tests 390 pass 390 fail 0 skipped 0 
+before-turns.log: commit: 94bc009  branch: task/T-042-serve-allow-list | dirty: no | RESULT: PASS
+  unit tests: tests 378 pass 377 fail 0 skipped 1 
+Count: before 378 + 12 tests in tests/serve.test.js = 390 after. The skipped test of the before run is the handoff test ('# handoff not filled in'); after, the Handoff is filled in and that test passes, so pass goes from 377 to 390 and skipped from 1 to 0. No other test was added, removed or skipped:
+  > a server started on a folder link to the root serves the same files and refuses every kind
+  > a: encoded separators %5C and %2F get 404
+  > b: case variants of secrets, dotfiles, index.html and src get 404
+  > c: 8.3 short names and any ~ get 404
+  > d: NTFS stream names and colons get 404
+  > e: trailing dots and spaces get 404
+  > f: a file symlink src/env.js to .env gets 404
+  > f: folder links inside the root to secrets/ or outside the root get 404
+  > g: a wrong or missing Host gets 421; 127.0.0.1 and localhost with the own port get what the path alone gets
+  > h: dotfiles, secrets/, files outside the allow-list, control characters and device names get 404, a bad escape 400
+  > i: / and /index.html and JavaScript under src/ are served with their type
+  > startServer rejects when the root cannot be resolved
+  (the lines above are the only test titles that differ between before-turns.log and after-turns.log, status marks and times removed)
+
+Result files of the all run against expected/ (cmp, byte for byte):
+  SAME render-smoke.json = expected/render-smoke.json
+  SAME input-smoke.json = expected/input-smoke.json
+  SAME turns-smoke.json = expected/turns-smoke.json
+  SAME turns.json = expected/turns.json
+  SAME movement.json = expected/movement.json
+  SAME hits.json = expected/hits.json
+  SAME config.json = expected/config.json
+The turns run's turns-smoke.json and turns.json were checked with cmp against expected/ right after that run: same (the all run then wrote over them).
+The three T-017 screenshots: after-png-sha256.txt (SAME as before and as T-040).
+
+$ node scripts/handoff-check.mjs
+PASS handoff names the latest code commit
+
+$ ./scripts/guards.sh
+exit 0
+$ node scripts/no-comments.mjs
+exit 0
+$ node scripts/conflict-markers.mjs
+exit 0
+$ node scripts/home-paths.mjs
+exit 0
+
+Leftovers in the OS temp dir and browser processes (counted, nothing killed):
+  before the first smoke run: galaxy-smoke-* folders 1, chrome.exe 20, msedge.exe 7
+  after the last run: galaxy-smoke-* folders 1, chrome.exe 20, msedge.exe 7, serve-test-* folders 0, t042-probe-* folders 0
+
+Latest code commit as the check itself reports it (the Handoff's hash briefly replaced by '<code commit>' in the working tree, then the file put back; the check then passes again):
+$ node scripts/handoff-check.mjs
+FAIL handoff names the latest code commit
+Handoff does not name 9a94a75; latest code commit is 9a94a75 (T-042: serve.mjs serves only index.html and src/ JavaScript, checks the native real path and the Host header; add tests/serve.test.js)
+exit 1
+$ node scripts/handoff-check.mjs   (Handoff put back)
+PASS handoff names the latest code commit
+$ git log -1 --format='%h %s' -- . ':(exclude)agent-team/*'
+9a94a75 T-042: serve.mjs serves only index.html and src/ JavaScript, checks the native real path and the Host header; add tests/serve.test.js

@@ -1,0 +1,21 @@
+T-042 Done-when 9: same pictures and same results after the change. Both after runs on 6ac9255 (code commit 9a94a75 plus FEATURE_MAP and evidence only; this brief's Handoff, naming 9a94a75, saved in the working tree; dirty: no).
+
+Before (BASE 94bc009, before-png-sha256.txt):
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *before-turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *before-turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *before-turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-042 --feature turns --label after (RESULT: PASS, after-turns.log), hashed right after the run:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+After ./scripts/verify.sh T-042 --feature all --label after (RESULT: PASS, after-all.log); the files now in this folder:
+b85671e052ebe355d40db564ab024be5bf5b3717dd531e8550911d33f22e292a *turns-smoke-backward-mid.png
+00a711509a671a6532682dbf5274295a11826eb77885247177aa1214352a93a9 *turns-smoke-backward-end.png
+cb4b372a9f9ac3ae1580a419c9ed47d2ed573d5022428c03033be0c5f373f64c *turns-smoke-explosion.png
+
+Compared with the before files and with agent-team/evidence/T-040/after-png-sha256.txt:
+  SAME turns-smoke-backward-mid.png (turns run, all run, before and T-040 values equal; cmp with before-turns-smoke-backward-mid.png: same bytes)
+  SAME turns-smoke-backward-end.png (turns run, all run, before and T-040 values equal; cmp with before-turns-smoke-backward-end.png: same bytes)
+  SAME turns-smoke-explosion.png (turns run, all run, before and T-040 values equal; cmp with before-turns-smoke-explosion.png: same bytes)

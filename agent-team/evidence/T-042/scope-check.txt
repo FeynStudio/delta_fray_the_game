@@ -1,0 +1,47 @@
+T-042 Done-when 7: scope, taken just before the last commit, over 94bc009..6ac9255 (6ac9255 = the owner's last commit before it; no review-record commits yet)
+
+$ git diff --stat 94bc009..6ac9255 -- expected/ scenarios/ src/ sim/ index.html scripts/smoke.mjs scripts/run-scenario.mjs scripts/guards.sh scripts/verify.sh .github/ .claude/ package.json package-lock.json
+(prints nothing)
+
+$ git diff --name-status 94bc009..6ac9255 -- . ':(exclude)agent-team/*'
+M	scripts/serve.mjs
+A	tests/serve.test.js
+(only scripts/serve.mjs and tests/serve.test.js)
+
+$ git diff --name-status 94bc009..6ac9255 -- agent-team/
+M	agent-team/FEATURE_MAP.md
+A	agent-team/evidence/T-042/before-png-sha256.txt
+A	agent-team/evidence/T-042/before-turns-smoke-backward-end.png
+A	agent-team/evidence/T-042/before-turns-smoke-backward-mid.png
+A	agent-team/evidence/T-042/before-turns-smoke-explosion.png
+A	agent-team/evidence/T-042/before-turns-smoke.json
+A	agent-team/evidence/T-042/before-turns-smoke.png
+A	agent-team/evidence/T-042/before-turns.json
+A	agent-team/evidence/T-042/before-turns.log
+A	agent-team/evidence/T-042/code-check.txt
+A	agent-team/evidence/T-042/negative-control.txt
+A	agent-team/evidence/T-042/precheck.txt
+A	agent-team/evidence/T-042/probe-after.txt
+A	agent-team/evidence/T-042/probe-before.txt
+A	agent-team/evidence/T-042/probe-diff.txt
+A	agent-team/evidence/T-042/serve-probe.mjs
+A	agent-team/evidence/T-042/test-coverage.txt
+
+$ git ls-files .gitignore
+(prints nothing; product-a/.gitignore not touched)
+
+$ git diff --numstat 94bc009 6ac9255 -- scripts/serve.mjs tests/serve.test.js agent-team/FEATURE_MAP.md
+1	1	agent-team/FEATURE_MAP.md
+35	11	scripts/serve.mjs
+220	0	tests/serve.test.js
+(total 268, limit 350; scripts/serve.mjs 46, limit 80)
+
+$ git diff 94bc009 6ac9255 -- agent-team/FEATURE_MAP.md | grep -vE '^(\+\+\+|---) ' | grep -cE '^[-+]'   (changed lines)
+2
+(one line deleted, one added; hunk header @@ -89 +89 @@: line 89, the section 9 serve.mjs line)
+
+Names and paths in agent-team/evidence/T-042/* and agent-team/tasks/T-042.md (working tree, after the Handoff was written):
+  node scripts/home-paths.mjs: exit 0
+  case-insensitive hits for the account name (taken from the USERNAME variable at run time, not written here): 0 files
+  hits for AppData, Local/Temp or Local\Temp, /tmp/, scratchpad, a drive letter followed by Users: 0 files (counted before this file existed; re-run now, the only hit is this line, which names the patterns)
+  the evidence names temp folders only as <OS temp dir> and <parent>; ports only as <port>
