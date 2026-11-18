@@ -30,3 +30,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | Handoff misstates what a commit contains (names a file the commit does not touch) | 1 | T-038 |
 | evidence hand-pasted from terminal output or a patch re-made without a run (disclosed, cross-checked) | 1 | T-040 |
 | brief scope check lists a file that the review-record step itself changes on the branch (REPEATS.md after review round 1) | 1 | T-039 |
+| one-off evidence script or test run leaves its throw-away temp fixture behind when the process ends early (cause not found, not reproduced by the reviewer) | 1 | T-042 |
