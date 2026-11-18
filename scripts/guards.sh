@@ -48,4 +48,5 @@ if [ -n "$fmt_hits" ]; then
   echo "$fmt_hits"; FAIL=1
 fi
 node scripts/conflict-markers.mjs || FAIL=1
+node scripts/home-paths.mjs || FAIL=1
 exit $FAIL

@@ -18,7 +18,7 @@
       "Edit(./scripts/no-comments.mjs)", "Edit(./tests/no-comments.test.js)",
       "Edit(./scripts/handoff-check.mjs)", "Edit(./tests/handoff-check.test.js)",
       "Edit(./scripts/conflict-markers.mjs)", "Edit(./tests/conflict-markers.test.js)",
-      "Edit(./tests/syntax-check.test.js)"
+      "Edit(./tests/syntax-check.test.js)", "Edit(./scripts/home-paths.mjs)", "Edit(./tests/home-paths.test.js)"
     ]
   }
 }

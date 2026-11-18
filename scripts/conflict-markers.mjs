@@ -60,12 +60,14 @@ export function checkTree(root) {
   return found;
 }
 
+export function report(found) {
+  if (found.length === 0) return { lines: [], code: 0 };
+  return { lines: [MESSAGE, ...found.map((hit) => `${hit.file}:${hit.line}: ${hit.text}`)], code: 1 };
+}
+
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
 if (isMain) {
-  const found = checkTree(resolve(dirname(fileURLToPath(import.meta.url)), '..'));
-  if (found.length > 0) {
-    process.stdout.write(MESSAGE + NEWLINE);
-    for (const hit of found) process.stdout.write(`${hit.file}:${hit.line}: ${hit.text}${NEWLINE}`);
-    process.exit(1);
-  }
+  const { lines, code } = report(checkTree(resolve(dirname(fileURLToPath(import.meta.url)), '..')));
+  for (const line of lines) process.stdout.write(line + NEWLINE);
+  process.exit(code);
 }

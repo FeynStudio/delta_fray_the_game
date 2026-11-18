@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTree, findMarkers } from '../scripts/conflict-markers.mjs';
+import { checkTree, findMarkers, report } from '../scripts/conflict-markers.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const RUN = 7;
@@ -167,6 +168,36 @@ test('checkTree does not follow a link to a folder', () => {
 
 test('checkTree fails on a folder that does not exist', () => {
   withTree({}, (root) => assert.throws(() => checkTree(join(root, 'missing'))));
+});
+
+const GUARD_FAIL = 'GUARD FAIL [no-conflict-markers]: Resolve the merge conflict; never commit conflict markers';
+const SCRIPT = join('scripts', 'conflict-markers.mjs');
+
+test('report gives no lines and code 0 when nothing is found', () => {
+  assert.deepEqual(report([]), { lines: [], code: 0 });
+});
+
+test('report gives the message, then one path:line: text line per finding in the given order, and code 1', () => {
+  assert.deepEqual(report([{ file: 'src/b.js', line: 4, text: CLOSE + ' other' }, { file: 'docs/a.md', line: 2, text: OPEN + ' HEAD' }]), {
+    lines: [GUARD_FAIL, 'src/b.js:4: ' + CLOSE + ' other', 'docs/a.md:2: ' + OPEN + ' HEAD'],
+    code: 1,
+  });
+});
+
+function runCopy(root) {
+  try {
+    return { code: 0, out: execFileSync(process.execPath, [realpathSync(resolve(root, SCRIPT))], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }) };
+  } catch (error) {
+    return { code: error.status, out: error.stdout };
+  }
+}
+
+test('run directly, the checker is silent with exit 0 on a clean tree and prints the message and path:line: text with exit 1 on a marker', () => {
+  withTree({ [SCRIPT]: readFileSync(join(ROOT, SCRIPT)) }, (root) => {
+    assert.deepEqual(runCopy(root), { code: 0, out: '' });
+    writeFileSync(join(root, 'notes.md'), 'one\n' + OPEN_LINE);
+    assert.deepEqual(runCopy(root), { code: 1, out: GUARD_FAIL + '\nnotes.md:2: ' + OPEN + ' HEAD\n' });
+  });
 });
 
 test('no file in this repo holds a conflict marker', () => {
