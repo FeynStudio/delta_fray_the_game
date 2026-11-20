@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "additionalDirectories": ["C:/Projects/my_ai_agent_company/.worktrees/product-a"],
     "allow": [
       "Bash(./scripts/verify.sh *)", "Bash(./scripts/guards.sh *)",
       "Bash(git status *)", "Bash(git diff *)", "Bash(git log *)",
@@ -8,7 +9,7 @@
       "Read", "Edit", "Write", "Glob", "Grep", "Bash(npm test *)", "WebSearch", "WebFetch",
       "Bash(git worktree add *)", "Bash(git worktree remove *)", "Bash(git worktree list*)",
       "Bash(git symbolic-ref *)", "Bash(git rev-parse *)", "Bash(git branch *)",
-      "Bash(npm ci)", "Bash(node --test *)", "Bash(node scripts/*)"
+      "Bash(npm ci)", "Bash(node --test *)", "Bash(node scripts/*)", "Bash(git -C C:/Projects/my_ai_agent_company/.worktrees/product-a/* *)"
     ],
     "deny": [
       "Bash(git push * main)", "Bash(git push * master)", "Bash(git merge *)", "Bash(git reset --hard *)",
@@ -22,7 +23,8 @@
       "Edit(./scripts/handoff-check.mjs)", "Edit(./tests/handoff-check.test.js)",
       "Edit(./scripts/conflict-markers.mjs)", "Edit(./tests/conflict-markers.test.js)",
       "Edit(./tests/syntax-check.test.js)", "Edit(./scripts/home-paths.mjs)", "Edit(./tests/home-paths.test.js)",
-      "Edit(./scripts/serve.mjs)", "Edit(./tests/serve.test.js)"
+      "Edit(./scripts/serve.mjs)", "Edit(./tests/serve.test.js)", 
+      "Bash(git -C * push * master)", "Bash(git -C * push * main)", "Bash(git -C * merge *)", "Bash(git -C * reset --hard *)"
     ]
   }
 }
