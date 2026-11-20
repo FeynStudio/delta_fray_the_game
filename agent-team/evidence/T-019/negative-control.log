@@ -1,0 +1,49 @@
+Negative control, 2026-11-20, worktree C:/Projects/my_ai_agent_company/.worktrees/product-a/T-019, HEAD 87beb0b plus uncommitted tests/flash-rate.test.js.
+Scratch change (reverted right after, never committed): src/config.js protectionBlinkMs 600 -> 300 (protectionMinAlpha 0).
+Command: node --test tests/flash-rate.test.js
+Exit code: 1
+Output (copied verbatim from the terminal):
+
+✖ the protection blink in src/config.js flashes at most 3 times a second (2.2674ms)
+✔ blink periods of 400 and 600 ms with a full fade pass (0.2238ms)
+✔ blink periods of 333 and 300 ms with a full fade fail and name the numbers and the rule (0.5812ms)
+✔ a shallow blink that stays at 0.6 alpha or above is exempt at 300 ms (0.1288ms)
+✔ overrides are restored after each check (0.4671ms)
+✔ protectionAlpha snaps back once per period, so flashes a second is 1000 / protectionBlinkMs (0.5269ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 79.9261
+
+✖ failing tests:
+
+test at tests\flash-rate.test.js:52:1
+✖ the protection blink in src/config.js flashes at most 3 times a second (2.2674ms)
+  AssertionError [ERR_ASSERTION]: Got unwanted exception.
+  Actual message: "protection blink flashes 3.33 times a second; WCAG 2.3.1 allows at most 3 (protectionBlinkMs must be >= 334 while protectionMinAlpha < 0.5)"
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-019/tests/flash-rate.test.js:53:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: Error: protection blink flashes 3.33 times a second; WCAG 2.3.1 allows at most 3 (protectionBlinkMs must be >= 334 while protectionMinAlpha < 0.5)
+        at checkFlashRate (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-019/tests/flash-rate.test.js:24:9)
+        at getActual (node:assert:611:5)
+        at strict.doesNotThrow (node:assert:779:32)
+        at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-019/tests/flash-rate.test.js:53:10)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1201:25)
+        at Test.start (node:internal/test_runner/test:1096:17)
+        at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17),
+    expected: undefined,
+    operator: 'doesNotThrow',
+    diff: 'simple'
+  }
+
+After the revert: git diff --stat -- src/ was empty (see after-config.log, dirty: no).
