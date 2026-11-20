@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "additionalDirectories": ["C:/Projects/my_ai_agent_company/.worktrees/product-a"],
     "allow": [
       "Bash(./scripts/verify.sh *)", "Bash(./scripts/guards.sh *)",
       "Bash(git status *)", "Bash(git diff *)", "Bash(git log *)",
