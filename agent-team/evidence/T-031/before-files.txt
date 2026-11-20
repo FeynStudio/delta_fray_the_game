@@ -1,0 +1,6 @@
+PNG files written by the render smoke in the before run (BASE 1fa6b61, ./scripts/verify.sh T-031 --feature render --label before, RESULT: PASS):
+render-smoke.png
+
+Renaming: the shell mv of the before outputs needs a permission prompt that nobody can answer on this unattended run, so the before outputs were committed under their own names in the first evidence commit of the branch (see the Handoff), and the after runs then overwrote render-smoke.json and render-smoke.png.
+The before render-smoke.json is also kept, byte for byte, as before-render-smoke.json.
+The before render-smoke.png is kept in git: git show <first evidence commit>:agent-team/evidence/T-031/render-smoke.png
