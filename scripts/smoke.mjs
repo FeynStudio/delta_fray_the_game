@@ -332,6 +332,90 @@ async function explosionProbe() {
   return { explosionMs: cfg.explosionMs, spawn: cfg.spawns[1] };
 }
 
+function scoreSetupProbe(scores) {
+  const s = window.__game.getState();
+  s.clock = 0;
+  s.scores = scores;
+  window.__game.setState(s);
+}
+
+async function scorePixelsProbe(scores) {
+  const cfg = (await import('/src/config.js')).default;
+  const { COLORS } = await import('/src/render.js');
+  const c = document.querySelector('canvas');
+  const sx = c.width / cfg.worldWidth, sy = c.height / cfg.worldHeight;
+  const { data } = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = `${cfg.scoreFontSize}px monospace`;
+  m.textBaseline = 'top';
+  const edge = 2;
+  const tol = 48;
+  const inner = { x0: edge, y0: edge, x1: cfg.worldWidth - edge, y1: cfg.worldHeight - edge };
+  const inside = (b) => b.x0 >= inner.x0 && b.x1 <= inner.x1 && b.y0 >= inner.y0 && b.y1 <= inner.y1;
+  const fmt = (b) => `x ${b.x0.toFixed(1)}..${b.x1.toFixed(1)}, y ${b.y0.toFixed(1)}..${b.y1.toFixed(1)}`;
+  const span = (lo, hi, scale, size) => [Math.max(0, Math.floor(lo * scale)), Math.min(size, Math.ceil(hi * scale))];
+  const problems = [];
+  scores.forEach((score, i) => {
+    const color = COLORS.ships[i % COLORS.ships.length];
+    const want = [1, 3, 5].map((k) => parseInt(color.slice(k, k + 2), 16));
+    const colored = (x, y) => {
+      const k = (y * c.width + x) * 4;
+      return want.every((v, j) => Math.abs(data[k + j] - v) <= tol);
+    };
+    const text = String(score);
+    const right = i % 2 === 1;
+    const ax = right ? cfg.worldWidth - cfg.scoreMargin : cfg.scoreMargin, ay = cfg.scoreMargin;
+    m.textAlign = right ? 'right' : 'left';
+    const t = m.measureText(text);
+    const box = {
+      x0: ax - t.actualBoundingBoxLeft, x1: ax + t.actualBoundingBoxRight,
+      y0: ay - t.actualBoundingBoxAscent, y1: ay + t.actualBoundingBoxDescent,
+    };
+    const who = `player ${i + 1} score ${text}`;
+    if (!inside(box)) {
+      problems.push(`${who}: text box (${fmt(box)}) is not inside the map border (inner edge ${fmt(inner)})`);
+      return;
+    }
+    const pad = 8;
+    const [px0, px1] = span(box.x0 - pad, box.x1 + pad, sx, c.width);
+    const [py0, py1] = span(box.y0 - pad, box.y1 + pad, sy, c.height);
+    for (let y = py0; y < py1; y++) {
+      for (let x = px0; x < px1; x++) {
+        if (!colored(x, y)) continue;
+        if (x < inner.x0 * sx || x >= inner.x1 * sx || y < inner.y0 * sy || y >= inner.y1 * sy) {
+          problems.push(`${who}: a pixel in the ship colour at canvas pixel (${x}, ${y}) is not inside the map border`);
+          return;
+        }
+      }
+    }
+    if (!text.startsWith('-')) {
+      problems.push(`${who}: wanted a minus sign, the score is not negative`);
+      return;
+    }
+    const pen = right ? ax - t.width : ax;
+    m.textAlign = 'left';
+    const d = m.measureText('-');
+    const minus = {
+      x0: pen - d.actualBoundingBoxLeft, x1: pen + d.actualBoundingBoxRight,
+      y0: ay - d.actualBoundingBoxAscent - 1, y1: ay + d.actualBoundingBoxDescent + 1,
+    };
+    const [mx0, mx1] = span(minus.x0, minus.x1, sx, c.width);
+    const [my0, my1] = span(minus.y0, minus.y1, sy, c.height);
+    let best = 0;
+    for (let y = my0; y < my1; y++) {
+      let run = 0;
+      for (let x = mx0; x < mx1; x++) run += colored(x, y) ? 1 : 0;
+      best = Math.max(best, run);
+    }
+    const cover = mx1 > mx0 ? best / (mx1 - mx0) : 0;
+    if (cover < 0.6) {
+      problems.push(`${who}: minus sign not drawn in the ship colour ${color} (best row covers ${Math.round(cover * 100)}% `
+        + `of the minus box ${fmt(minus)}, wanted at least 60%)`);
+    }
+  });
+  return problems;
+}
+
 const headingOff = (s, want) => Math.abs((((s.ships[0].heading - want.angle) % 360) + 540) % 360 - 180) > 1e-6;
 
 function backwardMidWrong(s, want) {
@@ -369,6 +453,26 @@ function explosionWrong(s, want) {
 
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
+const SQUARE_2X = { width: 1000, height: 1000, dpr: 2 };
+
+async function scoreShot(browser, url, shots, suffix, size, scores) {
+  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
+  const p = await browser.open(url, size);
+  await p.eval(freezeLoopProbe);
+  await p.eval(scoreSetupProbe, scores);
+  const before = await p.eval(drawnStateProbe);
+  const png = await p.screenshot();
+  const problems = await p.eval(scorePixelsProbe, scores);
+  const after = await p.eval(stateProbe);
+  await p.close();
+  for (const [when, s] of [['before', before], ['after', after]]) {
+    if (JSON.stringify(s.scores) !== JSON.stringify(scores)) {
+      problems.push(`wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)} ${when} the capture`);
+    }
+  }
+  if (problems.length) throw new Error(`${file}: ${problems.join('; ')}`);
+  shots.push({ suffix, png });
+}
 
 async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
@@ -408,8 +512,10 @@ const FEATURES = {
     const a = await browser.open(url, FULL_HD);
     const r1 = await a.eval(renderProbe);
     shots.push({ suffix: '', png: await a.screenshot() });
-    const b = await browser.open(url, { width: 1000, height: 1000, dpr: 2 });
+    const b = await browser.open(url, SQUARE_2X);
     const r2 = await b.eval(renderProbe);
+    await scoreShot(browser, url, shots, '-negative-score', FULL_HD, [-12, -7]);
+    await scoreShot(browser, url, shots, '-negative-score-1000', SQUARE_2X, [-12, -7]);
     return {
       'one canvas': r1.canvases === 1,
       'fits the 1920x1080 window': r1.fits === true,
