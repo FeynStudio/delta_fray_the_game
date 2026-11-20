@@ -1,0 +1,40 @@
+T-031 scope check. BASE 1fa6b61, code commit 443d232.
+
+1. git diff --numstat 1fa6b61 -- scripts/smoke.mjs agent-team/FEATURE_MAP.md
+1	0	agent-team/FEATURE_MAP.md
+35	0	scripts/smoke.mjs
+Total 36 added + 0 deleted = 36 (limit 60). No line of smoke.mjs removed or changed.
+
+2. git diff -U0 1fa6b61 HEAD -- scripts/smoke.mjs, hunk headers:
+@@ -334,0 +335,18 @@ async function explosionProbe()   -> titleShipProbe (the set-up probe), 17 lines plus a blank line
+@@ -369,0 +388,16 @@ function explosionWrong(s, want)  -> titleShipWrong (the check function), 15 lines plus a blank line
+@@ -412,0 +447 @@ const FEATURES = {                  -> one stateShot call in FEATURES.render:
++    await stateShot(browser, url, shots, '-title-ship', titleShipProbe, [], titleShipWrong);
+All three hunks are pure additions (-N,0).
+
+3. Import block (lines 2 to 7): unchanged. The first hunk starts at line 335, so lines 1 to 334 of BASE are untouched, which also leaves the browser launch, the websocket code (connect), the page helper (open), stateShot, phaseShot, freezeLoopProbe and every existing probe as they were; the main block (from `if (!FEATURES[feature] || !out)`) is below the last hunk and has no hunk.
+
+4. Scanner directive. git grep -n -c nosemgrep 1fa6b61 HEAD -- scripts/smoke.mjs
+1fa6b61:scripts/smoke.mjs:1
+HEAD:scripts/smoke.mjs:1
+git grep -n nosemgrep 1fa6b61 HEAD -- scripts/smoke.mjs
+1fa6b61:scripts/smoke.mjs:77:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+HEAD:scripts/smoke.mjs:77:      if (port && path) finish(ok, `ws://127.0.0.1:${port}${path}`); // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+Byte-identical, same line number, the only nosemgrep in the file on both.
+
+5. git diff --name-only 1fa6b61 HEAD (before the final evidence commit):
+agent-team/FEATURE_MAP.md
+agent-team/evidence/T-031/before-files.txt
+agent-team/evidence/T-031/before-render-smoke.json
+agent-team/evidence/T-031/before-render.log
+agent-team/evidence/T-031/render-smoke.json
+agent-team/evidence/T-031/render-smoke.png
+scripts/smoke.mjs
+The only file outside agent-team/ is scripts/smoke.mjs.
+
+6. git diff --stat 1fa6b61 -- expected/ scenarios/ src/ sim/ tests/ index.html scripts/serve.mjs
+(empty)
+
+7. No new import, no new address, no new scanner directive. titleShipProbe reads only window.__game (getState, setState, press) and /src/config.js, the same module the existing probes import; the new page is opened and closed by the existing stateShot.
+
+8. node scripts/no-comments.mjs: no output, exit 0 (run as `./scripts/guards.sh && node scripts/no-comments.mjs && echo ALL-ZERO`, which printed only ALL-ZERO). ./scripts/guards.sh: exit 0.

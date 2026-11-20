@@ -1,0 +1,10 @@
+SHA-256 of agent-team/evidence/T-031/render-smoke-title-ship.png, committed change 443d232, sha256sum:
+run 1 (./scripts/verify.sh T-031 --feature render --label after, 2026-11-20T06:21:36Z): 43992eb8dd89fdb2862733cd502f2733b67b675d496bb999e2ac1e152db15e0b
+run 2 (./scripts/verify.sh T-031 --feature all --label after, 2026-11-20T06:22:05Z):    43992eb8dd89fdb2862733cd502f2733b67b675d496bb999e2ac1e152db15e0b
+run 3 (./scripts/verify.sh T-031 --feature render --label after, 2026-11-20T06:23:25Z, after the negative controls): 43992eb8dd89fdb2862733cd502f2733b67b675d496bb999e2ac1e152db15e0b
+Same in every run.
+
+render-smoke.json, sha256sum:
+before (BASE 1fa6b61, before-render-smoke.json): 6fdbff7358274171bca44232b37886f17c58a8244746a3e0c2a56f52a03bf79e
+after runs 1, 2 and 3 (443d232, render-smoke.json):  6fdbff7358274171bca44232b37886f17c58a8244746a3e0c2a56f52a03bf79e
+cmp render-smoke.json before-render-smoke.json: identical

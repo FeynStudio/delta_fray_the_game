@@ -1,0 +1,44 @@
+T-031 negative controls, run on the committed change 443d232 with uncommitted scratch changes to scripts/smoke.mjs, each undone with `git restore scripts/smoke.mjs` before the next step (git status afterwards: no change under scripts/).
+
+(A) Space press left out of titleShipProbe
+Scratch diff:
+@@ -343,7 +343,6 @@ async function titleShipProbe() {
+   s.ships[0] = { ...s.ships[0], x: want.x, y: want.y, heading: 0, alive: true };
+   s.gauge = { ...s.gauge, phase: 'power', power: 0.6, backward: false };
+   g.setState(s);
+-  g.press('Space');
+   const d = g.getState();
+   d.gauge = { ...d.gauge, needle: 30 };
+   g.setState(d);
+Command: ./scripts/verify.sh T-031 --feature render --label negative   (exit code 1)
+Output:
+commit: 443d232  branch: task/T-031-smoke-ship-under-title  2026-11-20T06:22:46Z
+dirty: yes
+PASS guards
+PASS lint
+PASS unit tests
+FAIL render browser runs
+FAIL render browser output
+RESULT: FAIL
+Error in negative-render.log (line 409):
+smoke render: render-smoke-title-ship.png: wanted gauge phase 'direction' backward false, got phase 'power' backward false before the capture
+Full log: agent-team/evidence/T-031/negative-render.log
+
+(B) ship 0 placed at y = config.worldHeight / 2
+Scratch diff:
+@@ -340,7 +340,7 @@ async function titleShipProbe() {
+   const s = g.getState();
+   s.turn = 0;
+   s.clock = 0;
+-  s.ships[0] = { ...s.ships[0], x: want.x, y: want.y, heading: 0, alive: true };
++  s.ships[0] = { ...s.ships[0], x: want.x, y: cfg.worldHeight / 2, heading: 0, alive: true };
+   s.gauge = { ...s.gauge, phase: 'power', power: 0.6, backward: false };
+   g.setState(s);
+   g.press('Space');
+Command: node scripts/smoke.mjs --feature render --out agent-team/evidence/T-031/negative-b/render-smoke.json
+Exit code: 1
+stderr:
+smoke render: render-smoke-title-ship.png: ship 0 (alive true) at (640, 480) is not under the title, wanted (640, 52) before the capture
+Result file: agent-team/evidence/T-031/negative-b/render-smoke.json holds { "error": ... } with the same message; no render-smoke-title-ship.png was written for it.
+
+After both: git restore scripts/smoke.mjs; ./scripts/verify.sh T-031 --feature render --label after on 443d232 gave RESULT: PASS again (after-render.log).
