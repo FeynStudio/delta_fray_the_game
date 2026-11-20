@@ -14,7 +14,7 @@ case $FEATURE in
   all|render|input|movement|hits|turns|config|balance) ;;
   *) echo "Unknown feature: '$FEATURE' (use render|input|movement|hits|turns|config|balance|all)"; exit 2;;
 esac
-OUT=agent-team/evidence/$TASK; mkdir -p "$OUT"
+OUT=agent-team/evidence/$TASK/$LABEL; mkdir -p "$OUT"
 LOG="$OUT/$LABEL-$FEATURE.log"; FAIL=0
 DIRTY=unknown
 STATUS=$(git --no-optional-locks -c core.fsmonitor=false status --porcelain --no-renames --untracked-files=normal 2>/dev/null) && DIRTY=no
