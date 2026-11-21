@@ -1,0 +1,18 @@
+T-027 negative control (Done-when 4): a wrong state at capture time fails the run with an error naming the file.
+
+Scratch change, never committed, on top of code commit 4487463, in scripts/smoke.mjs freezeLoopProbe:
+  -  if (window.__redraw) return true;
+  +  window.__redraw = () => {}; return true;
+so the page's loop is left running and the redraw does nothing.
+
+Run: ./scripts/verify.sh T-027 --feature input --label negative-loop-running
+Log: agent-team/evidence/T-027/negative-loop-running/negative-loop-running-input.log (dirty: yes)
+  FAIL input browser runs
+  FAIL input browser output
+  RESULT: FAIL
+  smoke input: input-smoke.png: the state changed during the capture
+Result file: agent-team/evidence/T-027/negative-loop-running/input-smoke.json
+  { "error": "input-smoke.png: the state changed during the capture" }
+
+The scratch line was put back to `if (window.__redraw) return true;` right after; `git status` then showed
+no change outside agent-team/evidence/T-027/.
