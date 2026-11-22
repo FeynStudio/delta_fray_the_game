@@ -1,0 +1,3 @@
+{
+  "error": "render-smoke-negative-score.png: player 1 score -12: minus sign not drawn in the ship colour #4fd1ff (best row covers 25% of the minus box x 19.0..29.0, y 27.8..31.8, wanted at least 60%); player 2 score -7: minus sign not drawn in the ship colour #ff6b6b (best row covers 0% of the minus box x 1236.2..1246.2, y 27.8..31.8, wanted at least 60%); wanted scores [-12,-7], got [12,7] before the capture; wanted scores [-12,-7], got [12,7] after the capture"
+}

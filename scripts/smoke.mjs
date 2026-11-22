@@ -219,17 +219,31 @@ function phaseProbe() {
   return window.__game.getState().gauge.phase;
 }
 
-function phaseSetupProbe(keys) {
-  for (const k of keys) window.__game.press(k);
+function phaseSetupProbe(keys, reading) {
+  const g = window.__game;
+  const s = g.getState();
+  s.gauge = { ...s.gauge, power: reading.power, sweep: 1 };
+  g.setState(s);
+  for (const k of keys) g.press(k);
+  const d = g.getState();
+  if (d.gauge.phase === 'direction') d.gauge = { ...d.gauge, needle: reading.needle };
+  g.setState(d);
 }
 
-function gaugeAfterFrameProbe() {
-  return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
-    () => done(window.__game.getState().gauge))));
+async function steadyProbe(power) {
+  const cfg = (await import('/src/config.js')).default;
+  const g = window.__game;
+  if (g.getState().anim) g.step(cfg.moveAnimMs);
+  const s = g.getState();
+  if (s.gauge.phase === 'power') s.gauge = { ...s.gauge, power, sweep: 1 };
+  g.setState(s);
 }
 
-function gaugeProbe() {
-  return window.__game.getState().gauge;
+async function fixedClockProbe(clock) {
+  const { protectionAlpha } = await import('/src/render.js');
+  const g = window.__game;
+  g.setState({ ...g.getState(), clock });
+  return protectionAlpha(clock);
 }
 
 async function turnsProbe() {
@@ -265,6 +279,7 @@ async function turnsProbe() {
 }
 
 function freezeLoopProbe() {
+  if (window.__redraw) return true;
   return new Promise((done) => {
     window.requestAnimationFrame = (loop) => {
       window.requestAnimationFrame = () => 0;
@@ -332,20 +347,102 @@ async function explosionProbe() {
   return { explosionMs: cfg.explosionMs, spawn: cfg.spawns[1] };
 }
 
-async function titleShipProbe() {
+function scoreSetupProbe(scores) {
+  const s = window.__game.getState();
+  s.scores = scores;
+  window.__game.setState(s);
+}
+
+async function scorePixelsProbe(scores) {
+  const cfg = (await import('/src/config.js')).default;
+  const { COLORS } = await import('/src/render.js');
+  const c = document.querySelector('canvas');
+  const sx = c.width / cfg.worldWidth, sy = c.height / cfg.worldHeight;
+  const { data } = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = `${cfg.scoreFontSize}px monospace`;
+  m.textBaseline = 'top';
+  const edge = 2;
+  const tol = 48;
+  const inner = { x0: edge, y0: edge, x1: cfg.worldWidth - edge, y1: cfg.worldHeight - edge };
+  const inside = (b) => b.x0 >= inner.x0 && b.x1 <= inner.x1 && b.y0 >= inner.y0 && b.y1 <= inner.y1;
+  const fmt = (b) => `x ${b.x0.toFixed(1)}..${b.x1.toFixed(1)}, y ${b.y0.toFixed(1)}..${b.y1.toFixed(1)}`;
+  const span = (lo, hi, scale, size) => [Math.max(0, Math.floor(lo * scale)), Math.min(size, Math.ceil(hi * scale))];
+  const problems = [];
+  scores.forEach((score, i) => {
+    const color = COLORS.ships[i % COLORS.ships.length];
+    const want = [1, 3, 5].map((k) => parseInt(color.slice(k, k + 2), 16));
+    const colored = (x, y) => {
+      const k = (y * c.width + x) * 4;
+      return want.every((v, j) => Math.abs(data[k + j] - v) <= tol);
+    };
+    const text = String(score);
+    const right = i % 2 === 1;
+    const ax = right ? cfg.worldWidth - cfg.scoreMargin : cfg.scoreMargin, ay = cfg.scoreMargin;
+    m.textAlign = right ? 'right' : 'left';
+    const t = m.measureText(text);
+    const box = {
+      x0: ax - t.actualBoundingBoxLeft, x1: ax + t.actualBoundingBoxRight,
+      y0: ay - t.actualBoundingBoxAscent, y1: ay + t.actualBoundingBoxDescent,
+    };
+    const who = `player ${i + 1} score ${text}`;
+    if (!inside(box)) {
+      problems.push(`${who}: text box (${fmt(box)}) is not inside the map border (inner edge ${fmt(inner)})`);
+      return;
+    }
+    const pad = 8;
+    const [px0, px1] = span(box.x0 - pad, box.x1 + pad, sx, c.width);
+    const [py0, py1] = span(box.y0 - pad, box.y1 + pad, sy, c.height);
+    for (let y = py0; y < py1; y++) {
+      for (let x = px0; x < px1; x++) {
+        if (!colored(x, y)) continue;
+        if (x < inner.x0 * sx || x >= inner.x1 * sx || y < inner.y0 * sy || y >= inner.y1 * sy) {
+          problems.push(`${who}: a pixel in the ship colour at canvas pixel (${x}, ${y}) is not inside the map border`);
+          return;
+        }
+      }
+    }
+    if (!text.startsWith('-')) {
+      problems.push(`${who}: wanted a minus sign, the score is not negative`);
+      return;
+    }
+    const pen = right ? ax - t.width : ax;
+    m.textAlign = 'left';
+    const d = m.measureText('-');
+    const minus = {
+      x0: pen - d.actualBoundingBoxLeft, x1: pen + d.actualBoundingBoxRight,
+      y0: ay - d.actualBoundingBoxAscent - 1, y1: ay + d.actualBoundingBoxDescent + 1,
+    };
+    const [mx0, mx1] = span(minus.x0, minus.x1, sx, c.width);
+    const [my0, my1] = span(minus.y0, minus.y1, sy, c.height);
+    let best = 0;
+    for (let y = my0; y < my1; y++) {
+      let run = 0;
+      for (let x = mx0; x < mx1; x++) run += colored(x, y) ? 1 : 0;
+      best = Math.max(best, run);
+    }
+    const cover = mx1 > mx0 ? best / (mx1 - mx0) : 0;
+    if (cover < 0.6) {
+      problems.push(`${who}: minus sign not drawn in the ship colour ${color} (best row covers ${Math.round(cover * 100)}% `
+        + `of the minus box ${fmt(minus)}, wanted at least 60%)`);
+    }
+  });
+  return problems;
+}
+
+async function titleShipProbe(gauge) {
   const cfg = (await import('/src/config.js')).default;
   const g = window.__game;
   const top = cfg.titleTop, bottom = cfg.titleTop + cfg.titleFontSize;
   const want = { x: cfg.worldWidth / 2, y: top + cfg.titleFontSize / 2, top, bottom, spawn: cfg.spawns[0] };
   const s = g.getState();
   s.turn = 0;
-  s.clock = 0;
   s.ships[0] = { ...s.ships[0], x: want.x, y: want.y, heading: 0, alive: true };
-  s.gauge = { ...s.gauge, phase: 'power', power: 0.6, backward: false };
+  s.gauge = { ...s.gauge, phase: 'power', power: gauge.power, backward: false };
   g.setState(s);
   g.press('Space');
   const d = g.getState();
-  d.gauge = { ...d.gauge, needle: 30 };
+  d.gauge = { ...d.gauge, needle: gauge.needle };
   g.setState(d);
   return want;
 }
@@ -385,6 +482,16 @@ function explosionWrong(s, want) {
   return null;
 }
 
+function phaseWrong(s, want) {
+  const g = s.gauge;
+  if (g.phase !== want.phase || g.backward !== want.backward) {
+    return `wanted gauge phase '${want.phase}' backward ${want.backward}, got phase '${g.phase}' backward ${g.backward}`;
+  }
+  if (g.power !== GAUGE.power) return `wanted power ${GAUGE.power}, got ${g.power}`;
+  if (g.phase === 'direction' && g.needle !== GAUGE.needle) return `wanted needle ${GAUGE.needle}, got ${g.needle}`;
+  return null;
+}
+
 function titleShipWrong(s, want) {
   const ship = s.ships[0];
   const near = (a, b) => Math.abs(a - b) <= 0.001;
@@ -392,6 +499,9 @@ function titleShipWrong(s, want) {
     return `wanted gauge phase 'direction' backward false, got phase '${s.gauge.phase}' backward ${s.gauge.backward}`;
   }
   if (s.turn !== 0) return `wanted turn 0, got turn ${s.turn}`;
+  if (s.gauge.power !== GAUGE.power || s.gauge.needle !== GAUGE.needle) {
+    return `wanted power ${GAUGE.power} needle ${GAUGE.needle}, got power ${s.gauge.power} needle ${s.gauge.needle}`;
+  }
   if (!(want.y > want.top && want.y < want.bottom) || (near(want.x, want.spawn.x) && near(want.y, want.spawn.y))) {
     return `wanted point (${want.x}, ${want.y}) is not inside the title band ${want.top} to ${want.bottom} or is ship 0's spawn point`;
   }
@@ -403,48 +513,74 @@ function titleShipWrong(s, want) {
 
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
+const SQUARE_2X = { width: 1000, height: 1000, dpr: 2 };
 
-async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
+const FIXED_CLOCK_MS = 0;
+const MIN_PROTECTION_ALPHA = 0.75;
+const GAUGE = { power: 0.6, needle: 30 };
+
+async function fixedShot(p, shots, suffix, wrong = () => null) {
   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
-  const p = await browser.open(url, FULL_HD);
   await p.eval(freezeLoopProbe);
-  const want = await p.eval(setup, ...setupArgs);
+  const alpha = await p.eval(fixedClockProbe, FIXED_CLOCK_MS);
   const before = await p.eval(drawnStateProbe);
   const png = await p.screenshot();
   const after = await p.eval(stateProbe);
-  await p.close();
-  for (const [when, s] of [['before', before], ['after', after]]) {
-    const problem = wrong(s, want);
-    if (problem) throw new Error(`${file}: ${problem} ${when} the capture`);
-  }
+  const problems = [['before', before], ['after', after]].map(([when, s]) => {
+    const problem = wrong(s);
+    return problem && `${problem} ${when} the capture`;
+  });
+  if (JSON.stringify(before) !== JSON.stringify(after)) problems.push('the state changed during the capture');
+  if (before.clock !== FIXED_CLOCK_MS) problems.push(`wanted clock ${FIXED_CLOCK_MS}, got ${before.clock}`);
+  if (!(alpha >= MIN_PROTECTION_ALPHA)) problems.push(`protection alpha ${alpha} at clock ${FIXED_CLOCK_MS}, wanted at least ${MIN_PROTECTION_ALPHA}`);
+  if (problems.some(Boolean)) throw new Error(`${file}: ${problems.filter(Boolean).join('; ')}`);
   shots.push({ suffix, png });
 }
 
-async function phaseShot(browser, url, shots, suffix, keys, want) {
-  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
-  const p = await browser.open(url, FULL_HD);
-  await p.eval(phaseSetupProbe, keys);
-  const before = await p.eval(gaugeAfterFrameProbe);
-  const png = await p.screenshot();
-  const after = await p.eval(gaugeProbe);
+async function steadyShot(p, shots) {
+  await p.eval(freezeLoopProbe);
+  await p.eval(steadyProbe, GAUGE.power);
+  await fixedShot(p, shots, '');
+}
+
+async function scoreShot(browser, url, shots, suffix, size, scores) {
+  const p = await browser.open(url, size);
+  await p.eval(freezeLoopProbe);
+  await p.eval(scoreSetupProbe, scores);
+  await p.eval(steadyProbe, GAUGE.power);
+  await fixedShot(p, shots, suffix, (s) => (JSON.stringify(s.scores) === JSON.stringify(scores) ? null
+    : `wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)}`));
+  const problems = await p.eval(scorePixelsProbe, scores);
   await p.close();
-  for (const g of [before, after]) {
-    if (g.phase !== want.phase || g.backward !== want.backward) {
-      throw new Error(`${file}: wanted gauge phase '${want.phase}' backward ${want.backward}, `
-        + `got phase '${g.phase}' backward ${g.backward} at capture time`);
-    }
-  }
-  shots.push({ suffix, png });
+  if (problems.length) throw new Error(`${basename(out).replace(/\.json$/, '')}${suffix}.png: ${problems.join('; ')}`);
+}
+
+async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
+  const p = await browser.open(url, FULL_HD);
+  await p.eval(freezeLoopProbe);
+  const want = await p.eval(setup, ...setupArgs);
+  await fixedShot(p, shots, suffix, (s) => wrong(s, want));
+  await p.close();
+}
+
+async function phaseShot(browser, url, shots, suffix, keys, want) {
+  const p = await browser.open(url, FULL_HD);
+  await p.eval(freezeLoopProbe);
+  await p.eval(phaseSetupProbe, keys, GAUGE);
+  await fixedShot(p, shots, suffix, (s) => phaseWrong(s, want));
+  await p.close();
 }
 
 const FEATURES = {
   async render(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r1 = await a.eval(renderProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
-    const b = await browser.open(url, { width: 1000, height: 1000, dpr: 2 });
+    await steadyShot(a, shots);
+    const b = await browser.open(url, SQUARE_2X);
     const r2 = await b.eval(renderProbe);
-    await stateShot(browser, url, shots, '-title-ship', titleShipProbe, [], titleShipWrong);
+    await scoreShot(browser, url, shots, '-negative-score', FULL_HD, [-12, -7]);
+    await scoreShot(browser, url, shots, '-negative-score-1000', SQUARE_2X, [-12, -7]);
+    await stateShot(browser, url, shots, '-title-ship', titleShipProbe, [GAUGE], titleShipWrong);
     return {
       'one canvas': r1.canvases === 1,
       'fits the 1920x1080 window': r1.fits === true,
@@ -462,7 +598,7 @@ const FEATURES = {
   async input(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(inputProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
+    await steadyShot(a, shots);
     const b = await browser.open(url, FULL_HD);
     const flipped = await b.eval(shiftFlipProbe);
     const c = await browser.open(url, FULL_HD);
@@ -491,7 +627,7 @@ const FEATURES = {
   async turns(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(turnsProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
+    await steadyShot(a, shots);
     await stateShot(browser, url, shots, '-backward-mid', backwardLaunchProbe, [0.5], backwardMidWrong);
     await stateShot(browser, url, shots, '-backward-end', backwardLaunchProbe, [1], backwardEndWrong);
     await stateShot(browser, url, shots, '-explosion', explosionProbe, [], explosionWrong);

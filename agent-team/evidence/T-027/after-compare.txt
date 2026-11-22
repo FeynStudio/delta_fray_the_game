@@ -1,0 +1,41 @@
+T-027 after: two verify.sh runs on code commit 4487463 (labels after and after-2), --feature all, both RESULT: PASS.
+Each label writes its own folder (verify.sh since 569c7ec), so the second run does not overwrite the first.
+Hash: git blob id (SHA-1) from `git hash-object --no-filters <file>`, not SHA-256 (see before-compare.txt).
+A = agent-team/evidence/T-027/after/, B = agent-team/evidence/T-027/after-2/
+
+input-smoke-direction-backward.png    A 0fb004e335ed86d7453ba17e384d04511f47a8cb  B same  identical
+input-smoke-direction.png             A 4cd6fddba8bbe516d7bdcede8ae246155d848b49  B same  identical
+input-smoke-power.png                 A 020cab0361aa832823e60d3e9818f56ac716fff8  B same  identical
+input-smoke.png                       A 4a1ff7b9ead560128dcd4f4e6d6a7cbd868f971b  B same  identical
+render-smoke-negative-score-1000.png  A 56745cec6fa3938a11559c52aa700b8faecbcf7a  B same  identical
+render-smoke-negative-score.png       A 3f2908c35f5a9ada03ac40e07395faf802167d37  B same  identical
+render-smoke.png                      A 020cab0361aa832823e60d3e9818f56ac716fff8  B same  identical
+turns-smoke-backward-end.png          A 8a79138545706ad4997f89cd9f6e1f21b1bc7d40  B same  identical
+turns-smoke-backward-mid.png          A 0d2ceff980250455a8eb0ed3430bb45db11fdece  B same  identical
+turns-smoke-explosion.png             A e3d1f370c0c67d72d67fe2ad6da8e804d92c7e71  B same  identical
+turns-smoke.png                       A 728a9612897cf60fad5a0d7760c73ad28d6c414e  B same  identical
+
+Pictures that differ: 0 of 11.
+
+Result JSON files, after and after-2 against before and before-2 (all four identical):
+input-smoke.json   4fa0a28de5a43664fe832c4699b6303d993073df
+render-smoke.json  5768ffc30f32f6a109c7f80bbf62b99368c7e25a
+turns-smoke.json   44e7f20da7f4d16a857b9676a69338ced7b785bd
+
+Notes:
+- render-smoke.png and input-smoke-power.png have the same bytes: both show the start position in the
+  power phase at clock 0 with power 0.6, which is the same frame.
+- turns-smoke-backward-end.png is byte-identical to the before runs: that capture was already at a
+  state where no ship is spawn-protected after the move and the gauge is the fresh one, so the fixed
+  clock changes nothing there.
+- turns-smoke-backward-mid.png and turns-smoke-explosion.png differ from before: before, T-017 set the
+  clock to 0 and then stepped it (300 ms and 1100 ms), so the protected ship 2 was drawn at a blink
+  alpha below 1; now the clock is 0 at capture time, alpha 1.
+- input-smoke.png now shows the move finished (steadyProbe steps the running move to its end, turn
+  passed to player 2, player 2's power bar at 60%), not the ship part-way through the move.
+
+Viewed by the owner (Read of the PNG files): after/input-smoke-power.png and after/render-smoke.png show
+player 1's power bar filled to about 60%; after/input-smoke-direction.png shows the dial on the nose side
+with the needle 30 degrees below the heading, after/input-smoke-direction-backward.png the dial on the
+tail side with the needle 30 degrees off the reversed heading, both with a grey locked bar at about 60%;
+both ships are drawn at full strength in render-smoke.png.
