@@ -185,3 +185,4 @@ Context: the human's answer to the session orchestrator's question "Go with (a)?
 Decided by human in session, 2026-11-20: "close T-020. CI result for PR 10 and 11 are both successfully merged."
 Context: the human's answer after the session orchestrator reported T-020 merged (pull request #10, f5c5bb6) and asked to close it and for the CI result. Pull request #11 (9bfe02e) is the human's scripts/verify.sh change (569c7ec): evidence goes to agent-team/evidence/T-###/<label>/. Session orchestrator's reading, not a human decision: close T-020 (Status DONE, Summary); CI passed on #10 and #11 in the human's word, no agent read the runs; the session orchestrator updates FEATURE_MAP, REPEATS and BACKLOG for the verify.sh change as offered earlier. Not a merge or push approval.
 Merged by the human, 2026-11-21: task/T-019-flash-rate-test at 029259e
+Merged by the human, 2026-11-22: task/T-027-smoke-fixed-clock at d0c076c (pull request #12)

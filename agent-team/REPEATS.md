@@ -16,7 +16,7 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | file edited outside the brief's Allowed sections (disclosed leftover-conflict cleanup) | 2 | T-014, T-009 |
 | owner wrote a 'Decided by human' line the brief reserves for the coordinator (verbatim copy, not an approval) | 2 | T-013, T-029 |
 | handoff claims more test coverage than the tests have (e.g. "states include explosions" with empty explosions arrays) | 1 | T-010 |
-| smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte (handled by T-027 once merged, branch task/T-027-smoke-fixed-clock, raised by the T-027 reviewer 2026-11-20) | 1 | T-021 |
+| smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte (HANDLED 2026-11-22: T-027 merged, pull request #12, d0c076c; every smoke screenshot goes through fixedShot; raised by the T-027 reviewer 2026-11-20) | 1 | T-021 |
 | brief or handoff cites a section that does not exist (dangling 'open question N' reference) | 1 | T-023 |
 | check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter) | 2 | T-016, T-017 |
 | fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
