@@ -219,17 +219,31 @@ function phaseProbe() {
   return window.__game.getState().gauge.phase;
 }
 
-function phaseSetupProbe(keys) {
-  for (const k of keys) window.__game.press(k);
+function phaseSetupProbe(keys, reading) {
+  const g = window.__game;
+  const s = g.getState();
+  s.gauge = { ...s.gauge, power: reading.power, sweep: 1 };
+  g.setState(s);
+  for (const k of keys) g.press(k);
+  const d = g.getState();
+  if (d.gauge.phase === 'direction') d.gauge = { ...d.gauge, needle: reading.needle };
+  g.setState(d);
 }
 
-function gaugeAfterFrameProbe() {
-  return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(
-    () => done(window.__game.getState().gauge))));
+async function steadyProbe(power) {
+  const cfg = (await import('/src/config.js')).default;
+  const g = window.__game;
+  if (g.getState().anim) g.step(cfg.moveAnimMs);
+  const s = g.getState();
+  if (s.gauge.phase === 'power') s.gauge = { ...s.gauge, power, sweep: 1 };
+  g.setState(s);
 }
 
-function gaugeProbe() {
-  return window.__game.getState().gauge;
+async function fixedClockProbe(clock) {
+  const { protectionAlpha } = await import('/src/render.js');
+  const g = window.__game;
+  g.setState({ ...g.getState(), clock });
+  return protectionAlpha(clock);
 }
 
 async function turnsProbe() {
@@ -265,6 +279,7 @@ async function turnsProbe() {
 }
 
 function freezeLoopProbe() {
+  if (window.__redraw) return true;
   return new Promise((done) => {
     window.requestAnimationFrame = (loop) => {
       window.requestAnimationFrame = () => 0;
@@ -334,7 +349,6 @@ async function explosionProbe() {
 
 function scoreSetupProbe(scores) {
   const s = window.__game.getState();
-  s.clock = 0;
   s.scores = scores;
   window.__game.setState(s);
 }
@@ -451,67 +465,81 @@ function explosionWrong(s, want) {
   return null;
 }
 
+function phaseWrong(s, want) {
+  const g = s.gauge;
+  if (g.phase !== want.phase || g.backward !== want.backward) {
+    return `wanted gauge phase '${want.phase}' backward ${want.backward}, got phase '${g.phase}' backward ${g.backward}`;
+  }
+  if (g.power !== GAUGE.power) return `wanted power ${GAUGE.power}, got ${g.power}`;
+  if (g.phase === 'direction' && g.needle !== GAUGE.needle) return `wanted needle ${GAUGE.needle}, got ${g.needle}`;
+  return null;
+}
+
 
 const FULL_HD = { width: 1920, height: 1080, dpr: 1 };
 const SQUARE_2X = { width: 1000, height: 1000, dpr: 2 };
 
-async function scoreShot(browser, url, shots, suffix, size, scores) {
+const FIXED_CLOCK_MS = 0;
+const MIN_PROTECTION_ALPHA = 0.75;
+const GAUGE = { power: 0.6, needle: 30 };
+
+async function fixedShot(p, shots, suffix, wrong = () => null) {
   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
+  await p.eval(freezeLoopProbe);
+  const alpha = await p.eval(fixedClockProbe, FIXED_CLOCK_MS);
+  const before = await p.eval(drawnStateProbe);
+  const png = await p.screenshot();
+  const after = await p.eval(stateProbe);
+  const problems = [['before', before], ['after', after]].map(([when, s]) => {
+    const problem = wrong(s);
+    return problem && `${problem} ${when} the capture`;
+  });
+  if (JSON.stringify(before) !== JSON.stringify(after)) problems.push('the state changed during the capture');
+  if (before.clock !== FIXED_CLOCK_MS) problems.push(`wanted clock ${FIXED_CLOCK_MS}, got ${before.clock}`);
+  if (!(alpha >= MIN_PROTECTION_ALPHA)) problems.push(`protection alpha ${alpha} at clock ${FIXED_CLOCK_MS}, wanted at least ${MIN_PROTECTION_ALPHA}`);
+  if (problems.some(Boolean)) throw new Error(`${file}: ${problems.filter(Boolean).join('; ')}`);
+  shots.push({ suffix, png });
+}
+
+async function steadyShot(p, shots) {
+  await p.eval(freezeLoopProbe);
+  await p.eval(steadyProbe, GAUGE.power);
+  await fixedShot(p, shots, '');
+}
+
+async function scoreShot(browser, url, shots, suffix, size, scores) {
   const p = await browser.open(url, size);
   await p.eval(freezeLoopProbe);
   await p.eval(scoreSetupProbe, scores);
-  const before = await p.eval(drawnStateProbe);
-  const png = await p.screenshot();
+  await p.eval(steadyProbe, GAUGE.power);
+  await fixedShot(p, shots, suffix, (s) => (JSON.stringify(s.scores) === JSON.stringify(scores) ? null
+    : `wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)}`));
   const problems = await p.eval(scorePixelsProbe, scores);
-  const after = await p.eval(stateProbe);
   await p.close();
-  for (const [when, s] of [['before', before], ['after', after]]) {
-    if (JSON.stringify(s.scores) !== JSON.stringify(scores)) {
-      problems.push(`wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)} ${when} the capture`);
-    }
-  }
-  if (problems.length) throw new Error(`${file}: ${problems.join('; ')}`);
-  shots.push({ suffix, png });
+  if (problems.length) throw new Error(`${basename(out).replace(/\.json$/, '')}${suffix}.png: ${problems.join('; ')}`);
 }
 
 async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
-  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
   const p = await browser.open(url, FULL_HD);
   await p.eval(freezeLoopProbe);
   const want = await p.eval(setup, ...setupArgs);
-  const before = await p.eval(drawnStateProbe);
-  const png = await p.screenshot();
-  const after = await p.eval(stateProbe);
+  await fixedShot(p, shots, suffix, (s) => wrong(s, want));
   await p.close();
-  for (const [when, s] of [['before', before], ['after', after]]) {
-    const problem = wrong(s, want);
-    if (problem) throw new Error(`${file}: ${problem} ${when} the capture`);
-  }
-  shots.push({ suffix, png });
 }
 
 async function phaseShot(browser, url, shots, suffix, keys, want) {
-  const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
   const p = await browser.open(url, FULL_HD);
-  await p.eval(phaseSetupProbe, keys);
-  const before = await p.eval(gaugeAfterFrameProbe);
-  const png = await p.screenshot();
-  const after = await p.eval(gaugeProbe);
+  await p.eval(freezeLoopProbe);
+  await p.eval(phaseSetupProbe, keys, GAUGE);
+  await fixedShot(p, shots, suffix, (s) => phaseWrong(s, want));
   await p.close();
-  for (const g of [before, after]) {
-    if (g.phase !== want.phase || g.backward !== want.backward) {
-      throw new Error(`${file}: wanted gauge phase '${want.phase}' backward ${want.backward}, `
-        + `got phase '${g.phase}' backward ${g.backward} at capture time`);
-    }
-  }
-  shots.push({ suffix, png });
 }
 
 const FEATURES = {
   async render(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r1 = await a.eval(renderProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
+    await steadyShot(a, shots);
     const b = await browser.open(url, SQUARE_2X);
     const r2 = await b.eval(renderProbe);
     await scoreShot(browser, url, shots, '-negative-score', FULL_HD, [-12, -7]);
@@ -533,7 +561,7 @@ const FEATURES = {
   async input(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(inputProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
+    await steadyShot(a, shots);
     const b = await browser.open(url, FULL_HD);
     const flipped = await b.eval(shiftFlipProbe);
     const c = await browser.open(url, FULL_HD);
@@ -562,7 +590,7 @@ const FEATURES = {
   async turns(browser, url, shots) {
     const a = await browser.open(url, FULL_HD);
     const r = await a.eval(turnsProbe);
-    shots.push({ suffix: '', png: await a.screenshot() });
+    await steadyShot(a, shots);
     await stateShot(browser, url, shots, '-backward-mid', backwardLaunchProbe, [0.5], backwardMidWrong);
     await stateShot(browser, url, shots, '-backward-end', backwardLaunchProbe, [1], backwardEndWrong);
     await stateShot(browser, url, shots, '-explosion', explosionProbe, [], explosionWrong);
