@@ -49,4 +49,11 @@ if [ -n "$fmt_hits" ]; then
 fi
 node scripts/conflict-markers.mjs || FAIL=1
 node scripts/home-paths.mjs || FAIL=1
+sm=scripts/smoke.mjs
+smoke_fail () { echo "GUARD FAIL [smoke-shape]: $1"; FAIL=1; }
+[ "$(grep -o 'p\.screenshot()' "$sm" | wc -l)" = 1 ] || smoke_fail "scripts/smoke.mjs must call p.screenshot() exactly once"
+[ "$(grep -c 'nosemgrep' "$sm")" = 1 ] || smoke_fail "scripts/smoke.mjs must hold exactly one nosemgrep line"
+[ "$(grep -E '^import ' "$sm" | tr -d '\r' | sha256sum | cut -c1-64)" = "df989a638c055a6a8bbd922ea1c0e95ff7a8d607b49fa84169a56c322cef3e23" ] || smoke_fail "scripts/smoke.mjs top-level imports changed"
+grep -E 'import\(' "$sm" | grep -vqE "import\('/src/[a-z]+\.js'\)" && smoke_fail "every in-page import() in scripts/smoke.mjs must use a fixed '/src/...' path"
+sed '2d' "$sm" | grep -qE 'child_process|exec|taskkill|tasklist|/IM' && smoke_fail "scripts/smoke.mjs may name child_process only in its line-2 import; no exec, taskkill, tasklist or /IM"
 exit $FAIL
