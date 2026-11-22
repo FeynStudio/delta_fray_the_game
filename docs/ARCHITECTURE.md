@@ -42,7 +42,7 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 
 - Enemy inside the swept path is destroyed (any part counts).
 - Reaching a map edge destroys the moving ship. Hitting an enemy and then the edge destroys both.
-- Destroyed ships respawn at their spawn point. Spawn points can't be attacked until ship moves away from its spawn no matter how small the move. Endless play.
+- Destroyed ships respawn at their spawn point. Spawn points can't be attacked until ship moves away from its spawn no matter how small the move (a launch with distance 0 counts as a move). Endless play.
 - No turn timer.
 
 ## Do NOT Add
