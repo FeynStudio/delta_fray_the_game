@@ -1,0 +1,5 @@
+T-031 fix round 1 negative control, 2026-11-22, on 2ffc4f7.
+Scratch change in scripts/smoke.mjs titleShipProbe: needle: gauge.needle -> needle: gauge.needle + 1 (sed), never committed, undone with git restore scripts/smoke.mjs.
+Command: ./scripts/verify.sh T-031 --feature render --label negative-fix1
+Result: RESULT: FAIL (log negative-fix1/negative-fix1-render.log, dirty: yes)
+Error in negative-fix1/render-smoke.json: render-smoke-title-ship.png: wanted power 0.6 needle 30, got power 0.6 needle 31 before the capture; wanted power 0.6 needle 30, got power 0.6 needle 31 after the capture

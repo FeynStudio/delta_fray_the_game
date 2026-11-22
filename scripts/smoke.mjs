@@ -430,6 +430,23 @@ async function scorePixelsProbe(scores) {
   return problems;
 }
 
+async function titleShipProbe(gauge) {
+  const cfg = (await import('/src/config.js')).default;
+  const g = window.__game;
+  const top = cfg.titleTop, bottom = cfg.titleTop + cfg.titleFontSize;
+  const want = { x: cfg.worldWidth / 2, y: top + cfg.titleFontSize / 2, top, bottom, spawn: cfg.spawns[0] };
+  const s = g.getState();
+  s.turn = 0;
+  s.ships[0] = { ...s.ships[0], x: want.x, y: want.y, heading: 0, alive: true };
+  s.gauge = { ...s.gauge, phase: 'power', power: gauge.power, backward: false };
+  g.setState(s);
+  g.press('Space');
+  const d = g.getState();
+  d.gauge = { ...d.gauge, needle: gauge.needle };
+  g.setState(d);
+  return want;
+}
+
 const headingOff = (s, want) => Math.abs((((s.ships[0].heading - want.angle) % 360) + 540) % 360 - 180) > 1e-6;
 
 function backwardMidWrong(s, want) {
@@ -472,6 +489,25 @@ function phaseWrong(s, want) {
   }
   if (g.power !== GAUGE.power) return `wanted power ${GAUGE.power}, got ${g.power}`;
   if (g.phase === 'direction' && g.needle !== GAUGE.needle) return `wanted needle ${GAUGE.needle}, got ${g.needle}`;
+  return null;
+}
+
+function titleShipWrong(s, want) {
+  const ship = s.ships[0];
+  const near = (a, b) => Math.abs(a - b) <= 0.001;
+  if (s.gauge.phase !== 'direction' || s.gauge.backward !== false) {
+    return `wanted gauge phase 'direction' backward false, got phase '${s.gauge.phase}' backward ${s.gauge.backward}`;
+  }
+  if (s.turn !== 0) return `wanted turn 0, got turn ${s.turn}`;
+  if (s.gauge.power !== GAUGE.power || s.gauge.needle !== GAUGE.needle) {
+    return `wanted power ${GAUGE.power} needle ${GAUGE.needle}, got power ${s.gauge.power} needle ${s.gauge.needle}`;
+  }
+  if (!(want.y > want.top && want.y < want.bottom) || (near(want.x, want.spawn.x) && near(want.y, want.spawn.y))) {
+    return `wanted point (${want.x}, ${want.y}) is not inside the title band ${want.top} to ${want.bottom} or is ship 0's spawn point`;
+  }
+  if (ship.alive !== true || !near(ship.x, want.x) || !near(ship.y, want.y)) {
+    return `ship 0 (alive ${ship.alive}) at (${ship.x}, ${ship.y}) is not under the title, wanted (${want.x}, ${want.y})`;
+  }
   return null;
 }
 
@@ -544,6 +580,7 @@ const FEATURES = {
     const r2 = await b.eval(renderProbe);
     await scoreShot(browser, url, shots, '-negative-score', FULL_HD, [-12, -7]);
     await scoreShot(browser, url, shots, '-negative-score-1000', SQUARE_2X, [-12, -7]);
+    await stateShot(browser, url, shots, '-title-ship', titleShipProbe, [GAUGE], titleShipWrong);
     return {
       'one canvas': r1.canvases === 1,
       'fits the 1920x1080 window': r1.fits === true,
