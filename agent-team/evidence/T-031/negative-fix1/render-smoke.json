@@ -1,0 +1,3 @@
+{
+  "error": "render-smoke-title-ship.png: wanted power 0.6 needle 30, got power 0.6 needle 31 before the capture; wanted power 0.6 needle 30, got power 0.6 needle 31 after the capture"
+}

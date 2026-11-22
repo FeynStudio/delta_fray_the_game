@@ -1,0 +1,20 @@
+{
+  "games": 2000,
+  "report": {
+    "movesToFirstEncounter": {
+      "stat": "median",
+      "min": 3,
+      "max": 35,
+      "value": 5,
+      "samples": 2000,
+      "ok": true
+    },
+    "edgeDeathRate": {
+      "stat": "mean",
+      "max": 0.1,
+      "value": 0.0011892724212719927,
+      "samples": 2000,
+      "ok": true
+    }
+  }
+}

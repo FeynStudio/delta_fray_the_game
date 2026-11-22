@@ -1,0 +1,30 @@
+{
+  "destroyed enemy respawns and it becomes their turn (FEATURE_MAP 6)": {
+    "turn": 1,
+    "ships.1.alive": true,
+    "ships.1.x": 1090,
+    "ships.1.y": 480,
+    "ships.1.heading": 180,
+    "ships.0.x": 350
+  },
+  "ship that hits the wall respawns": {
+    "turn": 1,
+    "ships.0.alive": true,
+    "ships.0.x": 190,
+    "ships.0.y": 480,
+    "ships.0.heading": 0,
+    "ships.1.x": 600
+  },
+  "double kill does not skip a turn": {
+    "turn": 1,
+    "ships.0.alive": true,
+    "ships.0.x": 190,
+    "ships.1.alive": true,
+    "ships.1.x": 1090
+  },
+  "plain move passes the turn back": {
+    "turn": 0,
+    "ships.0.x": 190,
+    "ships.1.x": 990
+  }
+}
