@@ -45,7 +45,7 @@
 - Hit: any enemy inside the swept path is destroyed.
 - Edges are solid. A ship that reaches an edge is destroyed.
 - If a path destroys an enemy and then reaches the edge, both ships are destroyed.
-- Destroyed ships respawn at their side's spawn point (spawn points can't be attacked until ship moves away from its spawn no matter how small the move).
+- Destroyed ships respawn at their side's spawn point (spawn points can't be attacked until ship moves away from its spawn no matter how small the move, a launch with distance 0 counts as a move).
 - No path preview and no kill confirmation before launch. Judging the path is part of the challenge.
 
 ### New Design Plans
