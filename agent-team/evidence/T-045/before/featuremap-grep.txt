@@ -1,0 +1,4 @@
+commit: 71b7935 (master HEAD, BASE)
+search: "flash-rate" in agent-team/FEATURE_MAP.md
+result: 0 matches; section 2 line 15 describes render.protectionAlpha and the blink but names no test that limits its rate.
+verify: ./scripts/verify.sh T-045 --feature config --label before -> RESULT: PASS (docs-only task, nothing failing to reproduce; log in before/before-config.log)
