@@ -1,0 +1,11 @@
+{
+  "a 200-unit move is allowed when maxMove is 200": {
+    "ships.0.x": 400,
+    "ships.0.y": 480
+  },
+  "a 200-unit move resolves when maxMove is 200": {
+    "ships.0.alive": true,
+    "ships.0.x": 400,
+    "ships.1.alive": true
+  }
+}
