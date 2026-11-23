@@ -1,0 +1,37 @@
+commit: ddff2f1  branch: task/T-044-flash-rate-shallow  (equal to master HEAD)  2026-11-23
+scratch file: .worktrees/product-a/T-044-scratch/flash-rate-scratch.test.js (outside the repo, not committed)
+scratch content: withConfig and countSnapBacks copied verbatim from tests/flash-rate.test.js on master (fixed threshold `alpha - previous > 0.5`),
+plus one case running countSnapBacks(10) with protectionBlinkMs 600 and protectionMinAlpha 0.5, 0.6, 0.9, expecting 10 +/- 1.
+command: node --test C:/Projects/my_ai_agent_company/.worktrees/product-a/T-044-scratch/flash-rate-scratch.test.js
+exit code: 1
+
+protectionMinAlpha 0.5: old counter returns 0
+protectionMinAlpha 0.6: old counter returns 0
+protectionMinAlpha 0.9: old counter returns 0
+✖ scratch: old counter on shallow blinks at 600 ms (2.8162ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71.6962
+
+✖ failing tests:
+
+test at ..\.worktrees\product-a\T-044-scratch\flash-rate-scratch.test.js:28:1
+✖ scratch: old counter on shallow blinks at 600 ms (2.8162ms)
+  AssertionError [ERR_ASSERTION]: protectionMinAlpha 0.5: expected 10 snap backs (within 1) over 10 periods, got 0
+      at TestContext.<anonymous> (file:///C:/Projects/my_ai_agent_company/.worktrees/product-a/T-044-scratch/flash-rate-scratch.test.js:35:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
