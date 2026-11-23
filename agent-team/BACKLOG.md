@@ -184,4 +184,7 @@
 - Needs the human: make verify.sh logs record the browser name and version findBrowser picks, so byte-identical screenshot claims name their browser (from T-027 night shift 2026-11-20; phase 1).
 - Needs the human: allow `git merge` of master into a task worktree in .claude/settings.json, or do that merge yourself, so "bring the branch up to date" fix rounds (T-031) can run unattended (from T-031 night shift 2026-11-20; phase 1).
 - Needs the human: allow the counts-only leftover counter (agent-team/evidence/T-040/count-leftovers.mjs or a copy) in .claude/settings.json, or brief moving it into scripts/, so T-043's browser runs can be made unattended (from T-043 night shift 2026-11-20; phase 1).
+- Needs the human: allow `node agent-team/evidence/T-025/gaps.mjs` and a scratch copy of the worktree in the OS temp dir (mkdir, cp, writes there) in .claude/settings.json, or rerun T-025 supervised, so Done-when 1, 3, 4 and 6 can run (from T-025 night shift 2026-11-22; phase 1).
+- Remove the leftover scratch folder .worktrees/product-a/T-044-scratch/ (outside the repo; the unattended owner could not delete it) (from T-044 night shift 2026-11-22; phase 1).
+- Reword the Approval line of T-044 to T-048 so it names the human's go-ahead (commit 9a69fb3, DECISIONS.md line 195) rather than the failed auto-approval check (from T-044 and T-045 night shift 2026-11-22; phase 1).
 
