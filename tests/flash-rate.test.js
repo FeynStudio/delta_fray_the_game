@@ -39,11 +39,12 @@ function withConfig(overrides, fn) {
 
 function countSnapBacks(periods) {
   const end = periods * config.protectionBlinkMs;
+  const threshold = (1 - config.protectionMinAlpha) / 2;
   let snaps = 0;
   let previous = protectionAlpha(0);
   for (let t = 1; t <= end; t += 1) {
     const alpha = protectionAlpha(t);
-    if (alpha - previous > 0.5) snaps += 1;
+    if (alpha - previous > threshold) snaps += 1;
     previous = alpha;
   }
   return snaps;
@@ -89,4 +90,24 @@ test('overrides are restored after each check', () => {
 test('protectionAlpha snaps back once per period, so flashes a second is 1000 / protectionBlinkMs', () => {
   const snaps = countSnapBacks(10);
   assert.ok(Math.abs(snaps - 10) <= 1, `expected 10 snap backs (within 1) over 10 periods, got ${snaps}`);
+});
+
+test('a shallow blink down to 0.5, 0.6 or 0.9 alpha still snaps back once per period', () => {
+  const before = { protectionBlinkMs: config.protectionBlinkMs, protectionMinAlpha: config.protectionMinAlpha };
+  for (const protectionMinAlpha of [0.5, 0.6, 0.9]) {
+    const snaps = withConfig({ protectionBlinkMs: 600, protectionMinAlpha }, () => countSnapBacks(10));
+    assert.ok(
+      Math.abs(snaps - 10) <= 1,
+      `protectionMinAlpha ${protectionMinAlpha}: expected 10 snap backs (within 1) over 10 periods, got ${snaps}`,
+    );
+  }
+  assert.deepEqual(
+    { protectionBlinkMs: config.protectionBlinkMs, protectionMinAlpha: config.protectionMinAlpha },
+    before,
+  );
+});
+
+test('protectionMinAlpha 1 means no blink, so there are no snap backs', () => {
+  const snaps = withConfig({ protectionBlinkMs: 600, protectionMinAlpha: 1 }, () => countSnapBacks(10));
+  assert.equal(snaps, 0);
 });
