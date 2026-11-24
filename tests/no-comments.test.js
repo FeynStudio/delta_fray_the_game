@@ -37,6 +37,11 @@ const FLAGGED = [
   ['html', 'a comment inside an inline script', '<p>a</p>\n<script>\nconst a = 1;\nconst b = 2; ' + S2 + ' note\n</script>', [4]],
 ];
 
+for (const prop of ['o.of', 'o.in', 'o.case', 'o.new', 'o.delete', 'o?.of']) {
+  FLAGGED.push(['js', `a line comment after a division by ${prop}`, 'const a = 1;\nconst d = ' + prop + ' / 2; ' + S2 + ' note /', [2]]);
+  FLAGGED.push(['js', `a block comment after a division by ${prop}`, 'const a = 1;\nconst d = ' + prop + ' / 2; ' + OPEN + ' note ' + CLOSE + ' / 3;', [2]]);
+}
+
 const CLEAN = [
   ['js', 'comment marks in a single-quoted string', 'const a = \'' + URL_TEXT + '\';'],
   ['js', 'comment marks in a double-quoted string', 'const a = "' + URL_TEXT + '";'],
@@ -45,6 +50,7 @@ const CLEAN = [
   ['js', 'comment marks in a regular expression', 'const m = s.match(/ws:\\/\\/\\S+/); const n = ' + RE + '.test(s);'],
   ['js', 'comment marks in a character class', 'const r = /[' + S2 + ']+/; const q = /[' + OPEN + ']/g;'],
   ['js', 'a regular expression after ( , = and return', 'f(' + RE + ');\nf(a, ' + RE + ');\nconst r = ' + RE + ';\nfunction g() { return ' + RE + '; }'],
+  ['js', 'a regular expression with comment marks after the keywords return, typeof and case', 'function g() { return ' + RE + '; }\nconst t = typeof ' + RE + ';\nswitch (x) { case ' + RE + ': break; }'],
   ['js', 'division', 'const d = a / b / c; const e = (a + b) / 2 / list[0] / 3; i++ / 2;'],
   ['js', 'a shebang on line 1', SHEBANG + '\nconst a = 1;'],
   ['sh', 'a shebang on line 1', HASH + '!/usr/bin/env bash\nset -uo pipefail'],
@@ -110,7 +116,7 @@ test('checkTree reports a comment in every checked place with file and line', ()
 test('checkTree skips old evidence, unchecked files and node_modules', () => {
   inTree({
     'agent-team/evidence/T-010/x.mjs': JS_NOTE,
-    'agent-team/evidence/T-001-old/x.sh': SH_NOTE,
+    'agent-team/evidence/T-001/x.sh': SH_NOTE,
     '.github/x.js': JS_NOTE,
     '.gitattributes': SH_NOTE,
     'src/data.json': JS_NOTE,
@@ -120,6 +126,20 @@ test('checkTree skips old evidence, unchecked files and node_modules', () => {
     'node_modules/pkg/x.js': JS_NOTE,
     'src/clean.js': 'const a = 1;\n',
   }, (found) => assert.deepEqual(found, []));
+});
+
+test('checkTree skips only the evidence folders named exactly T-001 to T-014', () => {
+  inTree({
+    'agent-team/evidence/T-001/x.mjs': JS_NOTE,
+    'agent-team/evidence/T-014/x.sh': SH_NOTE,
+    'agent-team/evidence/T-015/x.mjs': JS_NOTE,
+    'agent-team/evidence/T-014-new/x.mjs': JS_NOTE,
+    'agent-team/evidence/T-0140/x.sh': SH_NOTE,
+    'agent-team/evidence/T-001-old/x.sh': SH_NOTE,
+  }, (found) => assert.deepEqual(found.sort(), [
+    'agent-team/evidence/T-001-old/x.sh:2', 'agent-team/evidence/T-014-new/x.mjs:2',
+    'agent-team/evidence/T-0140/x.sh:2', 'agent-team/evidence/T-015/x.mjs:2',
+  ]));
 });
 
 test('checkTree accepts each scanner directive only in its own file with its exact text', () => {
@@ -133,6 +153,13 @@ test('checkTree accepts each scanner directive only in its own file with its exa
     'scripts/serve.mjs': 'run(); ' + S2 + ASSIGN + '\n',
     'src/a.js': 'run(); ' + S2 + SOCKET + '\n',
   }, (found) => assert.deepEqual(found.sort(), ['scripts/run-scenario.mjs:1', 'scripts/run-scenario.mjs:2', 'scripts/serve.mjs:1', 'scripts/smoke.mjs:1', 'src/a.js:1']));
+});
+
+test('checkTree accepts each scanner directive once per file and reports the second copy on its line', () => {
+  inTree({
+    'scripts/run-scenario.mjs': SHEBANG + '\nrun(); ' + S2 + ASSIGN + '\nrun(); ' + S2 + ASSIGN + '\n',
+    'scripts/smoke.mjs': 'run(); ' + S2 + SOCKET + '\r\nrun();\nrun(); ' + S2 + SOCKET + '\n',
+  }, (found) => assert.deepEqual(found.sort(), ['scripts/run-scenario.mjs:3', 'scripts/smoke.mjs:3']));
 });
 
 test('the two real scanner directives are seen by the tokenizer', () => {
