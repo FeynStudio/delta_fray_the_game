@@ -208,3 +208,4 @@ Decided by human, 2026-11-23: "(a) rerun T-025 in a supervised session." (the "H
 Merged by the human, 2026-11-23: task/T-025-applied at b6e404e (pull request #18, merge 7451f5f), the T-025 no-comments checker fixes copied into the protected files (route A).
 Merged by the human, 2026-11-24: task/T-047-smoke-close-on-throw at 05441bc
 Merged by the human, 2026-11-24: task/T-048-fixedshot-negative-controls at ab7faee
+Decided by human, 2026-11-24: "T-046 approve as is." (task/T-046-featuremap-fixedshot-lines at 070870e, after review round 2 CHANGES NEEDED at the 2-round hard stop; the Handoff keeps line numbers without quoted code text). Not a merge.
