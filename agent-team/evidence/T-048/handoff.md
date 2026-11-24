@@ -1,0 +1,39 @@
+# T-048 Handoff
+
+- Status: DONE
+- What changed:
+  - No code change. Commits touch only agent-team/evidence/T-048/.
+  - agent-team/evidence/T-048/neg-a.diff to neg-d.diff: the four scratch changes to scripts/smoke.mjs. Each was applied, run once, then reverted with `git checkout -- scripts/smoke.mjs`. None was committed.
+  - agent-team/evidence/T-048/before/, neg-a/, neg-b/, neg-c/, neg-d/, after/: verify.sh logs and smoke results.
+  - agent-team/evidence/T-048/handoff.md: this handoff.
+- Evidence:
+  - BASE: 8742213 ("T-047: IN REVIEW", master HEAD). T-047 is not merged, so BASE does not hold it.
+  - Done-when 0: T-027's merge commit d0c076c ("Merge pull request #12 from FeynStudio/task/T-027-smoke-fixed-clock", parents c18fef1 and c5589bd) is an ancestor of BASE. `git merge-base --is-ancestor d0c076c HEAD` on 8742213 exited 0 (printed ANCESTOR_YES).
+  - Before (8742213, clean):
+    - `--feature input --label before` gave RESULT: PASS (before/before-input.log).
+    - `--feature render --label before` gave RESULT: PASS (before/before-render.log).
+  - (a) Wrong clock. neg-a.diff changes fixedShot to call `p.eval(fixedClockProbe, 1)` in place of `FIXED_CLOCK_MS`. alpha at clock 1 stays about 1, so only the clock branch trips.
+    - `--feature render --label neg-a` on 8742213 (dirty: yes): FAIL render browser runs, FAIL render browser output, RESULT: FAIL.
+    - Error in neg-a/render-smoke.json and neg-a/neg-a-render.log: "render-smoke.png: wanted clock 0, got 1"
+  - (b) Protection alpha below 0.75. neg-b.diff makes fixedClockProbe return `protectionAlpha(clock) * 0.5`. The clock is still set to 0.
+    - `--feature render --label neg-b` on 8742213 (dirty: yes): FAIL render browser runs, FAIL render browser output, RESULT: FAIL.
+    - Error in neg-b/render-smoke.json and neg-b/neg-b-render.log: "render-smoke.png: protection alpha 0.5 at clock 0, wanted at least 0.75"
+  - (c) phaseWrong power. neg-c.diff makes phaseShot pass `{ ...GAUGE, power: 0.5 }` to phaseSetupProbe.
+    - `--feature input --label neg-c` on 8742213 (dirty: yes): FAIL input browser runs, FAIL input browser output, RESULT: FAIL.
+    - Error in neg-c/input-smoke.json and neg-c/neg-c-input.log: "input-smoke-power.png: wanted power 0.6, got 0.5 before the capture; wanted power 0.6, got 0.5 after the capture"
+  - (d) phaseWrong needle. neg-d.diff makes phaseShot pass `{ ...GAUGE, needle: 20 }` to phaseSetupProbe.
+    - `--feature input --label neg-d` on 8742213 (dirty: yes): FAIL input browser runs, FAIL input browser output, RESULT: FAIL.
+    - Error in neg-d/input-smoke.json and neg-d/neg-d-input.log: "input-smoke-direction.png: wanted needle 30, got 20 before the capture; wanted needle 30, got 20 after the capture"
+    - The -power shot passed first (neg-d/input-smoke-power.png was written). This is expected, because phaseWrong checks the needle only in the direction phase.
+  - Each of the four errors names the file and that branch's own text, and no other branch's text.
+  - After reverting (8742213, dirty: no): `./scripts/verify.sh T-048 --feature input --label after` printed RESULT: PASS (after/after-input.log).
+  - `git diff --stat 8742213 -- src/ tests/ scripts/ expected/ scenarios/` printed nothing.
+  - `./scripts/guards.sh` exited 0 with no output. guards also showed PASS inside every verify.sh run above.
+  - Latest code commit on task/T-048-fixedshot-negative-controls (unchanged by the evidence commits, which touch agent-team/ only):
+    - run-task reading, `git log -1 --format=%h task/T-048-fixedshot-negative-controls -- . ":(exclude)agent-team"`: c06aca0 ("T-044: count snap backs against half the blink depth so shallow blinks pass").
+    - First-parent rule of scripts/handoff-check.mjs (rev-list --first-parent from HEAD, diff-tree of each commit against its first parent over `. :(exclude)agent-team*`): c7af204 ("Merge branch 'task/T-044-flash-rate-shallow'"). Against its first parent e5bdeaf it changes tests/flash-rate.test.js. Every first-parent commit from 8742213 down to 209eece changes agent-team/ only.
+- Files read for the branch texts: scripts/smoke.mjs on BASE, lines 222-247 (phaseSetupProbe, fixedClockProbe), 295-302 (drawnStateProbe, stateProbe), 485-493 (phaseWrong) and 515-572 (FIXED_CLOCK_MS, MIN_PROTECTION_ALPHA, GAUGE, fixedShot, phaseShot); src/render.js lines 41-45 (protectionAlpha); scripts/verify.sh; scripts/handoff-check.mjs lines 24 and 75-116.
+- Not verified:
+  - The scratch changes alter probe inputs and outputs in scripts/smoke.mjs, not game code in src/. A real regression in src/ (for example, a clock that does not reset) was not simulated.
+  - The brief's Handoff section was not filled in, because the owner may not edit the brief. The main session copies this handoff there.
+- Follow-ups: none.

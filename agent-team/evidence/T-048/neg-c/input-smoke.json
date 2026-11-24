@@ -1,0 +1,3 @@
+{
+  "error": "input-smoke-power.png: wanted power 0.6, got 0.5 before the capture; wanted power 0.6, got 0.5 after the capture"
+}

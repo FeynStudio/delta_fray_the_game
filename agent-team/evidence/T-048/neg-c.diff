@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 8d4c7df..a4cdd67 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -566,7 +566,7 @@ async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
+ async function phaseShot(browser, url, shots, suffix, keys, want) {
+   const p = await browser.open(url, FULL_HD);
+   await p.eval(freezeLoopProbe);
+-  await p.eval(phaseSetupProbe, keys, GAUGE);
++  await p.eval(phaseSetupProbe, keys, { ...GAUGE, power: 0.5 });
+   await fixedShot(p, shots, suffix, (s) => phaseWrong(s, want));
+   await p.close();
+ }

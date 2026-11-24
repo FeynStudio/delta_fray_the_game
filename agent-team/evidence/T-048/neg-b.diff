@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 8d4c7df..887943f 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -243,7 +243,7 @@ async function fixedClockProbe(clock) {
+   const { protectionAlpha } = await import('/src/render.js');
+   const g = window.__game;
+   g.setState({ ...g.getState(), clock });
+-  return protectionAlpha(clock);
++  return protectionAlpha(clock) * 0.5;
+ }
+
+ async function turnsProbe() {
