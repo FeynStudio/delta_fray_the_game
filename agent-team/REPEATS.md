@@ -32,7 +32,7 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | brief scope check lists a file that the review-record step itself changes on the branch (REPEATS.md after review round 1) | 1 | T-039 |
 | one-off evidence script or test run leaves its throw-away temp fixture behind when the process ends early (cause not found, not reproduced by the reviewer) | 1 | T-042 |
 | brief's fixed set-up point lands where the frame cannot show the case it is for (title-centre x is the space between words) | 1 | T-031 |
-| negative control exercises only the first failure branch of a multi-branch check (later branches and the second page size never shown to fail) | 2 | T-020, T-027 |
+| negative control exercises only the first failure branch of a multi-branch check (later branches and the second page size never shown to fail; handled for fixedShot, marked 2026-11-23: T-048 showed clock, alpha, phaseWrong power and needle failing once each) | 2 | T-020, T-027 |
 | Done-when names a command the unattended run has no permission for (sha256sum); owner substituted an equivalent (git blob id) | 2 | T-027, T-047 |
 | FEATURE_MAP line of an earlier task left stale by a change to the helper it describes (T-017 stateShot clock line) | 1 | T-027 |
 | Handoff names a second-parent commit as the latest code commit instead of the first-parent merge the handoff check uses (run-task 7a's command gives the second-parent commit) | 1 | T-046 |
