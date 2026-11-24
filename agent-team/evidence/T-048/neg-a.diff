@@ -1,0 +1,13 @@
+diff --git a/scripts/smoke.mjs b/scripts/smoke.mjs
+index 8d4c7df..d5bf7db 100644
+--- a/scripts/smoke.mjs
++++ b/scripts/smoke.mjs
+@@ -522,7 +522,7 @@ const GAUGE = { power: 0.6, needle: 30 };
+ async function fixedShot(p, shots, suffix, wrong = () => null) {
+   const file = `${basename(out).replace(/\.json$/, '')}${suffix}.png`;
+   await p.eval(freezeLoopProbe);
+-  const alpha = await p.eval(fixedClockProbe, FIXED_CLOCK_MS);
++  const alpha = await p.eval(fixedClockProbe, 1);
+   const before = await p.eval(drawnStateProbe);
+   const png = await p.screenshot();
+   const after = await p.eval(stateProbe);
