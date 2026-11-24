@@ -38,6 +38,11 @@ const lineEnd = (text, from) => {
   const end = text.indexOf(NEWLINE, from);
   return end === -1 ? text.length : end;
 };
+const afterDot = (text, at) => {
+  let j = at - 1;
+  while (j >= 0 && BLANK.includes(text[j])) j -= 1;
+  return text[j] === '.' && text[j - 1] !== '.';
+};
 
 function skipQuoted(text, start) {
   const quote = text[start];
@@ -109,7 +114,7 @@ function findJs(text) {
     else if (isWord(ch)) {
       let end = i;
       while (isWord(text[end])) end += 1;
-      regexNext = REGEX_AFTER_WORD.includes(text.slice(i, end));
+      regexNext = !afterDot(text, i) && REGEX_AFTER_WORD.includes(text.slice(i, end));
       i = end;
     } else if (ch === '{') {
       stack.push('brace');
@@ -211,13 +216,15 @@ export function checkTree(root) {
   const files = [];
   for (const { dir, exts } of CODE_DIRS) walk(join(base, dir), exts, () => false, files);
   if (existsSync(join(base, 'index.html'))) files.push(join(base, 'index.html'));
-  walk(join(base, EVIDENCE_DIR), EVIDENCE_EXTS, (name) => OLD_EVIDENCE.some((old) => name.startsWith(old)), files);
+  walk(join(base, EVIDENCE_DIR), EVIDENCE_EXTS, (name) => OLD_EVIDENCE.includes(name), files);
   const found = [];
   for (const full of files.sort()) {
     const file = relative(base, full).split('\\').join('/');
+    const used = new Set();
     for (const hit of findComments(readFileSync(full, 'utf8'), KINDS[extname(full)])) {
-      const allowed = ALLOWED.some((entry) => entry.file === file && LINE_OPEN + entry.text === hit.text);
-      if (!allowed) found.push({ file, line: hit.line, text: hit.text });
+      const allowed = ALLOWED.find((entry) => entry.file === file && LINE_OPEN + entry.text === hit.text && !used.has(entry));
+      if (allowed) used.add(allowed);
+      else found.push({ file, line: hit.line, text: hit.text });
     }
   }
   return found;
