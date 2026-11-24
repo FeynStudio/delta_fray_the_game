@@ -209,3 +209,5 @@ Merged by the human, 2026-11-23: task/T-025-applied at b6e404e (pull request #18
 Merged by the human, 2026-11-24: task/T-047-smoke-close-on-throw at 05441bc
 Merged by the human, 2026-11-24: task/T-048-fixedshot-negative-controls at ab7faee
 Decided by human, 2026-11-24: "T-046 approve as is." (task/T-046-featuremap-fixedshot-lines at 070870e, after review round 2 CHANGES NEEDED at the 2-round hard stop; the Handoff keeps line numbers without quoted code text). Not a merge.
+Decided by human in session, 2026-11-24: "roadmap.md change was done by human and we are conitnuing with the current design but still tighening up loose ends."
+Context: the Phase 1 exit-gate box "Decision recorded: continue to Phase 2, rework, or change direction" in agent-team/ROADMAP.md was ticked by the human. Session orchestrator's reading, not a human decision: continue with the current design and keep closing Phase 1 loose ends. Two Phase 2 items logged in BACKLOG.md the same day (feyn-splash in every product; "Prototype 1" and version 1.0 on the play screen title). Not a build go-ahead.
