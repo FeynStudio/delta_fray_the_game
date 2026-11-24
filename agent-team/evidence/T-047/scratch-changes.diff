@@ -1,0 +1,41 @@
+Scratch changes used for the negative controls. They were applied to scripts/smoke.mjs with the Edit tool,
+run through ./scripts/verify.sh (so every log says "dirty: yes"), and removed with
+`git checkout -- scripts/smoke.mjs` before the clean runs. None of them is committed.
+
+1. Instrumentation, applied in every negative-* run (same text on BASE ae7f706 and on the fix f2dfbab):
+
+@@ async open(url, { width, height, dpr }) {
+       const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank' });
++      process.stderr.write(`SCRATCH open ${targetId}\n`);
+@@ page.close()
+         async close() {
++          process.stderr.write(`SCRATCH closeTarget ${targetId}\n`);
+           await cdp.send('Target.closeTarget', { targetId });
+@@ browser close()
+     async close() {
++      const { targetInfos } = await cdp.send('Target.getTargets');
++      const pages = targetInfos.filter((t) => t.type === 'page');
++      process.stderr.write(`SCRATCH page targets open before Browser.close: ${pages.length}: ${pages.map((t) => t.targetId).join(' ')}\n`);
+       const closing = cdp.send('Browser.close').then(() => null, (err) => err);
+
+2. One fault per run (only one at a time):
+
+negative-*-scoreShot (feature render), in scoreShot's check passed to fixedShot:
+-  (s) => (JSON.stringify(s.scores) === JSON.stringify(scores) ? null
++  (s) => (false ? null
+
+negative-*-scorePixelsProbe (feature render), first line of scorePixelsProbe:
+ async function scorePixelsProbe(scores) {
++  throw new Error('scratch: scorePixelsProbe forced to throw');
+
+negative-*-stateShot (feature turns), in stateShot:
+-  (s) => wrong(s, want)
++  (s) => 'scratch: stateShot check forced to fail'
+
+negative-*-phaseShot (feature input), in phaseShot:
+-  (s) => phaseWrong(s, want)
++  (s) => 'scratch: phaseShot check forced to fail'
+
+negative-after-phaseShot-close-fails (feature input, fix f2dfbab only): the phaseShot fault above plus
+-          await cdp.send('Target.closeTarget', { targetId });
++          await cdp.send('Target.closeTarget', { targetId: 'scratch-bad-id' });

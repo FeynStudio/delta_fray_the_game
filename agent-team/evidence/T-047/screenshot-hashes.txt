@@ -1,0 +1,24 @@
+Screenshot comparison, before (BASE ae7f706) and after (fix f2dfbab), both with --feature all.
+sha256sum is not on the night-shift allow list, so these are git blob ids from
+`git hash-object --no-filters <file>` (SHA-1 over "blob <size>\0" + the file bytes). Equal ids mean byte-identical files.
+SHA-256 was not computed.
+
+file                                  before/                                   after-rerun/                              after/ (first run)
+render-smoke.png                      d5594e21d02f0246da034ea44550dab1051bafb8  d5594e21d02f0246da034ea44550dab1051bafb8  d5594e21d02f0246da034ea44550dab1051bafb8
+render-smoke-negative-score.png       e5eafdd333fd786de6d49ef740ca2ce769ef3a59  e5eafdd333fd786de6d49ef740ca2ce769ef3a59  e5eafdd333fd786de6d49ef740ca2ce769ef3a59
+render-smoke-negative-score-1000.png  cc37d16be8e32eadfd596c4351890f8a1fb8f94a  cc37d16be8e32eadfd596c4351890f8a1fb8f94a  cc37d16be8e32eadfd596c4351890f8a1fb8f94a
+render-smoke-title-ship.png           160f3503c6f831092b0212be710ceb928be2c4eb  160f3503c6f831092b0212be710ceb928be2c4eb  160f3503c6f831092b0212be710ceb928be2c4eb
+input-smoke.png                       c0cd86eff3926cb45e548200ae446f39f6226cfd  c0cd86eff3926cb45e548200ae446f39f6226cfd  f0f81041dac755beff1ea5d93b55c813a8e552e7 (all black)
+input-smoke-power.png                 d5594e21d02f0246da034ea44550dab1051bafb8  d5594e21d02f0246da034ea44550dab1051bafb8  d5594e21d02f0246da034ea44550dab1051bafb8
+input-smoke-direction.png             cf40695b97ee5d5fa319499e7e624e6b826a0b36  cf40695b97ee5d5fa319499e7e624e6b826a0b36  cf40695b97ee5d5fa319499e7e624e6b826a0b36
+input-smoke-direction-backward.png    f866d0c5a1df7a1785ad7f10f6d38670ae0dd7b4  f866d0c5a1df7a1785ad7f10f6d38670ae0dd7b4  f866d0c5a1df7a1785ad7f10f6d38670ae0dd7b4
+turns-smoke.png                       f5446a95e67bf145f4e728d45dad72020218c4a3  f5446a95e67bf145f4e728d45dad72020218c4a3  f5446a95e67bf145f4e728d45dad72020218c4a3
+turns-smoke-backward-mid.png          4dd1846c5f7b3ea9654e4c8c4b496992479a1440  4dd1846c5f7b3ea9654e4c8c4b496992479a1440  4dd1846c5f7b3ea9654e4c8c4b496992479a1440
+turns-smoke-backward-end.png          02a227eb8a9b743387260722c7485e6ad7c02a22  02a227eb8a9b743387260722c7485e6ad7c02a22  02a227eb8a9b743387260722c7485e6ad7c02a22
+turns-smoke-explosion.png             c2467c6011183949b470609d12a44dd7a65b7c31  c2467c6011183949b470609d12a44dd7a65b7c31  c2467c6011183949b470609d12a44dd7a65b7c31
+
+The first after run (after/, RESULT: PASS) saved an all-black input-smoke.png. That picture is taken by steadyShot on
+the first input page, before any phaseShot runs, so this change does not touch that code path. The input-only rerun
+(after-input-rerun/, input-smoke.png c0cd86ef...) and the full rerun (after-rerun/) both match before/ for all files.
+The negative-before-phaseShot, negative-after-phaseShot and negative-after-phaseShot-close-fails runs also produced
+input-smoke.png c0cd86ef.... fixedShot checks state, not pixels, so a black frame still passes. See Follow-ups.
