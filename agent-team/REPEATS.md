@@ -35,3 +35,5 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | negative control exercises only the first failure branch of a multi-branch check (later branches and the second page size never shown to fail) | 2 | T-020, T-027 |
 | Done-when names a command the unattended run has no permission for (sha256sum); owner substituted an equivalent (git blob id) | 1 | T-027 |
 | FEATURE_MAP line of an earlier task left stale by a change to the helper it describes (T-017 stateShot clock line) | 1 | T-027 |
+| Handoff names a second-parent commit as the latest code commit instead of the first-parent merge the handoff check uses (run-task 7a's command gives the second-parent commit) | 1 | T-046 |
+| Handoff says it quotes source lines but gives line numbers only (seen in the main session's shortened copy given to the reviewer, not in the owner's handoff) | 1 | T-046 |
