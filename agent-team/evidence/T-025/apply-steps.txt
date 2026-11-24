@@ -1,0 +1,45 @@
+T-025 route A: steps for the human (agents do not edit the two protected files)
+
+Proof status: the 2026-11-22 run wrote the two proposed files but could not run them. The supervised
+run of 2026-11-23 ran Done-when 1, 3, 4 and 6 (before-gaps.txt, after-scratch.txt, after-scratch-verify.txt,
+negative-scratch.txt): the proposed tests pass, the real tree is clean under the stricter rules, and the
+negative controls fail as expected. Apply only after the review approves.
+
+From the product folder (product-a), after the review approves:
+
+1. Branch from master:
+   git switch -c task/T-025-applied master
+
+   The proposed files live under agent-team/evidence/T-025/, which is on master only after the task branch
+   task/T-025-no-comments-fixes is merged. Step 2 below takes them straight from the task branch with
+   git show, so it works whether or not that branch is merged (it must exist in your local clone).
+
+2. Copy the two proposed files over the protected ones:
+   git show task/T-025-no-comments-fixes:agent-team/evidence/T-025/proposed/no-comments.mjs > scripts/no-comments.mjs
+   git show task/T-025-no-comments-fixes:agent-team/evidence/T-025/proposed/no-comments.test.js > tests/no-comments.test.js
+
+   If the task branch is already merged into master, the plain copies do the same:
+   cp agent-team/evidence/T-025/proposed/no-comments.mjs scripts/no-comments.mjs
+   cp agent-team/evidence/T-025/proposed/no-comments.test.js tests/no-comments.test.js
+
+   Check that the change is exactly proposed.diff (44 changed lines, both files):
+   git diff --stat
+   git diff -- scripts/no-comments.mjs tests/no-comments.test.js
+
+3. Run the checks; both must pass:
+   ./scripts/verify.sh T-025-applied --feature all
+   ./scripts/guards.sh
+
+4. Optional, only when the task branch is already merged into master (gaps.mjs is under
+   agent-team/evidence/T-025/ and imports ../../../scripts/no-comments.mjs, so it runs against the
+   copied-in checker): the four gaps against the new checker (every case of 1 to 3 should now print a
+   finding, case 4 should say yes):
+   node agent-team/evidence/T-025/gaps.mjs
+
+5. Commit, open the pull request with the checks-change label (the CI step "Block changes to the checks"
+   watches both files), merge:
+   git add scripts/no-comments.mjs tests/no-comments.test.js
+   git commit -m "T-025: apply the no-comments checker fixes from agent-team/evidence/T-025/proposed"
+
+6. The coordinator then copies agent-team/evidence/T-025/feature-map-line.txt into
+   agent-team/FEATURE_MAP.md section 9 ("No-comments guard") and closes the task.

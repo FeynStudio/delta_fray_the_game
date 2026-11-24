@@ -1,0 +1,7 @@
+T-025 Done-when 8, self-check of the three new scripts, 2026-11-23 (supervised session), worktree HEAD 44ca568
+
+$ grep -nE '//|/\*|\*/|<!--' agent-team/evidence/T-025/proposed/no-comments.mjs agent-team/evidence/T-025/proposed/no-comments.test.js agent-team/evidence/T-025/gaps.mjs
+exit=1 (1 = no match)
+
+$ grep -nE 'child_process|eval\(|new Function|new RegExp|fetch\(|https?:' agent-team/evidence/T-025/proposed/no-comments.mjs agent-team/evidence/T-025/proposed/no-comments.test.js agent-team/evidence/T-025/gaps.mjs
+exit=1 (1 = no match)

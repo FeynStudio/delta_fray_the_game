@@ -1,0 +1,82 @@
+T-025 Done-when 3, scratch copy run 2026-11-23 (supervised session)
+Scratch copy: a copy of the worktree at 44ca568 without .git and node_modules, in the OS temp dir (<TEMP>/claude/<session>/scratchpad/T-025-scratch), with proposed/no-comments.mjs copied over scripts/no-comments.mjs and proposed/no-comments.test.js over tests/no-comments.test.js.
+cmp of the copied files with the proposed files:
+  scripts/no-comments.mjs identical
+  tests/no-comments.test.js identical
+
+$ node --test tests/no-comments.test.js
+✔ findComments flags a whole-line comment (js) (3.6487ms)
+✔ findComments flags a trailing comment after code (js) (0.117ms)
+✔ findComments flags a trailing comment after a division (js) (0.0737ms)
+✔ findComments flags a one-line block comment (js) (0.0653ms)
+✔ findComments flags a block comment over several lines (js) (0.0777ms)
+✔ findComments flags a block comment in the middle of a line (js) (0.0923ms)
+✔ findComments flags a comment inside the code part of a template literal (js) (0.1608ms)
+✔ findComments flags a comment on line 2 under a shebang (js) (0.0785ms)
+✔ findComments flags a shebang that is not on line 1 (js) (0.1073ms)
+✔ findComments flags a whole-line comment (sh) (0.2314ms)
+✔ findComments flags a trailing comment after a command (sh) (0.072ms)
+✔ findComments flags a one-line comment (html) (0.2077ms)
+✔ findComments flags a comment across lines (html) (0.0684ms)
+✔ findComments flags a block comment inside style (html) (0.0419ms)
+✔ findComments flags a comment inside an inline script (html) (0.0637ms)
+✔ findComments flags a line comment after a division by o.of (js) (0.0403ms)
+✔ findComments flags a block comment after a division by o.of (js) (0.0725ms)
+✔ findComments flags a line comment after a division by o.in (js) (0.0377ms)
+✔ findComments flags a block comment after a division by o.in (js) (0.0367ms)
+✔ findComments flags a line comment after a division by o.case (js) (0.0341ms)
+✔ findComments flags a block comment after a division by o.case (js) (0.0363ms)
+✔ findComments flags a line comment after a division by o.new (js) (0.0393ms)
+✔ findComments flags a block comment after a division by o.new (js) (0.0732ms)
+✔ findComments flags a line comment after a division by o.delete (js) (0.0355ms)
+✔ findComments flags a block comment after a division by o.delete (js) (0.0344ms)
+✔ findComments flags a line comment after a division by o?.of (js) (0.0453ms)
+✔ findComments flags a block comment after a division by o?.of (js) (0.0341ms)
+✔ findComments does not flag comment marks in a single-quoted string (js) (0.0825ms)
+✔ findComments does not flag comment marks in a double-quoted string (js) (0.0354ms)
+✔ findComments does not flag comment marks in a template string (js) (0.0474ms)
+✔ findComments does not flag an escaped quote before comment marks (js) (0.0337ms)
+✔ findComments does not flag comment marks in a regular expression (js) (0.0416ms)
+✔ findComments does not flag comment marks in a character class (js) (0.0333ms)
+✔ findComments does not flag a regular expression after ( , = and return (js) (0.0468ms)
+✔ findComments does not flag a regular expression with comment marks after the keywords return, typeof and case (js) (0.0363ms)
+✔ findComments does not flag division (js) (0.0529ms)
+✔ findComments does not flag a shebang on line 1 (js) (0.0547ms)
+✔ findComments does not flag a shebang on line 1 (sh) (0.0554ms)
+✔ findComments does not flag the argument count and an array length (sh) (0.0476ms)
+✔ findComments does not flag a hash inside single and double quotes (sh) (0.0441ms)
+✔ findComments does not flag a path with a glob (sh) (0.0262ms)
+✔ findComments does not flag the doctype (html) (0.0562ms)
+✔ findComments does not flag a block comment mark in an attribute value (html) (0.0289ms)
+✔ findComments does not flag a colour inside style (html) (0.0657ms)
+✔ findComments returns the comment text and rejects an unknown kind (0.2684ms)
+✔ checkTree reports a comment in every checked place with file and line (10.4536ms)
+✔ checkTree skips old evidence, unchecked files and node_modules (7.4565ms)
+✔ checkTree skips only the evidence folders named exactly T-001 to T-014 (5.8754ms)
+✔ checkTree accepts each scanner directive only in its own file with its exact text (4.7799ms)
+✔ checkTree accepts each scanner directive once per file and reports the second copy on its line (1.8084ms)
+✔ the two real scanner directives are seen by the tokenizer (3.1399ms)
+✔ no code file in this repo holds a comment (54.5694ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 187.8632
+exit=0
+
+$ node agent-team/evidence/T-025/gaps.mjs   (imports the scratch scripts/no-comments.mjs)
+case 1a, division by o.of then a line comment: line 1
+case 1b, division by o.case then a block comment: line 1
+case 2, scripts/smoke.mjs holds the allowed directive twice: scripts/smoke.mjs:2
+case 3, comment in agent-team/evidence/T-014-new/: agent-team/evidence/T-014-new/x.mjs:2, agent-team/evidence/T-014-new/y.sh:2
+case 3, comment in agent-team/evidence/T-0140/: agent-team/evidence/T-0140/x.mjs:2, agent-team/evidence/T-0140/y.sh:2
+case 3, comment in agent-team/evidence/T-001-old/: agent-team/evidence/T-001-old/x.mjs:2, agent-team/evidence/T-001-old/y.sh:2
+case 4, test lines in tests/no-comments.test.js: 10, of which name T-014: 1
+case 4, the string T-014 anywhere in tests/no-comments.test.js: yes
+exit=0
+
+$ node scripts/no-comments.mjs   (the real tree under the stricter rules)
+exit=0

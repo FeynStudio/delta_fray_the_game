@@ -1,0 +1,66 @@
+T-025 Done-when 6, negative controls in the scratch copy, 2026-11-23 (supervised session). One at a time; each undone before the next (cmp shown).
+
+=== Control 1: fix 1 taken out of the scratch checker ===
+changed line:
+117:      regexNext = REGEX_AFTER_WORD.includes(text.slice(i, end));
+$ node --test tests/no-comments.test.js   (failing tests and summary)
+exit=1
+✖ findComments flags a line comment after a division by o.of (js) (2.5747ms)
+✖ findComments flags a block comment after a division by o.of (js) (0.1973ms)
+✖ findComments flags a line comment after a division by o.in (js) (0.1382ms)
+✖ findComments flags a block comment after a division by o.in (js) (0.1107ms)
+✖ findComments flags a line comment after a division by o.case (js) (0.1029ms)
+✖ findComments flags a block comment after a division by o.case (js) (0.1002ms)
+✖ findComments flags a line comment after a division by o.new (js) (0.1279ms)
+✖ findComments flags a block comment after a division by o.new (js) (0.1016ms)
+✖ findComments flags a line comment after a division by o.delete (js) (0.1105ms)
+✖ findComments flags a block comment after a division by o.delete (js) (0.1081ms)
+✖ findComments flags a line comment after a division by o?.of (js) (0.0957ms)
+✖ findComments flags a block comment after a division by o?.of (js) (0.0949ms)
+ℹ tests 52
+ℹ pass 40
+ℹ fail 12
+✖ failing tests:
+✖ findComments flags a line comment after a division by o.of (js) (2.5747ms)
+✖ findComments flags a block comment after a division by o.of (js) (0.1973ms)
+✖ findComments flags a line comment after a division by o.in (js) (0.1382ms)
+✖ findComments flags a block comment after a division by o.in (js) (0.1107ms)
+✖ findComments flags a line comment after a division by o.case (js) (0.1029ms)
+✖ findComments flags a block comment after a division by o.case (js) (0.1002ms)
+✖ findComments flags a line comment after a division by o.new (js) (0.1279ms)
+✖ findComments flags a block comment after a division by o.new (js) (0.1016ms)
+✖ findComments flags a line comment after a division by o.delete (js) (0.1105ms)
+✖ findComments flags a block comment after a division by o.delete (js) (0.1081ms)
+✖ findComments flags a line comment after a division by o?.of (js) (0.0957ms)
+✖ findComments flags a block comment after a division by o?.of (js) (0.0949ms)
+undone: scripts/no-comments.mjs identical to proposed again
+
+=== Control 2: OLD_EVIDENCE shortened to 13 entries ===
+changed line:
+27:const OLD_EVIDENCE = Array.from({ length: 13 }, (_, i) => 'T-0' + String(i + 1).padStart(2, '0'));
+$ node --test tests/no-comments.test.js   (failing tests and summary)
+exit=1
+✖ checkTree skips only the evidence folders named exactly T-001 to T-014 (6.788ms)
+ℹ tests 52
+ℹ pass 51
+ℹ fail 1
+✖ failing tests:
+✖ checkTree skips only the evidence folders named exactly T-001 to T-014 (6.788ms)
+undone: scripts/no-comments.mjs identical to proposed again
+
+=== Control 3: a second copy of the directive appended to scripts/smoke.mjs ===
+scripts/smoke.mjs now has 676 lines; nosemgrep lines:
+77:      if (port && path) finish(ok, `ws://127.0.0.1:${port
+676:      if (port && path) finish(ok, `ws://127.0.0.1:${por
+$ node scripts/no-comments.mjs
+GUARD FAIL [no-comments]: Remove the comment; put the reason in the brief, the handoff or FEATURE_MAP
+scripts/smoke.mjs:676: // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+exit=1
+$ ./scripts/guards.sh
+GUARD FAIL [no-comments]: Remove the comment; put the reason in the brief, the handoff or FEATURE_MAP
+scripts/smoke.mjs:676: // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+GUARD FAIL [smoke-shape]: scripts/smoke.mjs must hold exactly one nosemgrep line
+exit=1
+undone: scripts/smoke.mjs identical to the worktree file again
+$ node scripts/no-comments.mjs   (after undo)
+exit=0

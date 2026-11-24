@@ -1,0 +1,16 @@
+T-025 Done-when 1, the four gaps with the checker as it is on BASE 12972d1, run 2026-11-23 (supervised session)
+Worktree HEAD 44ca568; git diff --stat 12972d1 HEAD -- scripts tests prints nothing, so scripts/no-comments.mjs and tests/no-comments.test.js are the BASE files.
+node v24.15.0
+
+$ node agent-team/evidence/T-025/gaps.mjs
+case 1a, division by o.of then a line comment: no finding
+case 1b, division by o.case then a block comment: no finding
+case 2, scripts/smoke.mjs holds the allowed directive twice: no finding
+case 3, comment in agent-team/evidence/T-014-new/: no finding
+case 3, comment in agent-team/evidence/T-0140/: no finding
+case 3, comment in agent-team/evidence/T-001-old/: no finding
+case 4, test lines in tests/no-comments.test.js: 8, of which name T-014: 0
+case 4, the string T-014 anywhere in tests/no-comments.test.js: no
+exit=0
+
+Note on case 4: the 8 counts lines that start with test( ; the other no-comments tests are generated in loops over the FLAGGED and CLEAN tables (37 tests in the BASE run, before/before-config.log). The string T-014 does not occur anywhere in the file, so no test names T-014.

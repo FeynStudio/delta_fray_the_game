@@ -1,0 +1,112 @@
+diff --git a/scripts/no-comments.mjs b/agent-team/evidence/T-025/proposed/no-comments.mjs
+index 63afa5f..2836823 100644
+--- a/scripts/no-comments.mjs
++++ b/agent-team/evidence/T-025/proposed/no-comments.mjs
+@@ -38,6 +38,11 @@ const lineEnd = (text, from) => {
+   const end = text.indexOf(NEWLINE, from);
+   return end === -1 ? text.length : end;
+ };
++const afterDot = (text, at) => {
++  let j = at - 1;
++  while (j >= 0 && BLANK.includes(text[j])) j -= 1;
++  return text[j] === '.' && text[j - 1] !== '.';
++};
+ 
+ function skipQuoted(text, start) {
+   const quote = text[start];
+@@ -109,7 +114,7 @@ function findJs(text) {
+     else if (isWord(ch)) {
+       let end = i;
+       while (isWord(text[end])) end += 1;
+-      regexNext = REGEX_AFTER_WORD.includes(text.slice(i, end));
++      regexNext = !afterDot(text, i) && REGEX_AFTER_WORD.includes(text.slice(i, end));
+       i = end;
+     } else if (ch === '{') {
+       stack.push('brace');
+@@ -211,13 +216,15 @@ export function checkTree(root) {
+   const files = [];
+   for (const { dir, exts } of CODE_DIRS) walk(join(base, dir), exts, () => false, files);
+   if (existsSync(join(base, 'index.html'))) files.push(join(base, 'index.html'));
+-  walk(join(base, EVIDENCE_DIR), EVIDENCE_EXTS, (name) => OLD_EVIDENCE.some((old) => name.startsWith(old)), files);
++  walk(join(base, EVIDENCE_DIR), EVIDENCE_EXTS, (name) => OLD_EVIDENCE.includes(name), files);
+   const found = [];
+   for (const full of files.sort()) {
+     const file = relative(base, full).split('\\').join('/');
++    const used = new Set();
+     for (const hit of findComments(readFileSync(full, 'utf8'), KINDS[extname(full)])) {
+-      const allowed = ALLOWED.some((entry) => entry.file === file && LINE_OPEN + entry.text === hit.text);
+-      if (!allowed) found.push({ file, line: hit.line, text: hit.text });
++      const allowed = ALLOWED.find((entry) => entry.file === file && LINE_OPEN + entry.text === hit.text && !used.has(entry));
++      if (allowed) used.add(allowed);
++      else found.push({ file, line: hit.line, text: hit.text });
+     }
+   }
+   return found;
+diff --git a/tests/no-comments.test.js b/agent-team/evidence/T-025/proposed/no-comments.test.js
+index b81d238..6afe8ba 100644
+--- a/tests/no-comments.test.js
++++ b/agent-team/evidence/T-025/proposed/no-comments.test.js
+@@ -37,6 +37,11 @@ const FLAGGED = [
+   ['html', 'a comment inside an inline script', '<p>a</p>\n<script>\nconst a = 1;\nconst b = 2; ' + S2 + ' note\n</script>', [4]],
+ ];
+ 
++for (const prop of ['o.of', 'o.in', 'o.case', 'o.new', 'o.delete', 'o?.of']) {
++  FLAGGED.push(['js', `a line comment after a division by ${prop}`, 'const a = 1;\nconst d = ' + prop + ' / 2; ' + S2 + ' note /', [2]]);
++  FLAGGED.push(['js', `a block comment after a division by ${prop}`, 'const a = 1;\nconst d = ' + prop + ' / 2; ' + OPEN + ' note ' + CLOSE + ' / 3;', [2]]);
++}
++
+ const CLEAN = [
+   ['js', 'comment marks in a single-quoted string', 'const a = \'' + URL_TEXT + '\';'],
+   ['js', 'comment marks in a double-quoted string', 'const a = "' + URL_TEXT + '";'],
+@@ -45,6 +50,7 @@ const CLEAN = [
+   ['js', 'comment marks in a regular expression', 'const m = s.match(/ws:\\/\\/\\S+/); const n = ' + RE + '.test(s);'],
+   ['js', 'comment marks in a character class', 'const r = /[' + S2 + ']+/; const q = /[' + OPEN + ']/g;'],
+   ['js', 'a regular expression after ( , = and return', 'f(' + RE + ');\nf(a, ' + RE + ');\nconst r = ' + RE + ';\nfunction g() { return ' + RE + '; }'],
++  ['js', 'a regular expression with comment marks after the keywords return, typeof and case', 'function g() { return ' + RE + '; }\nconst t = typeof ' + RE + ';\nswitch (x) { case ' + RE + ': break; }'],
+   ['js', 'division', 'const d = a / b / c; const e = (a + b) / 2 / list[0] / 3; i++ / 2;'],
+   ['js', 'a shebang on line 1', SHEBANG + '\nconst a = 1;'],
+   ['sh', 'a shebang on line 1', HASH + '!/usr/bin/env bash\nset -uo pipefail'],
+@@ -110,7 +116,7 @@ test('checkTree reports a comment in every checked place with file and line', ()
+ test('checkTree skips old evidence, unchecked files and node_modules', () => {
+   inTree({
+     'agent-team/evidence/T-010/x.mjs': JS_NOTE,
+-    'agent-team/evidence/T-001-old/x.sh': SH_NOTE,
++    'agent-team/evidence/T-001/x.sh': SH_NOTE,
+     '.github/x.js': JS_NOTE,
+     '.gitattributes': SH_NOTE,
+     'src/data.json': JS_NOTE,
+@@ -122,6 +128,20 @@ test('checkTree skips old evidence, unchecked files and node_modules', () => {
+   }, (found) => assert.deepEqual(found, []));
+ });
+ 
++test('checkTree skips only the evidence folders named exactly T-001 to T-014', () => {
++  inTree({
++    'agent-team/evidence/T-001/x.mjs': JS_NOTE,
++    'agent-team/evidence/T-014/x.sh': SH_NOTE,
++    'agent-team/evidence/T-015/x.mjs': JS_NOTE,
++    'agent-team/evidence/T-014-new/x.mjs': JS_NOTE,
++    'agent-team/evidence/T-0140/x.sh': SH_NOTE,
++    'agent-team/evidence/T-001-old/x.sh': SH_NOTE,
++  }, (found) => assert.deepEqual(found.sort(), [
++    'agent-team/evidence/T-001-old/x.sh:2', 'agent-team/evidence/T-014-new/x.mjs:2',
++    'agent-team/evidence/T-0140/x.sh:2', 'agent-team/evidence/T-015/x.mjs:2',
++  ]));
++});
++
+ test('checkTree accepts each scanner directive only in its own file with its exact text', () => {
+   inTree({
+     'scripts/run-scenario.mjs': SHEBANG + '\nrun(); ' + S2 + ASSIGN + '\n',
+@@ -135,6 +155,13 @@ test('checkTree accepts each scanner directive only in its own file with its exa
+   }, (found) => assert.deepEqual(found.sort(), ['scripts/run-scenario.mjs:1', 'scripts/run-scenario.mjs:2', 'scripts/serve.mjs:1', 'scripts/smoke.mjs:1', 'src/a.js:1']));
+ });
+ 
++test('checkTree accepts each scanner directive once per file and reports the second copy on its line', () => {
++  inTree({
++    'scripts/run-scenario.mjs': SHEBANG + '\nrun(); ' + S2 + ASSIGN + '\nrun(); ' + S2 + ASSIGN + '\n',
++    'scripts/smoke.mjs': 'run(); ' + S2 + SOCKET + '\r\nrun();\nrun(); ' + S2 + SOCKET + '\n',
++  }, (found) => assert.deepEqual(found.sort(), ['scripts/run-scenario.mjs:3', 'scripts/smoke.mjs:3']));
++});
++
+ test('the two real scanner directives are seen by the tokenizer', () => {
+   for (const [file, text] of [['scripts/run-scenario.mjs', ASSIGN], ['scripts/smoke.mjs', SOCKET]]) {
+     const found = findComments(readFileSync(join(ROOT, file), 'utf8'), 'js');

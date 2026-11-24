@@ -1,0 +1,28 @@
+T-025 Done-when 7, scope check, 2026-11-23 (supervised session), BASE 12972d1, branch task/T-025-no-comments-fixes, HEAD ff4e337
+
+$ git diff --stat 12972d1 -- scripts/ tests/ src/ sim/ index.html .github/ .claude/ scenarios/ expected/ docs/ package.json package-lock.json AGENTS.md agent-team/FEATURE_MAP.md
+(end of output)
+
+$ git diff --stat 12972d1 --name-only   (every file the branch changes)
+agent-team/evidence/T-025/after-scratch-verify.txt
+agent-team/evidence/T-025/after-scratch.txt
+agent-team/evidence/T-025/after/after-config.log
+agent-team/evidence/T-025/after/config.json
+agent-team/evidence/T-025/apply-steps.txt
+agent-team/evidence/T-025/before-gaps.txt
+agent-team/evidence/T-025/before/before-config.log
+agent-team/evidence/T-025/before/config.json
+agent-team/evidence/T-025/feature-map-line.txt
+agent-team/evidence/T-025/gaps.mjs
+agent-team/evidence/T-025/negative-scratch.txt
+agent-team/evidence/T-025/proposed.diff
+agent-team/evidence/T-025/proposed/no-comments.mjs
+agent-team/evidence/T-025/proposed/no-comments.test.js
+agent-team/evidence/T-025/scope-check.txt
+agent-team/evidence/T-025/self-check.txt
+agent-team/tasks/T-025.md
+
+$ git status --short   (after the verify --label after run)
+ M agent-team/evidence/T-025/after/after-config.log
+ M agent-team/evidence/T-025/scope-check.txt
+(end of output)
