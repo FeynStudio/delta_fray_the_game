@@ -545,30 +545,55 @@ async function steadyShot(p, shots) {
 
 async function scoreShot(browser, url, shots, suffix, size, scores) {
   const p = await browser.open(url, size);
-  await p.eval(freezeLoopProbe);
-  await p.eval(scoreSetupProbe, scores);
-  await p.eval(steadyProbe, GAUGE.power);
-  await fixedShot(p, shots, suffix, (s) => (JSON.stringify(s.scores) === JSON.stringify(scores) ? null
-    : `wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)}`));
-  const problems = await p.eval(scorePixelsProbe, scores);
-  await p.close();
+  let failed = true;
+  let problems;
+  try {
+    await p.eval(freezeLoopProbe);
+    await p.eval(scoreSetupProbe, scores);
+    await p.eval(steadyProbe, GAUGE.power);
+    await fixedShot(p, shots, suffix, (s) => (JSON.stringify(s.scores) === JSON.stringify(scores) ? null
+      : `wanted scores ${JSON.stringify(scores)}, got ${JSON.stringify(s.scores)}`));
+    problems = await p.eval(scorePixelsProbe, scores);
+    failed = false;
+  } finally {
+    await p.close().catch((e) => {
+      if (!failed) throw e;
+      process.stderr.write(`page close failed after an earlier error: ${e.message}\n`);
+    });
+  }
   if (problems.length) throw new Error(`${basename(out).replace(/\.json$/, '')}${suffix}.png: ${problems.join('; ')}`);
 }
 
 async function stateShot(browser, url, shots, suffix, setup, setupArgs, wrong) {
   const p = await browser.open(url, FULL_HD);
-  await p.eval(freezeLoopProbe);
-  const want = await p.eval(setup, ...setupArgs);
-  await fixedShot(p, shots, suffix, (s) => wrong(s, want));
-  await p.close();
+  let failed = true;
+  try {
+    await p.eval(freezeLoopProbe);
+    const want = await p.eval(setup, ...setupArgs);
+    await fixedShot(p, shots, suffix, (s) => wrong(s, want));
+    failed = false;
+  } finally {
+    await p.close().catch((e) => {
+      if (!failed) throw e;
+      process.stderr.write(`page close failed after an earlier error: ${e.message}\n`);
+    });
+  }
 }
 
 async function phaseShot(browser, url, shots, suffix, keys, want) {
   const p = await browser.open(url, FULL_HD);
-  await p.eval(freezeLoopProbe);
-  await p.eval(phaseSetupProbe, keys, GAUGE);
-  await fixedShot(p, shots, suffix, (s) => phaseWrong(s, want));
-  await p.close();
+  let failed = true;
+  try {
+    await p.eval(freezeLoopProbe);
+    await p.eval(phaseSetupProbe, keys, GAUGE);
+    await fixedShot(p, shots, suffix, (s) => phaseWrong(s, want));
+    failed = false;
+  } finally {
+    await p.close().catch((e) => {
+      if (!failed) throw e;
+      process.stderr.write(`page close failed after an earlier error: ${e.message}\n`);
+    });
+  }
 }
 
 const FEATURES = {
