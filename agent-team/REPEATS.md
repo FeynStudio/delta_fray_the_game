@@ -18,7 +18,7 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | handoff claims more test coverage than the tests have (e.g. "states include explosions" with empty explosions arrays) | 1 | T-010 |
 | smoke screenshots differ between two runs of the same commit (real-time animation during capture), so before/after pairs cannot be compared byte for byte (HANDLED 2026-11-22: T-027 merged, pull request #12, d0c076c; every smoke screenshot goes through fixedShot; raised by the T-027 reviewer 2026-11-20) | 1 | T-021 |
 | brief or handoff cites a section that does not exist (dangling 'open question N' reference) | 1 | T-023 |
-| check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter) | 2 | T-016, T-017 |
+| check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter; T-052 errorCode filter and exit 1 path) | 3 | T-016, T-017, T-052 |
 | fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
 | rewrite meant to keep a rule unchanged differs from the old rule on an edge the owner's differential cases did not cover (pathspec `agent-team/` matches a gitlink named agent-team) | 1 | T-032 |
 | Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) (handled, not promoted, marked 2026-11-18: both T-024 reviewers judged a code guard a poor fit and suggested a checklist step; it is coordinator working rule (9) in agent-team/BACKLOG.md, 2026-11-18 close entry for T-039, T-041, T-038, T-040 and T-024: every brief whose task adds, changes or documents a path or name filter gets a Done-when item in which the owner probes encoded separators, case variants, short names, stream names and links before writing "never" about it) | 3 | T-036, T-041, T-024 |
@@ -39,3 +39,4 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | Handoff says it quotes source lines but gives line numbers only (seen in the main session's shortened copy given to the reviewer, not in the owner's handoff) | 1 | T-046 |
 | Handoff Follow-ups item not added to agent-team/BACKLOG.md | 1 | T-047 |
 | smoke capture blank (all-black) on one run of a fixed-clock commit while verify.sh passes (fixedShot checks state, not pixels) | 1 | T-047 |
+| owner ran commands outside the brief's command list (launcher's `cd <worktree> && ...` form conflicts with the brief's no-cd, no-&& rule; disclosed) | 1 | T-052 |
