@@ -1,0 +1,17 @@
+Output copied unchanged from the tool output, commit f884235's files in the worktree, Windows 11, 2026-11-25. Each command was run as `cd <worktree> && node scripts/count-leftovers.mjs [arg]; echo "exit $?"` (the echo only records the exit code). No browser run was made in this task. The two count lines hold no slash or backslash; the usage line holds the fixed text `scripts/count-leftovers.mjs` that the brief sets for it (no machine path). `node scripts/home-paths.mjs` with this file in the tree: see self-check.txt.
+
+$ node scripts/count-leftovers.mjs
+counted 2026-11-25T15:52:30.199Z after waiting 0 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 94; msedge.exe processes 55
+exit 0
+
+$ node scripts/count-leftovers.mjs 2
+counted 2026-11-25T15:52:32.762Z after waiting 2 s: galaxy-smoke-* folders in the OS temp dir 0; chrome.exe processes 94; msedge.exe processes 55
+exit 0
+
+$ node scripts/count-leftovers.mjs abc
+usage: node scripts/count-leftovers.mjs [seconds 0-120]
+exit 2
+
+$ node scripts/count-leftovers.mjs 121
+usage: node scripts/count-leftovers.mjs [seconds 0-120]
+exit 2

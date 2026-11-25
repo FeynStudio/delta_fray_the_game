@@ -1,0 +1,16 @@
+Grep tool results on scripts/count-leftovers.mjs at commit f884235, counts copied unchanged from the tool output (output_mode count; regex, so `(` is written `\(`).
+
+execFileSync\(                      1
+execFileSync\('tasklist'            1   (the one call has 'tasklist' as its first argument)
+  line 36:   return execFileSync('tasklist', ['/FI', 'IMAGENAME eq ' + image, '/NH', '/FO', 'CSV'], { encoding: 'utf8', windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] });
+
+shell|exec\(|execSync\(|spawn|fork|kill|taskkill                 0  (so each of shell, exec(, execSync(, spawn, fork, kill, taskkill: 0)
+/V'|/M'|/SVC|/PID|wmic|Get-Process|CommandLine                   0  (so each of /V', /M', /SVC, /PID, wmic, Get-Process, CommandLine: 0)
+console|process\.env|argv\[3\]|http|eval\(                       0  (so each of console, process.env, argv[3], http, eval(: 0)
+
+^import                             5
+1:import { execFileSync } from 'node:child_process';
+2:import { readdirSync } from 'node:fs';
+3:import { tmpdir } from 'node:os';
+4:import { resolve } from 'node:path';
+5:import { pathToFileURL } from 'node:url';

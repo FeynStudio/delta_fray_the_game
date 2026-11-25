@@ -1,0 +1,6 @@
+Output of `git diff --numstat 11218fd` on commit f884235, copied unchanged from the tool output.
+
+60	0	scripts/count-leftovers.mjs
+89	0	tests/count-leftovers.test.js
+
+Added lines of the two new files: 60 + 89 = 149 (limit 150).

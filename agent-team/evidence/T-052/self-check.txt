@@ -1,0 +1,11 @@
+Output copied unchanged from the tool output, worktree on branch task/T-052-leftover-counter (code commit f884235, with FEATURE_MAP and every evidence file of this folder except this one and scope-check.txt and handoff.md in the tree). Run as `cd <worktree> && <command>; echo "<name> exit $?"` for each.
+
+no-comments exit 0
+conflict-markers exit 0
+home-paths exit 0
+guards exit 0
+SKIP handoff check (handoff not filled in)
+handoff-check exit 0
+
+node scripts/no-comments.mjs, node scripts/conflict-markers.mjs and node scripts/home-paths.mjs printed nothing; ./scripts/guards.sh printed nothing and exited 0 (format-string guard included). scripts/child-process.mjs (T-049) is not on BASE 11218fd, so it was not run.
+handoff-check prints SKIP because the owner was told by the launching session not to edit the brief, so its Handoff section is still the placeholder; the main session writes the Handoff into the brief on the default branch.
