@@ -1,0 +1,20 @@
+Output of `git diff --stat 11218fd` and `git diff --numstat 11218fd -- agent-team/FEATURE_MAP.md` at 54e51aa, copied unchanged from the tool output. BASE = 11218fd (master HEAD when the branch was cut).
+
+ agent-team/FEATURE_MAP.md                          |   1 +
+ agent-team/evidence/T-052/after/after-config.log   | 460 +++++++++++++++++++++
+ agent-team/evidence/T-052/after/config.json        |  11 +
+ agent-team/evidence/T-052/before-first-run.txt     |  29 ++
+ agent-team/evidence/T-052/before/before-config.log | 435 +++++++++++++++++++
+ agent-team/evidence/T-052/before/config.json       |  11 +
+ agent-team/evidence/T-052/code-check.txt           |  16 +
+ agent-team/evidence/T-052/run-direct.txt           |  17 +
+ agent-team/evidence/T-052/self-check.txt           |  11 +
+ agent-team/evidence/T-052/size.txt                 |   6 +
+ agent-team/evidence/T-052/unit-test.txt            |  36 ++
+ scripts/count-leftovers.mjs                        |  60 +++
+ tests/count-leftovers.test.js                      |  89 ++++
+ 13 files changed, 1182 insertions(+)
+
+1	0	agent-team/FEATURE_MAP.md
+
+Only scripts/count-leftovers.mjs, tests/count-leftovers.test.js, one added line in agent-team/FEATURE_MAP.md (section 9) and files under agent-team/evidence/T-052/ changed; no other file under scripts/, tests/, src/, sim/, expected/, scenarios/, .claude/, .github/, index.html, package.json or agent-team/evidence/T-040/ is in the list. The brief is not changed (the owner was told not to edit it). The commit that adds this file and handoff.md adds only those two files under agent-team/evidence/T-052/.
