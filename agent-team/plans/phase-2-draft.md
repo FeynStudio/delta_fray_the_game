@@ -1,6 +1,6 @@
 # Phase 2 draft — Feel and polish
 
-Status: DRAFT (written by /triage via /plan-phase next, 2026-11-25). Not approved. Nothing here is a build go-ahead; the human approves the plan, adds the lines to BACKLOG.md and moves the "Current phase" line in ROADMAP.md.
+Status: APPROVED by human, 2026-11-26 (written by /triage via /plan-phase next, 2026-11-25). Nothing here is a build go-ahead; the human moves the "Current phase" line in ROADMAP.md after the Phase 1 cleanup.
 
 Sources read: agent-team/design/DESIGN.md, docs/ARCHITECTURE.md, agent-team/ROADMAP.md, agent-team/design/IDEAS.md (no rows, so no accepted ideas), agent-team/DECISIONS.md (playtest answers P1 to P11 of 2026-11-19, lines 177-178; exit-gate decision of 2026-11-24, lines 212-213), agent-team/BACKLOG.md (Phase 2 lines at 134, 153, 154 and note (42j) at 129), src/config.js, src/render.js (COLORS). design-scout was not run (optional step).
 

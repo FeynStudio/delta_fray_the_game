@@ -6,7 +6,7 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 
 ## Current Phase
 
-**Prototype 1 only:** local hot-seat, two players taking turns on one screen, two ships. Do NOT build: networking, servers, accounts, payments, currency, factions, or anything from later roadmap phases.
+**Phase 2 — Feel and polish:** local hot-seat, two players, two ships; readability, feedback and visual style only. No rule or balance changes. Do NOT build: networking, servers, accounts, payments, currency, factions, or anything from later roadmap phases.
 
 ## Tech Rules
 
@@ -14,6 +14,7 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 - One HTML page with a single canvas.
 - No frameworks, no game engines, no build step. Must run by opening `index.html` via a simple local server.
 - Dependencies only for testing, and only if needed.
+- Static SVG image files may sit next to `index.html`; each one must be named in the `scripts/serve.mjs` allow-list.
 
 ## Architecture Rules
 
@@ -21,8 +22,9 @@ Retro, browser-based game. Ships are triangles. A ship attacks by flying into an
 - `src/input.js`: keyboard handling and gauge state.
 - `src/render.js`: all canvas drawing.
 - `src/game.js`: game loop and turn manager; connects the other modules.
-- `src/config.js`: all tunable constants. Never hard-code these elsewhere.
+- `src/config.js`: all tunable constants, including colors and effect timings (score cue, turn cue, splash fade). Never hard-code these elsewhere.
 - All game math uses game units, never screen pixels. Rendering scales the 1280 × 960 world to fit the screen.
+- `src/splash.js`: the splash screen shown before the first turn; `game.js` calls it. No game state inside it.
 
 ## Game Constants (starting values, in config.js)
 
