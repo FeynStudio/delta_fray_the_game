@@ -217,3 +217,10 @@ Decided by human in session, 2026-11-26: "T-057 owner should also run guards.sh.
 Context: answers the open questions in agent-team/tasks/T-057.md and agent-team/tasks/T-058.md. T-057 keeps the guards.sh form; T-058 route (1) (tracked .gitignore) is ruled out, which upholds the 2026-11-12 rule. Not an approval of either brief; both stay DRAFT.
 Decided by human in session, 2026-11-26: "choose option 2 for T-058."
 Context: route (2) of the T-058 open question: the human adds the reviewer-evidence ignore rule to .git/info/exclude; T-058 shrinks to the unit test and the FEATURE_MAP sentence, with no tracked .gitignore. Not a merge or push approval.
+Decided by human in session, 2026-11-26: "T-049 choose option a."
+Context: T-049 is accepted as is after review round 2 hit the hard stop; the remaining bypasses become known limits (BACKLOG line 159). Not a merge; the human merges.
+Decided by human in session, 2026-11-26: "confirming that commit 9441412 was done by human."
+Context: 9441412 "Ready T-049 T-050 T-051" (2026-11-23) was the human's go-ahead for T-049, T-050 and T-051.
+Merged by the human, 2026-11-26: task/T-051-approval-lines at 1d0b531 (pull request #20, merge commit 7303657)
+Reported by human in session, 2026-11-26: "T-050 unable to install semgrep. semgrep not a valid cmdlet. using python to install semgrep still did not work."
+Context: T-050 Done-when 4 (local semgrep --x-ls-long run) stays BLOCKED; no route chosen yet.
