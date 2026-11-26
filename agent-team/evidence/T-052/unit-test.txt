@@ -1,0 +1,36 @@
+Output of `node --test tests/count-leftovers.test.js` (run as `cd <worktree> && node --test tests/count-leftovers.test.js; echo "exit $?"`) on commit f884235, copied unchanged from the tool output.
+
+✔ parseWait: [] gives 0 (0.757ms)
+✔ parseWait: ["0"] gives 0 (0.1057ms)
+✔ parseWait: ["15"] gives 15 (0.1012ms)
+✔ parseWait: ["120"] gives 120 (0.0842ms)
+✔ parseWait: ["121"] gives null (0.0843ms)
+✔ parseWait: ["-1"] gives null (0.0656ms)
+✔ parseWait: ["1.5"] gives null (0.0532ms)
+✔ parseWait: ["abc"] gives null (0.0496ms)
+✔ parseWait: [""] gives null (0.0677ms)
+✔ parseWait: ["1e1"] gives null (0.1227ms)
+✔ parseWait: ["0x1"] gives null (0.0606ms)
+✔ parseWait: ["15","1"] gives null (0.0577ms)
+✔ countImage: a CRLF listing gives 2 for chrome.exe (0.2077ms)
+✔ countImage: a CRLF listing gives 1 for msedge.exe (0.0655ms)
+✔ countImage: an LF listing gives 2 for chrome.exe (0.0812ms)
+✔ countImage: an LF listing gives 1 for msedge.exe (0.036ms)
+✔ countImage: the INFO line for no match gives 0 for chrome.exe (0.0281ms)
+✔ countImage: another case gives 0 for chrome.exe (0.0505ms)
+✔ countImage: a longer name gives 0 for chrome.exe (0.0297ms)
+✔ countImage: a leading blank gives 0 for chrome.exe (0.0361ms)
+✔ countImage: an empty string gives 0 for chrome.exe (0.0731ms)
+✔ countFolders: exact-case galaxy-smoke- entries, files too, give 3; an empty folder gives 0; a missing folder throws (5.2418ms)
+✔ formatCounts: the line with process counts and the line with processes null, neither holding a slash (0.8306ms)
+✔ run directly with a bad argument: usage line, exit 2, empty stderr (55.3483ms)
+✔ import: importing the module prints nothing and starts no wait (1.3101ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 135.5811
+exit 0

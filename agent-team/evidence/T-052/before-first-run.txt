@@ -1,0 +1,29 @@
+Lines copied unchanged from the tool output of the first `./scripts/verify.sh T-052 --feature config --label before` run (2026-11-25T15:50:14Z, commit 11218fd, dirty: no). Its log was overwritten by the second before run (before/before-config.log, RESULT: PASS); passing test lines are left out.
+
+PASS guards
+PASS lint
+FAIL unit tests
+PASS config: no magic numbers
+PASS config: override honored
+PASS config output
+RESULT: FAIL
+
+From the log:
+✖ tests\serve.test.js (964.2479ms)
+ℹ node --check ran on sim/balance.mjs
+ℹ tests 402
+ℹ suites 1
+ℹ pass 400
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 13296.4534
+
+✖ failing tests:
+
+test at tests\serve.test.js:1:1
+✖ tests\serve.test.js (964.2479ms)
+  'test failed'
+
+Then `node --test tests/serve.test.js` alone on the same commit: tests 12, pass 12, fail 0. The second before run passed (tests 413, pass 412, fail 0, skipped 1). tests/serve.test.js is unchanged by this task (protected file); the file-level failure under the parallel run was not reproduced and its cause is not known.
