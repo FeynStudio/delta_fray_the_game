@@ -1,0 +1,28 @@
+T-051 Done-when 4: task-branch copies of T-046, T-047 and T-048
+Run on 2026-11-25 with git -C on the T-051 worktree; master was 3de26c8 (BASE). Read only; no task branch was checked out, committed to or edited.
+The output below is copied verbatim from the tool output.
+
+== git branch --list "task/T-046*" "task/T-047*" "task/T-048*"
++ task/T-046-featuremap-fixedshot-lines
++ task/T-047-smoke-close-on-throw
++ task/T-048-fixedshot-negative-controls
+(The "+" marks a branch checked out in another worktree.)
+
+== git branch --merged master --list "task/T-046*" "task/T-047*" "task/T-048*"
++ task/T-046-featuremap-fixedshot-lines
++ task/T-047-smoke-close-on-throw
++ task/T-048-fixedshot-negative-controls
+
+== git diff master...task/T-046-featuremap-fixedshot-lines -- agent-team/tasks/T-046.md
+(no output: the branch does not change T-046.md relative to its merge base with master)
+
+== git diff master...task/T-047-smoke-close-on-throw -- agent-team/tasks/T-047.md
+(no output: the branch does not change T-047.md relative to its merge base with master)
+
+== git diff master...task/T-048-fixedshot-negative-controls -- agent-team/tasks/T-048.md
+(no output: the branch does not change T-048.md relative to its merge base with master)
+
+== Result
+- task/T-046-featuremap-fixedshot-lines does not change line 3 of T-046.md (no change to the brief at all), and it is already merged into master, so it cannot conflict with this task on line 3.
+- task/T-047-smoke-close-on-throw does not change line 3 of T-047.md (no change to the brief at all), and it is already merged into master, so it cannot conflict with this task on line 3.
+- task/T-048-fixedshot-negative-controls does not change line 3 of T-048.md (no change to the brief at all), and it is already merged into master, so it cannot conflict with this task on line 3.
