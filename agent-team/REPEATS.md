@@ -42,3 +42,5 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | owner ran commands outside the brief's command list (launcher's `cd <worktree> && ...` form conflicts with the brief's no-cd, no-&& rule; disclosed) | 1 | T-052 |
 | round 1 fix closes the reported example but not a near variant of the same construct (computed data key fixed, computed accessor key not) | 1 | T-049 |
 | hand-written tokenizer guard misses a JavaScript lexical edge case (regex read as division, division read as regex, lone CR or U+2028 line ends, getter keys, HTML-style comments) | 3 | T-025, T-049 (round 1), T-049 (round 2) |
+| owner writes the Handoff only in the evidence file and leaves the brief's Status/Handoff unfilled, so verify.sh's stale-handoff check skips (night-shift note: by design, run-task step 7 writes them on master) | 1 | T-050 |
+| reviewer session has no Bash permission; verify.sh, guards.sh and git checks cannot be rerun independently | 1 | T-050 |
