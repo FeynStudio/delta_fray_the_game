@@ -224,3 +224,5 @@ Context: 9441412 "Ready T-049 T-050 T-051" (2026-11-23) was the human's go-ahead
 Merged by the human, 2026-11-26: task/T-051-approval-lines at 1d0b531 (pull request #20, merge commit 7303657)
 Reported by human in session, 2026-11-26: "T-050 unable to install semgrep. semgrep not a valid cmdlet. using python to install semgrep still did not work."
 Context: T-050 Done-when 4 (local semgrep --x-ls-long run) stays BLOCKED; no route chosen yet.
+Decided by human in session, 2026-11-26: "T-050 choose option a."
+Context: T-050 Done-when 4 is waived; the CI security job on the T-050 pull request proves the .semgrepignore change. T-050 moves from BLOCKED to IN REVIEW (normal and security review). Not a merge approval.
