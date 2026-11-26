@@ -215,3 +215,5 @@ Decided by human in session, 2026-11-26: "1. phase 2 starts after phase 1 clean 
 Context: answers the open questions in agent-team/plans/phase-2-draft.md (questions 1 to 6) and the design review of that draft (12 points, none taken in). Folded into the draft's backlog lines 1, 2, 3 and 9 and its out-of-scope list. Not an approval of the plan, not a build go-ahead, and not a merge or push approval.
 Decided by human in session, 2026-11-26: "T-057 owner should also run guards.sh. T-058 don't track .gitignore."
 Context: answers the open questions in agent-team/tasks/T-057.md and agent-team/tasks/T-058.md. T-057 keeps the guards.sh form; T-058 route (1) (tracked .gitignore) is ruled out, which upholds the 2026-11-12 rule. Not an approval of either brief; both stay DRAFT.
+Decided by human in session, 2026-11-26: "choose option 2 for T-058."
+Context: route (2) of the T-058 open question: the human adds the reviewer-evidence ignore rule to .git/info/exclude; T-058 shrinks to the unit test and the FEATURE_MAP sentence, with no tracked .gitignore. Not a merge or push approval.
