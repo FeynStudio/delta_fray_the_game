@@ -21,14 +21,14 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | check added by the owner beyond the brief has no test (disclosed extra SKIP reasons and environment filter; T-052 errorCode filter and exit 1 path) | 3 | T-016, T-017, T-052 |
 | fix proven only by a one-off evidence script; no unit test pins it (paged history walk, git hardening arguments) | 2 | T-029, T-032 |
 | rewrite meant to keep a rule unchanged differs from the old rule on an edge the owner's differential cases did not cover (pathspec `agent-team/` matches a gitlink named agent-team) | 1 | T-032 |
-| Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) (handled, not promoted, marked 2026-11-18: both T-024 reviewers judged a code guard a poor fit and suggested a checklist step; it is coordinator working rule (9) in agent-team/BACKLOG.md, 2026-11-18 close entry for T-039, T-041, T-038, T-040 and T-024: every brief whose task adds, changes or documents a path or name filter gets a Done-when item in which the owner probes encoded separators, case variants, short names, stream names and links before writing "never" about it) | 3 | T-036, T-041, T-024 |
+| Handoff's known-limits list misses a bypass the reviewer found (skip-worktree/assume-unchanged edit hides a code change from the dirty line) (handled, not promoted, marked 2026-11-18: both T-024 reviewers judged a code guard a poor fit and suggested a checklist step; it is coordinator working rule (9) in agent-team/BACKLOG.md, 2026-11-18 close entry for T-039, T-041, T-038, T-040 and T-024: every brief whose task adds, changes or documents a path or name filter gets a Done-when item in which the owner probes encoded separators, case variants, short names, stream names and links before writing "never" about it) | 4 | T-036, T-041, T-024, T-049 (review rounds 1 and 2) |
 | evidence line written down from an earlier run instead of saved output | 2 | T-018, T-030 |
 | brief Done-when names the wrong file or command for its proof (2c names tests/rules.test.js, applyMove tests are in tests/movement.test.js) | 1 | T-030 |
 | brief Done-when asks for evidence a committed file cannot hold (git status after the commit that adds the file) | 2 | T-037, T-038 |
 | new test fails on a platform the owner did not run because of path handling (temp dir behind a symlink or junction: macOS /var, Windows junction) | 1 | T-039 |
-| guard's documented rule omits the false hits it makes on ordinary text (web routes such as /home/<page> flagged by the home-path pattern) | 1 | T-041 |
+| guard's documented rule omits the false hits it makes on ordinary text (web routes such as /home/<page> flagged by the home-path pattern) | 2 | T-041, T-049 |
 | Handoff misstates what a commit contains (names a file the commit does not touch) | 1 | T-038 |
-| evidence hand-pasted from terminal output or a patch re-made without a run (disclosed, cross-checked) | 2 | T-040, T-019 |
+| evidence hand-pasted from terminal output or a patch re-made without a run (disclosed, cross-checked) | 3 | T-040, T-019, T-049 |
 | brief scope check lists a file that the review-record step itself changes on the branch (REPEATS.md after review round 1) | 1 | T-039 |
 | one-off evidence script or test run leaves its throw-away temp fixture behind when the process ends early (cause not found, not reproduced by the reviewer) | 1 | T-042 |
 | brief's fixed set-up point lands where the frame cannot show the case it is for (title-centre x is the space between words) | 1 | T-031 |
@@ -40,3 +40,5 @@ Recurring kinds of issue found in review. At count 3, promote to a guard or a ve
 | Handoff Follow-ups item not added to agent-team/BACKLOG.md | 1 | T-047 |
 | smoke capture blank (all-black) on one run of a fixed-clock commit while verify.sh passes (fixedShot checks state, not pixels) | 1 | T-047 |
 | owner ran commands outside the brief's command list (launcher's `cd <worktree> && ...` form conflicts with the brief's no-cd, no-&& rule; disclosed) | 1 | T-052 |
+| round 1 fix closes the reported example but not a near variant of the same construct (computed data key fixed, computed accessor key not) | 1 | T-049 |
+| hand-written tokenizer guard misses a JavaScript lexical edge case (regex read as division, division read as regex, lone CR or U+2028 line ends, getter keys, HTML-style comments) | 3 | T-025, T-049 (round 1), T-049 (round 2) |
