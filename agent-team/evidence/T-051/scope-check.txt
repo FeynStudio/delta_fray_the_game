@@ -1,0 +1,66 @@
+T-051 Done-when 3: scope, BASE 3de26c8 .. owner's brief commit 5b5e5ae
+The output below is copied verbatim from the tool output.
+
+== git diff --numstat 3de26c8..5b5e5ae
+96	0	agent-team/evidence/T-051/base-facts.txt
+28	0	agent-team/evidence/T-051/branch-check.txt
+1	1	agent-team/tasks/T-044.md
+1	1	agent-team/tasks/T-046.md
+1	1	agent-team/tasks/T-047.md
+1	1	agent-team/tasks/T-048.md
+
+== git diff 3de26c8..5b5e5ae -- agent-team/tasks/T-044.md agent-team/tasks/T-046.md agent-team/tasks/T-047.md agent-team/tasks/T-048.md
+diff --git a/agent-team/tasks/T-044.md b/agent-team/tasks/T-044.md
+index d95f10c..7a58ef0 100644
+--- a/agent-team/tasks/T-044.md
++++ b/agent-team/tasks/T-044.md
+@@ -1,6 +1,6 @@
+ # T-044 Flash-rate test: the snap-back count also passes for a shallow blink (protectionMinAlpha 0.5 or higher)
+ Status: DONE
+-Approval: human: check a failed, the BACKLOG line was logged from the T-019 review (round 1, issue 4), not written or asked for by the human
++Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged from the T-019 review (round 1, issue 4), not written or asked for by the human
+ Owner role: owner
+ Created: 2026-11-21
+ Verify feature: config  (passed as --feature to every verify.sh run for this task; the changed test runs with the unit tests on every feature)
+diff --git a/agent-team/tasks/T-046.md b/agent-team/tasks/T-046.md
+index 8f964c5..f1959dc 100644
+--- a/agent-team/tasks/T-046.md
++++ b/agent-team/tasks/T-046.md
+@@ -1,6 +1,6 @@
+ # T-046 FEATURE_MAP section 9: fix the input and turns screenshot lines left stale by T-027
+ Status: DONE
+-Approval: human: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
++Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+ Owner role: owner
+ Created: 2026-11-21
+ Verify feature: input  (passed as --feature to every verify.sh run for this task; a FEATURE_MAP-only change; input and turns write the screenshots it describes, and Done-when 3 also asks for one --feature turns run)
+diff --git a/agent-team/tasks/T-047.md b/agent-team/tasks/T-047.md
+index 7083b33..04999e3 100644
+--- a/agent-team/tasks/T-047.md
++++ b/agent-team/tasks/T-047.md
+@@ -1,6 +1,6 @@
+ # T-047 Smoke harness: scoreShot, stateShot and phaseShot close their page when fixedShot throws
+ Status: DONE
+-Approval: human: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
++Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+ Summary: scoreShot, stateShot and phaseShot in scripts/smoke.mjs now close their capture page on every path, including when fixedShot or scorePixelsProbe throws; code commit f2dfbab, merge commit 05441bc; review round 1 APPROVE, security review round 1 APPROVE.
+ Owner role: owner
+ Created: 2026-11-21
+diff --git a/agent-team/tasks/T-048.md b/agent-team/tasks/T-048.md
+index 31d764f..293004d 100644
+--- a/agent-team/tasks/T-048.md
++++ b/agent-team/tasks/T-048.md
+@@ -1,6 +1,6 @@
+ # T-048 Evidence: each remaining fixedShot failure branch fails once with a scratch change
+ Status: DONE
+-Approval: human: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
++Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+ Summary: evidence only: the four remaining fixedShot failure branches (wrong clock, protection alpha below 0.75, phaseWrong power, phaseWrong needle) each shown failing once with a scratch change; no code commit (evidence commit a63c53f), merge commit ab7faee; review round 1 APPROVE.
+ Owner role: owner
+ Created: 2026-11-21
+
+== Result
+- The four briefs each show 1 1, and only the Approval: line (line 3) changes; no Status line changes (line 2 stays "Status: DONE" in all four).
+- The only other files are under agent-team/evidence/T-051/. No file outside agent-team/ is touched.
+- agent-team/tasks/T-051.md is not changed: the owner's run rules say the owner never edits the brief (the main session writes the Status and Handoff on master), so the brief's optional "this brief" entry is absent.
+- The commit after 5b5e5ae on this branch adds only files under agent-team/evidence/T-051/ (this file, after-lines.txt, the verify before/after logs and handoff.md). Reviewers can confirm with git diff --numstat 5b5e5ae..task/T-051-approval-lines.
