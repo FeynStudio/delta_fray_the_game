@@ -1,0 +1,20 @@
+## Handoff (T-051, owner, 2026-11-25)
+- Status: DONE
+- BASE: 3de26c8 (master HEAD at build time, "T-050: BLOCKED"); branch task/T-051-approval-lines; not pushed, not merged.
+- What changed:
+  - agent-team/tasks/T-044.md: line 3 only, replaced with the new Approval line given for T-044 under Coordinator choices.
+  - agent-team/tasks/T-046.md: line 3 only, replaced with the new T-046/T-047/T-048 Approval line.
+  - agent-team/tasks/T-047.md: line 3 only, the same new line.
+  - agent-team/tasks/T-048.md: line 3 only, the same new line.
+  - agent-team/evidence/T-051/: base-facts.txt, branch-check.txt, after-lines.txt, scope-check.txt, before/ and after/ verify logs, this handoff.md.
+- Evidence: before (3de26c8, `./scripts/verify.sh T-051 --feature config --label before` printed RESULT: PASS) -> after (5b5e5ae, the brief-edit commit; `--label after` printed RESULT: PASS; `./scripts/guards.sh` exited 0 with no output). Paths: agent-team/evidence/T-051/before/before-config.log, agent-team/evidence/T-051/after/after-config.log.
+  - Done-when 1 (base-facts.txt): 9a69fb3's subject is "T-025, T-044 - T-048 go ahead"; its diff sets Status DRAFT -> READY on T-044 to T-048 (and T-025); DECISIONS.md line 195 holds "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY ..."; line 3 of T-044, T-046, T-047 and T-048 on BASE equals the line quoted under Context, character for character. So the Stop rule did not apply.
+  - Done-when 2 (after-lines.txt): each new line 3 matches the brief's text exactly (an anchored, escaped regex matched both the brief's text and the brief's own line); T-045.md is unchanged from BASE.
+  - Done-when 3 (scope-check.txt): BASE..5b5e5ae is four briefs at `1 1` each plus files under agent-team/evidence/T-051/; only the Approval: lines change, with no Status line changed. The later evidence commit adds only files under agent-team/evidence/T-051/.
+  - Done-when 4 (branch-check.txt): task/T-046-featuremap-fixedshot-lines, task/T-047-smoke-close-on-throw and task/T-048-fixedshot-negative-controls exist and are all merged into master already. `git diff master...<branch>` shows no change to that task's brief on any of them, so none changes line 3 and merging after this task cannot conflict on line 3. No task branch was touched.
+  - Latest code commit (the commit the stale-handoff check names: the latest commit on the branch that touches a file outside agent-team/): 49c91ad ("Create README.md"), which comes before BASE. This task changes nothing outside agent-team/. The latest commit on the branch is the evidence commit that follows 5b5e5ae.
+- Not verified:
+  - I did not run `node scripts/handoff-check.mjs T-051` directly because the command needed approval. I found 49c91ad with `git log -1 --first-parent --format=%h HEAD -- . ":(exclude)agent-team"`, which uses the same rule as the script (first-parent history, paths outside agent-team/). The check also skips while T-051.md's Handoff holds only "(owner fills in)".
+  - Owner choice: per the owner run rules ("You never edit the brief"), T-051.md's Status line and Handoff were not filled in on the branch, even though the brief's Allowed list permits it; the main session writes them on master.
+  - Context drift, not a blocker: the brief's Context says T-046 to T-048 are READY, but on BASE line 2 of all four briefs reads "Status: DONE". The brief keeps line 2 as it is on BASE, and line 2 was not touched.
+- Follow-ups: none.

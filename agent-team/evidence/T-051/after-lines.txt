@@ -1,0 +1,20 @@
+T-051 Done-when 2: line 3 of T-044 to T-048 on the owner's commit 5b5e5ae (BASE 3de26c8)
+The output below is copied verbatim from the tool output (paths shortened to agent-team/...).
+
+== Grep ^Approval: over agent-team/tasks/T-044.md to T-048.md at 5b5e5ae
+agent-team/tasks/T-044.md:3:Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged from the T-019 review (round 1, issue 4), not written or asked for by the human
+agent-team/tasks/T-045.md:3:Approval: human: approve, reference point to DECISIONS line 195.
+agent-team/tasks/T-046.md:3:Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+agent-team/tasks/T-047.md:3:Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+agent-team/tasks/T-048.md:3:Approval: human: set READY by the human on 2026-11-22 (commit 9a69fb3, "T-025, T-044 - T-048 go ahead"; agent-team/DECISIONS.md, "Decided by human, 2026-11-22: T-025, T-044, T-045, T-046, T-047 and T-048 set to Status READY"); auto-approval did not apply: check a failed, the BACKLOG line was logged by the T-027 owner, not written or asked for by the human
+
+== Character-for-character check
+One escaped regex per expected line, anchored at both ends (^...\r?$), was run over agent-team/tasks/.
+- The T-046/T-047/T-048 regex matched exactly one line each in T-046.md, T-047.md and T-048.md (3 total).
+- The T-044 regex matched exactly one line in T-044.md (1 total).
+- The same two regexes, wrapped in backticks, matched T-051.md line 39 (T-044) and line 40 (T-046, T-047 and T-048), the new lines given under Coordinator choices.
+So each new line 3 equals the brief's text character for character.
+
+== T-045 unchanged from BASE
+git diff --stat 3de26c8..5b5e5ae -- agent-team/tasks/T-045.md
+(no output: T-045.md is unchanged; its line 3 is still the human's own "Approval: human: approve, reference point to DECISIONS line 195.")
